@@ -112,8 +112,10 @@
                       <a 
                         :href="getCampusLabsUrl(chapter)" 
                         target="_blank"
+                        rel="noopener noreferrer"
                         class="btn btn-sm btn-outline-success"
                         :title="getButtonTooltip(chapter)"
+                        :aria-label="`${getButtonText(chapter)} for ${chapter.universityName} (opens in new tab)`"
                         v-if="getCampusLabsUrl(chapter)"
                         @click="trackLinkClick(chapter)"
                       >
@@ -248,8 +250,10 @@
                               <a 
                                 :href="getCampusLabsUrl(chapter)" 
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 class="btn btn-sm btn-outline-success"
                                 :title="getButtonTooltip(chapter)"
+                                :aria-label="`${getButtonText(chapter)} for ${chapter.universityName} (opens in new tab)`"
                                 v-if="getCampusLabsUrl(chapter)"
                                 @click="trackLinkClick(chapter)"
                               >
@@ -333,9 +337,21 @@
 import { chapterService } from '../services/chapterService'
 import { memberService } from '../services/memberService'
 import { eventService } from '../services/eventService'
+import { useChapterLinks } from '../composables/useChapterLinks'
 
 export default {
   name: 'Dashboard',
+  setup() {
+    // Use the chapter links composable for consistent functionality
+    const { getCampusLabsUrl, getButtonText, getButtonTooltip, trackLinkClick } = useChapterLinks()
+    
+    return {
+      getCampusLabsUrl,
+      getButtonText, 
+      getButtonTooltip,
+      trackLinkClick
+    }
+  },
   data() {
     return {
       loading: true,
@@ -418,46 +434,7 @@ export default {
       })
     },
     
-    getCampusLabsUrl(chapter) {
-      // Generate appropriate URL based on university location and state
-      if (!chapter.universityName || !chapter.state) {
-        return null
-      }
-      
-      // Special case for Florida - use USF BullsConnect link
-      if (chapter.state === 'Florida') {
-        return 'https://bullsconnect.usf.edu/tpusa/home/'
-      }
-      
-      // For all other states, create a Google search for Turning Point USA in their area
-      const searchQuery = encodeURIComponent(`Turning Point USA ${chapter.state}`)
-      return `https://www.google.com/search?q=${searchQuery}`
-    },
-    
-    getButtonText(chapter) {
-      // Return appropriate button text based on state
-      if (chapter.state === 'Florida') {
-        return 'Chapter Link'
-      }
-      return 'Find Chapters'
-    },
-    
-    getButtonTooltip(chapter) {
-      // Return appropriate tooltip based on state
-      if (chapter.state === 'Florida') {
-        return 'Visit USF BullsConnect - TPUSA Chapter Page'
-      }
-      return `Search for Turning Point USA chapters in ${chapter.state}`
-    },
-    
-    trackLinkClick(chapter) {
-      // Track clicks for analytics (could be enhanced with actual analytics service)
-      if (chapter.state === 'Florida') {
-        console.log(`Florida BullsConnect link clicked for: ${chapter.universityName}`)
-      } else {
-        console.log(`Google search link clicked for TPUSA in: ${chapter.state}`)
-      }
-    },
+
     
     formatDate(dateString) {
       const date = new Date(dateString)
