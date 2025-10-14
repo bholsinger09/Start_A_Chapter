@@ -23,5 +23,5 @@ EXPOSE 8080
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=production
 
-# Run the application
-CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar"]
+# Run the application with URL conversion
+CMD ["sh", "-c", "if [ ! -z \"$SPRING_DATASOURCE_URL\" ] && echo \"$SPRING_DATASOURCE_URL\" | grep -q '^postgresql://'; then export SPRING_DATASOURCE_URL=\"jdbc:$SPRING_DATASOURCE_URL\"; fi; java -Dserver.port=${PORT:-8080} -jar target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar"]
