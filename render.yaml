@@ -5,6 +5,8 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
+    databases:
+      - chapter-organizer-db
     envVars:
       - key: JAVA_VERSION
         value: "21"
