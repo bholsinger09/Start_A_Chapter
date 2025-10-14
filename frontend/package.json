@@ -7,7 +7,8 @@
     "build": "vue-cli-service build",
     "dev": "vite",
     "build:prod": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "serve -s dist -l $PORT"
   },
   "dependencies": {
     "vue": "^3.3.4",
@@ -15,7 +16,8 @@
     "axios": "^1.5.0",
     "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.10.5",
-    "@popperjs/core": "^2.11.8"
+    "@popperjs/core": "^2.11.8",
+    "serve": "^14.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.4",
