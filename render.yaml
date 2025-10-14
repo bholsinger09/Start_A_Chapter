@@ -10,18 +10,6 @@ services:
         value: "21"
       - key: SPRING_PROFILES_ACTIVE
         value: production
-      - key: SPRING_DATASOURCE_URL
-        fromDatabase:
-          name: chapter-organizer-db
-          property: connectionString
-      - key: SPRING_DATASOURCE_USERNAME
-        fromDatabase:
-          name: chapter-organizer-db
-          property: user
-      - key: SPRING_DATASOURCE_PASSWORD
-        fromDatabase:
-          name: chapter-organizer-db
-          property: password
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
       - key: SPRING_JPA_DATABASE_PLATFORM
