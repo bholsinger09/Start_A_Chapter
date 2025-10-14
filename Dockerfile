@@ -17,11 +17,11 @@ COPY src src
 # Build the application
 RUN ./mvnw clean package -DskipTests
 
-# Expose the port
-EXPOSE $PORT
+# Expose the port (Render will set this automatically)
+EXPOSE 8080
 
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=production
 
 # Run the application
-CMD ["java", "-Dserver.port=${PORT:-8080}", "-jar", "target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar"]
+CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar"]

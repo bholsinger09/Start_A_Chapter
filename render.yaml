@@ -2,9 +2,8 @@ services:
   # Backend Spring Boot Application
   - type: web
     name: chapter-organizer-backend
-    env: java
-    buildCommand: "./mvnw clean package -DskipTests"
-    startCommand: "java -Dserver.port=$PORT -jar target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar"
+    runtime: docker
+    dockerfilePath: ./Dockerfile
     plan: free
     envVars:
       - key: JAVA_VERSION
