@@ -97,10 +97,30 @@
                 >
                   <div>
                     <strong>{{ chapter.name }}</strong><br>
-                    <small class="text-muted">{{ chapter.universityName }}</small>
+                    <small class="text-muted">{{ chapter.universityName }}</small><br>
+                    <small class="text-muted">{{ chapter.city }}, {{ chapter.state }}</small>
                   </div>
                   <div class="text-end">
-                    <small class="text-muted">{{ chapter.city }}, {{ chapter.state }}</small>
+                    <div class="btn-group" role="group">
+                      <router-link 
+                        :to="`/chapters/${chapter.id}`" 
+                        class="btn btn-sm btn-outline-primary"
+                        title="View Details"
+                      >
+                        <i class="bi bi-eye"></i>
+                      </router-link>
+                      <a 
+                        :href="getCampusLabsUrl(chapter)" 
+                        target="_blank"
+                        class="btn btn-sm btn-outline-success"
+                        :title="getButtonTooltip(chapter)"
+                        v-if="getCampusLabsUrl(chapter)"
+                        @click="trackLinkClick(chapter)"
+                      >
+                        <i class="bi bi-link-45deg me-1"></i>
+                        <small>{{ getButtonText(chapter) }}</small>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -217,12 +237,26 @@
                             <small class="text-muted">{{ chapter.universityName }}</small>
                           </div>
                           <div class="text-end">
-                            <router-link 
-                              :to="`/chapters/${chapter.id}`" 
-                              class="btn btn-sm btn-outline-primary"
-                            >
-                              <i class="bi bi-eye"></i>
-                            </router-link>
+                            <div class="btn-group" role="group">
+                              <router-link 
+                                :to="`/chapters/${chapter.id}`" 
+                                class="btn btn-sm btn-outline-primary"
+                                title="View Details"
+                              >
+                                <i class="bi bi-eye"></i>
+                              </router-link>
+                              <a 
+                                :href="getCampusLabsUrl(chapter)" 
+                                target="_blank"
+                                class="btn btn-sm btn-outline-success"
+                                :title="getButtonTooltip(chapter)"
+                                v-if="getCampusLabsUrl(chapter)"
+                                @click="trackLinkClick(chapter)"
+                              >
+                                <i class="bi bi-link-45deg me-1"></i>
+                                <small>{{ getButtonText(chapter) }}</small>
+                              </a>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -377,10 +411,54 @@ export default {
     },
 
     navigateToChaptersWithState() {
-      // This would pass the state filter to the Chapters page
-      // For now, just navigate to chapters page
-      this.$router.push('/chapters')
+      // Pass the state filter to the Chapters page via query parameters
+      this.$router.push({
+        path: '/chapters',
+        query: { state: this.selectedState }
+      })
     },
+    
+    getCampusLabsUrl(chapter) {
+      // Generate appropriate URL based on university location and state
+      if (!chapter.universityName || !chapter.state) {
+        return null
+      }
+      
+      // Special case for Florida - use USF BullsConnect link
+      if (chapter.state === 'Florida') {
+        return 'https://bullsconnect.usf.edu/tpusa/home/'
+      }
+      
+      // For all other states, create a Google search for Turning Point USA in their area
+      const searchQuery = encodeURIComponent(`Turning Point USA ${chapter.state}`)
+      return `https://www.google.com/search?q=${searchQuery}`
+    },
+    
+    getButtonText(chapter) {
+      // Return appropriate button text based on state
+      if (chapter.state === 'Florida') {
+        return 'Chapter Link'
+      }
+      return 'Find Chapters'
+    },
+    
+    getButtonTooltip(chapter) {
+      // Return appropriate tooltip based on state
+      if (chapter.state === 'Florida') {
+        return 'Visit USF BullsConnect - TPUSA Chapter Page'
+      }
+      return `Search for Turning Point USA chapters in ${chapter.state}`
+    },
+    
+    trackLinkClick(chapter) {
+      // Track clicks for analytics (could be enhanced with actual analytics service)
+      if (chapter.state === 'Florida') {
+        console.log(`Florida BullsConnect link clicked for: ${chapter.universityName}`)
+      } else {
+        console.log(`Google search link clicked for TPUSA in: ${chapter.state}`)
+      }
+    },
+    
     formatDate(dateString) {
       const date = new Date(dateString)
       return date.toLocaleDateString('en-US', {
