@@ -2,9 +2,9 @@ services:
   # Backend Spring Boot Application
   - type: web
     name: chapter-organizer-backend
-    env: java
+    runtime: java
     buildCommand: "./mvnw clean package -DskipTests"
-    startCommand: "java -Dserver.port=$PORT -jar target/campus-chapter-organizer-0.0.1-SNAPSHOT.jar"
+    startCommand: "java -Dserver.port=$PORT -jar target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar"
     plan: free
     envVars:
       - key: SPRING_PROFILES_ACTIVE
@@ -31,8 +31,8 @@ services:
   # Frontend Vue.js Application  
   - type: web
     name: chapter-organizer-frontend
-    env: node
-    buildCommand: cd frontend && npm ci && npm run build
+    runtime: node
+    buildCommand: cd frontend && npm ci && npm run build:prod
     startCommand: cd frontend && npm run preview -- --host 0.0.0.0 --port $PORT
     plan: free
     envVars:
