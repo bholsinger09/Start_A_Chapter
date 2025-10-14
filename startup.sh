@@ -7,57 +7,69 @@ echo "Starting application with environment setup..."
 echo "DATABASE_URL: $DATABASE_URL"
 echo "SPRING_DATASOURCE_URL (before): $SPRING_DATASOURCE_URL"
 
-# Function to fix incomplete PostgreSQL URLs
-fix_postgres_url() {
+# Function to parse PostgreSQL URL and extract components
+parse_postgres_url() {
     local url="$1"
     
-    # Parse JDBC PostgreSQL URL: jdbc:postgresql://user:pass@host:port/db or jdbc:postgresql://user:pass@host/db
-    if [[ "$url" =~ ^jdbc:postgresql://([^:]+):([^@]+)@([^:/]+)(:([0-9]+))?/(.+)$ ]]; then
+    # Remove postgresql:// or jdbc:postgresql:// prefix
+    url="${url#postgresql://}"
+    url="${url#jdbc:postgresql://}"
+    
+    # Parse: user:pass@host:port/db or user:pass@host/db
+    if [[ "$url" =~ ^([^:]+):([^@]+)@([^:/]+)(:([0-9]+))?/(.+)$ ]]; then
         local user="${BASH_REMATCH[1]}"
         local pass="${BASH_REMATCH[2]}" 
         local host="${BASH_REMATCH[3]}"
         local port="${BASH_REMATCH[5]:-5432}"  # Default to 5432 if no port
         local db="${BASH_REMATCH[6]}"
         
-        # If host doesn't contain a dot (incomplete hostname), try to fix it
+        # If host doesn't contain a dot (incomplete hostname), fix it
         if [[ "$host" =~ ^dpg-.*$ ]] && [[ ! "$host" =~ \. ]]; then
-            # Render PostgreSQL hostnames follow pattern: dpg-xxxxx-a.oregon-postgres.render.com
-            local fixed_host="${host}.oregon-postgres.render.com"
-            echo "jdbc:postgresql://${user}:${pass}@${fixed_host}:${port}/${db}"
-        else
-            echo "jdbc:postgresql://${user}:${pass}@${host}:${port}/${db}"
+            host="${host}.oregon-postgres.render.com"
         fi
+        
+        # Set individual environment variables for Spring Boot
+        export SPRING_DATASOURCE_USERNAME="$user"
+        export SPRING_DATASOURCE_PASSWORD="$pass"
+        export DB_HOST="$host"
+        export DB_PORT="$port"
+        export DB_NAME="$db"
+        
+        # Construct clean JDBC URL
+        local jdbc_url="jdbc:postgresql://${host}:${port}/${db}"
+        echo "$jdbc_url"
     else
-        echo "$url"
+        echo "Failed to parse URL: $url"
+        return 1
     fi
 }
 
 # Handle DATABASE_URL from Render
 if [[ -n "$DATABASE_URL" && "$DATABASE_URL" =~ ^postgresql:// ]]; then
-    echo "Converting DATABASE_URL: $DATABASE_URL"
-    export SPRING_DATASOURCE_URL="jdbc:$DATABASE_URL"
-    echo "After adding jdbc prefix: $SPRING_DATASOURCE_URL"
-    export SPRING_DATASOURCE_URL=$(fix_postgres_url "$SPRING_DATASOURCE_URL")
-    echo "After fixing URL: $SPRING_DATASOURCE_URL"
+    echo "Parsing DATABASE_URL: $DATABASE_URL"
+    SPRING_DATASOURCE_URL=$(parse_postgres_url "$DATABASE_URL")
 elif [[ -n "$SPRING_DATASOURCE_URL" && "$SPRING_DATASOURCE_URL" =~ ^postgresql:// ]]; then
-    echo "Converting SPRING_DATASOURCE_URL: $SPRING_DATASOURCE_URL"
-    export SPRING_DATASOURCE_URL="jdbc:$SPRING_DATASOURCE_URL"
-    echo "After adding jdbc prefix: $SPRING_DATASOURCE_URL"
-    export SPRING_DATASOURCE_URL=$(fix_postgres_url "$SPRING_DATASOURCE_URL")
-    echo "After fixing URL: $SPRING_DATASOURCE_URL"
+    echo "Parsing SPRING_DATASOURCE_URL: $SPRING_DATASOURCE_URL"
+    SPRING_DATASOURCE_URL=$(parse_postgres_url "$SPRING_DATASOURCE_URL")
 elif [[ -n "$SPRING_DATASOURCE_URL" && "$SPRING_DATASOURCE_URL" =~ ^jdbc:postgresql:// ]]; then
-    echo "Fixing existing JDBC URL: $SPRING_DATASOURCE_URL"
-    export SPRING_DATASOURCE_URL=$(fix_postgres_url "$SPRING_DATASOURCE_URL")
-    echo "After fixing URL: $SPRING_DATASOURCE_URL"
+    echo "Parsing existing JDBC URL: $SPRING_DATASOURCE_URL"
+    SPRING_DATASOURCE_URL=$(parse_postgres_url "$SPRING_DATASOURCE_URL")
 fi
 
-echo "Final Database URL: $SPRING_DATASOURCE_URL"
+export SPRING_DATASOURCE_URL
+
+echo "Final configuration:"
+echo "  Database URL: $SPRING_DATASOURCE_URL"
+echo "  Username: $SPRING_DATASOURCE_USERNAME"
+echo "  Host: $DB_HOST"
+echo "  Port: $DB_PORT"
+echo "  Database: $DB_NAME"
 
 # Validate URL format
-if [[ "$SPRING_DATASOURCE_URL" =~ jdbc:postgresql://.*@.*:.*/.* ]]; then
+if [[ "$SPRING_DATASOURCE_URL" =~ jdbc:postgresql://.*:.*/.* ]]; then
     echo "✓ URL format appears correct"
 else
-    echo "⚠ URL format may be incorrect - expected: jdbc:postgresql://user:pass@host:port/db"
+    echo "⚠ URL format may be incorrect"
 fi
 
 echo "Starting Java application..."
