@@ -150,8 +150,108 @@
         </div>
       </div>
 
+      <!-- State-based Search -->
+      <div class="row mb-4">
+        <div class="col">
+          <div class="card">
+            <div class="card-header bg-light">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-geo-alt text-primary me-2"></i>
+                Search Chapters by State
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row align-items-end">
+                <div class="col-md-4 mb-2">
+                  <label class="form-label">Select State</label>
+                  <select 
+                    class="form-select" 
+                    v-model="selectedState"
+                    @change="searchByState"
+                  >
+                    <option value="">Choose a state...</option>
+                    <option v-for="state in availableStates" :key="state" :value="state">
+                      {{ state }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <button 
+                    class="btn btn-primary w-100"
+                    @click="searchByState"
+                    :disabled="!selectedState"
+                  >
+                    <i class="bi bi-search me-2"></i>
+                    Search Chapters
+                  </button>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <button 
+                    class="btn btn-outline-secondary w-100"
+                    @click="clearStateSearch"
+                    v-if="selectedState"
+                  >
+                    <i class="bi bi-x-circle me-2"></i>
+                    Clear Search
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Search Results -->
+              <div v-if="stateSearchResults.length > 0" class="mt-3">
+                <h6 class="text-primary">
+                  <i class="bi bi-pin-map me-1"></i>
+                  Chapters in {{ selectedState }} ({{ stateSearchResults.length }})
+                </h6>
+                <div class="row">
+                  <div 
+                    v-for="chapter in stateSearchResults.slice(0, 6)" 
+                    :key="chapter.id"
+                    class="col-md-6 mb-2"
+                  >
+                    <div class="card border-0 bg-light">
+                      <div class="card-body py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <strong>{{ chapter.name }}</strong><br>
+                            <small class="text-muted">{{ chapter.universityName }}</small>
+                          </div>
+                          <div class="text-end">
+                            <router-link 
+                              :to="`/chapters/${chapter.id}`" 
+                              class="btn btn-sm btn-outline-primary"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </router-link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="stateSearchResults.length > 6" class="text-center mt-2">
+                  <router-link 
+                    to="/chapters" 
+                    class="btn btn-sm btn-outline-primary"
+                    @click="navigateToChaptersWithState"
+                  >
+                    View All {{ stateSearchResults.length }} Chapters in {{ selectedState }}
+                  </router-link>
+                </div>
+              </div>
+              
+              <!-- No Results -->
+              <div v-else-if="selectedState && searchPerformed" class="mt-3 text-center text-muted">
+                <i class="bi bi-search display-6 mb-2"></i>
+                <p>No chapters found in {{ selectedState }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Quick Actions -->
-      <div class="row mt-4">
+      <div class="row">
         <div class="col">
           <div class="card">
             <div class="card-header bg-light">
@@ -211,7 +311,11 @@ export default {
         totalEvents: 0
       },
       recentChapters: [],
-      upcomingEvents: []
+      upcomingEvents: [],
+      availableStates: [],
+      selectedState: '',
+      stateSearchResults: [],
+      searchPerformed: false
     }
   },
   async mounted() {
@@ -240,11 +344,42 @@ export default {
           new Date(event.eventDateTime) >= new Date()
         ).sort((a, b) => new Date(a.eventDateTime) - new Date(b.eventDateTime))
 
+        // Extract available states for search
+        this.availableStates = [...new Set(chapters.map(c => c.state).filter(Boolean))].sort()
+
       } catch (error) {
         console.error('Error loading dashboard data:', error)
       } finally {
         this.loading = false
       }
+    },
+
+    async searchByState() {
+      if (!this.selectedState) return
+      
+      try {
+        this.stateSearchResults = await chapterService.getChaptersByState(this.selectedState)
+        this.searchPerformed = true
+      } catch (error) {
+        console.error('Error searching by state:', error)
+        // Fallback to local filtering
+        this.stateSearchResults = this.recentChapters.filter(
+          chapter => chapter.state === this.selectedState
+        )
+        this.searchPerformed = true
+      }
+    },
+
+    clearStateSearch() {
+      this.selectedState = ''
+      this.stateSearchResults = []
+      this.searchPerformed = false
+    },
+
+    navigateToChaptersWithState() {
+      // This would pass the state filter to the Chapters page
+      // For now, just navigate to chapters page
+      this.$router.push('/chapters')
     },
     formatDate(dateString) {
       const date = new Date(dateString)

@@ -16,7 +16,7 @@
 
       <!-- Actions Bar -->
       <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <button 
             class="btn btn-primary" 
             @click="showCreateModal = true"
@@ -25,7 +25,7 @@
             Add New Chapter
           </button>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="input-group">
             <span class="input-group-text">
               <i class="bi bi-search"></i>
@@ -35,7 +35,113 @@
               class="form-control"
               placeholder="Search chapters..."
               v-model="searchTerm"
+              @input="performSearch"
             >
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-geo-alt"></i>
+            </span>
+            <select 
+              class="form-select" 
+              v-model="selectedState"
+              @change="performSearch"
+            >
+              <option value="">All States</option>
+              <option v-for="state in availableStates" :key="state" :value="state">
+                {{ state }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Search Card -->
+      <div class="row mb-4" v-if="showAdvancedSearch">
+        <div class="col">
+          <div class="card">
+            <div class="card-header bg-light">
+              <h6 class="card-title mb-0">
+                <i class="bi bi-funnel me-2"></i>
+                Advanced Search Filters
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">University Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="University name..."
+                    v-model="advancedFilters.university"
+                    @input="performSearch"
+                  >
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">City</label>
+                  <select 
+                    class="form-select" 
+                    v-model="advancedFilters.city"
+                    @change="performSearch"
+                  >
+                    <option value="">All Cities</option>
+                    <option v-for="city in availableCities" :key="city" :value="city">
+                      {{ city }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Status</label>
+                  <select 
+                    class="form-select" 
+                    v-model="advancedFilters.active"
+                    @change="performSearch"
+                  >
+                    <option value="">All Status</option>
+                    <option :value="true">Active</option>
+                    <option :value="false">Inactive</option>
+                  </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                  <button 
+                    class="btn btn-outline-secondary w-100"
+                    @click="clearFilters"
+                  >
+                    <i class="bi bi-x-circle me-1"></i>
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Toggle -->
+      <div class="row mb-3">
+        <div class="col">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span v-if="searchResults.length !== chapters.length" class="text-muted">
+                Showing {{ searchResults.length }} of {{ chapters.length }} chapters
+                <span v-if="selectedState" class="badge bg-primary ms-2">
+                  State: {{ selectedState }}
+                </span>
+                <span v-if="searchTerm" class="badge bg-info ms-2">
+                  Search: "{{ searchTerm }}"
+                </span>
+              </span>
+            </div>
+            <button 
+              class="btn btn-sm btn-outline-secondary"
+              @click="showAdvancedSearch = !showAdvancedSearch"
+            >
+              <i class="bi bi-funnel me-1"></i>
+              {{ showAdvancedSearch ? 'Hide' : 'Show' }} Advanced Filters
+            </button>
           </div>
         </div>
       </div>
@@ -52,13 +158,20 @@
         <div class="card-header bg-light">
           <h5 class="card-title mb-0">
             <i class="bi bi-table me-2"></i>
-            All Chapters ({{ filteredChapters.length }})
+            Chapters ({{ searchResults.length }})
           </h5>
         </div>
         <div class="card-body p-0">
-          <div v-if="filteredChapters.length === 0" class="text-center py-4 text-muted">
+          <div v-if="searchResults.length === 0" class="text-center py-4 text-muted">
             <i class="bi bi-inbox display-4 mb-3"></i>
-            <p>No chapters found</p>
+            <p>No chapters found matching your criteria</p>
+            <button 
+              v-if="hasActiveFilters" 
+              class="btn btn-outline-primary btn-sm"
+              @click="clearFilters"
+            >
+              Clear Filters
+            </button>
           </div>
           <div v-else class="table-responsive">
             <table class="table table-hover mb-0">
@@ -73,7 +186,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="chapter in filteredChapters" :key="chapter.id">
+                <tr v-for="chapter in searchResults" :key="chapter.id">
                   <td>
                     <strong>{{ chapter.name }}</strong>
                   </td>
@@ -267,11 +380,21 @@ export default {
       saving: false,
       chapters: [],
       members: [],
+      searchResults: [],
+      availableStates: [],
+      availableCities: [],
       searchTerm: '',
+      selectedState: '',
+      showAdvancedSearch: false,
       showCreateModal: false,
       showEditModal: false,
       showDeleteModal: false,
       chapterToDelete: null,
+      advancedFilters: {
+        university: '',
+        city: '',
+        active: ''
+      },
       chapterForm: {
         id: null,
         name: '',
@@ -284,16 +407,12 @@ export default {
     }
   },
   computed: {
-    filteredChapters() {
-      if (!this.searchTerm) return this.chapters
-      
-      const term = this.searchTerm.toLowerCase()
-      return this.chapters.filter(chapter =>
-        chapter.name.toLowerCase().includes(term) ||
-        chapter.universityName.toLowerCase().includes(term) ||
-        chapter.city.toLowerCase().includes(term) ||
-        chapter.state.toLowerCase().includes(term)
-      )
+    hasActiveFilters() {
+      return this.searchTerm || 
+             this.selectedState || 
+             this.advancedFilters.university || 
+             this.advancedFilters.city || 
+             this.advancedFilters.active !== ''
     }
   },
   async mounted() {
@@ -309,11 +428,88 @@ export default {
         ])
         this.chapters = chaptersData
         this.members = membersData
+        this.searchResults = chaptersData
+        
+        // Extract unique states and cities for filters
+        this.availableStates = [...new Set(chaptersData.map(c => c.state).filter(Boolean))].sort()
+        this.availableCities = [...new Set(chaptersData.map(c => c.city).filter(Boolean))].sort()
+        
       } catch (error) {
         console.error('Error loading chapters:', error)
       } finally {
         this.loading = false
       }
+    },
+
+    async performSearch() {
+      try {
+        // Build search parameters
+        const searchParams = {}
+        
+        if (this.searchTerm) searchParams.name = this.searchTerm
+        if (this.selectedState) searchParams.state = this.selectedState
+        if (this.advancedFilters.university) searchParams.university = this.advancedFilters.university
+        if (this.advancedFilters.city) searchParams.city = this.advancedFilters.city
+        if (this.advancedFilters.active !== '') searchParams.active = this.advancedFilters.active
+        
+        // If no search parameters, show all chapters
+        if (Object.keys(searchParams).length === 0) {
+          this.searchResults = this.chapters
+          return
+        }
+        
+        // Perform backend search
+        this.searchResults = await chapterService.searchChapters(searchParams)
+        
+      } catch (error) {
+        console.error('Error searching chapters:', error)
+        // Fallback to local filtering if backend search fails
+        this.performLocalSearch()
+      }
+    },
+
+    performLocalSearch() {
+      let results = this.chapters
+      
+      if (this.searchTerm) {
+        const term = this.searchTerm.toLowerCase()
+        results = results.filter(chapter =>
+          chapter.name.toLowerCase().includes(term) ||
+          chapter.universityName.toLowerCase().includes(term)
+        )
+      }
+      
+      if (this.selectedState) {
+        results = results.filter(chapter => chapter.state === this.selectedState)
+      }
+      
+      if (this.advancedFilters.university) {
+        const university = this.advancedFilters.university.toLowerCase()
+        results = results.filter(chapter =>
+          chapter.universityName.toLowerCase().includes(university)
+        )
+      }
+      
+      if (this.advancedFilters.city) {
+        results = results.filter(chapter => chapter.city === this.advancedFilters.city)
+      }
+      
+      if (this.advancedFilters.active !== '') {
+        results = results.filter(chapter => chapter.active === this.advancedFilters.active)
+      }
+      
+      this.searchResults = results
+    },
+
+    clearFilters() {
+      this.searchTerm = ''
+      this.selectedState = ''
+      this.advancedFilters = {
+        university: '',
+        city: '',
+        active: ''
+      }
+      this.searchResults = this.chapters
     },
     getMemberCount(chapterId) {
       return this.members.filter(member => member.chapter?.id === chapterId).length
@@ -352,6 +548,7 @@ export default {
         }
         
         await this.loadData()
+        await this.performSearch() // Refresh search results
         this.closeModal()
       } catch (error) {
         console.error('Error saving chapter:', error)
@@ -364,6 +561,7 @@ export default {
       try {
         await chapterService.deleteChapter(this.chapterToDelete.id)
         await this.loadData()
+        await this.performSearch() // Refresh search results
         this.showDeleteModal = false
         this.chapterToDelete = null
       } catch (error) {
