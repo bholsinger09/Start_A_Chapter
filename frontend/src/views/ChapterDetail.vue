@@ -341,7 +341,7 @@ export default {
         
         // Load chapter details and related data
         const [chapter, allMembers, allEvents] = await Promise.all([
-          chapterService.getChapter(chapterId),
+          chapterService.getChapterById(chapterId),
           memberService.getAllMembers(),
           eventService.getAllEvents()
         ])

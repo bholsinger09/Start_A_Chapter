@@ -203,18 +203,32 @@
                       <router-link 
                         :to="`/chapters/${chapter.id}`" 
                         class="btn btn-sm btn-outline-primary"
+                        title="View Details"
                       >
                         <i class="bi bi-eye"></i>
                       </router-link>
+                      <a 
+                        :href="getCampusLabsUrl(chapter)" 
+                        target="_blank"
+                        class="btn btn-sm btn-outline-success"
+                        :title="`Visit ${chapter.universityName} Campus Labs - TPUSA Chapter`"
+                        v-if="getCampusLabsUrl(chapter)"
+                        @click="trackCampusLabsClick(chapter)"
+                      >
+                        <i class="bi bi-link-45deg me-1"></i>
+                        <small>Campus Labs</small>
+                      </a>
                       <button 
                         class="btn btn-sm btn-outline-secondary"
                         @click="editChapter(chapter)"
+                        title="Edit Chapter"
                       >
                         <i class="bi bi-pencil"></i>
                       </button>
                       <button 
                         class="btn btn-sm btn-outline-danger"
                         @click="confirmDelete(chapter)"
+                        title="Delete Chapter"
                       >
                         <i class="bi bi-trash"></i>
                       </button>
@@ -416,6 +430,10 @@ export default {
     }
   },
   async mounted() {
+    // Check if there are route query parameters
+    if (this.$route.query.state) {
+      this.selectedState = this.$route.query.state
+    }
     await this.loadData()
   },
   methods: {
@@ -426,6 +444,7 @@ export default {
           chapterService.getAllChapters(),
           memberService.getAllMembers()
         ])
+        console.log('Loaded chapters:', chaptersData.length)
         this.chapters = chaptersData
         this.members = membersData
         this.searchResults = chaptersData
@@ -520,6 +539,196 @@ export default {
         month: 'short',
         day: 'numeric'
       })
+    },
+    getCampusLabsUrl(chapter) {
+      // Generate Campus Labs URL based on university name and state
+      if (!chapter.universityName || !chapter.state) {
+        return null
+      }
+      
+      // Comprehensive mapping of universities to their Campus Labs subdomains
+      // Based on common TPUSA chapter locations and Campus Labs patterns
+      const universityMappings = {
+        // Idaho
+        'University of Idaho': 'uidaho.campuslabs.com',
+        'Idaho State University': 'isu.campuslabs.com',
+        'Boise State University': 'boisestate.campuslabs.com',
+        
+        // Texas - Major TPUSA presence
+        'University of Texas at Austin': 'utexas.campuslabs.com',
+        'Texas A&M University': 'tamu.campuslabs.com',
+        'University of Houston': 'uh.campuslabs.com',
+        'Texas Tech University': 'ttu.campuslabs.com',
+        'University of North Texas': 'unt.campuslabs.com',
+        'Texas State University': 'txstate.campuslabs.com',
+        'Rice University': 'rice.campuslabs.com',
+        'Baylor University': 'baylor.campuslabs.com',
+        'Southern Methodist University': 'smu.campuslabs.com',
+        
+        // Florida - Strong TPUSA presence
+        'University of Florida': 'ufl.campuslabs.com',
+        'Florida State University': 'fsu.campuslabs.com',
+        'University of Central Florida': 'ucf.campuslabs.com',
+        'Florida International University': 'fiu.campuslabs.com',
+        'University of South Florida': 'usf.campuslabs.com',
+        'Florida Institute of Technology': 'fit.campuslabs.com',
+        'Nova Southeastern University': 'nova.campuslabs.com',
+        
+        // California - Major universities
+        'University of California, Berkeley': 'berkeley.campuslabs.com',
+        'Stanford University': 'stanford.campuslabs.com',
+        'UCLA': 'ucla.campuslabs.com',
+        'University of California, San Diego': 'ucsd.campuslabs.com',
+        'University of Southern California': 'usc.campuslabs.com',
+        'California Polytechnic State University': 'calpoly.campuslabs.com',
+        'San Diego State University': 'sdsu.campuslabs.com',
+        
+        // Arizona
+        'Arizona State University': 'asu.campuslabs.com',
+        'University of Arizona': 'arizona.campuslabs.com',
+        'Northern Arizona University': 'nau.campuslabs.com',
+        
+        // Alabama
+        'University of Alabama': 'ua.campuslabs.com',
+        'Auburn University': 'auburn.campuslabs.com',
+        'University of Alabama at Birmingham': 'uab.campuslabs.com',
+        
+        // Tennessee
+        'University of Tennessee, Knoxville': 'utk.campuslabs.com',
+        'Vanderbilt University': 'vanderbilt.campuslabs.com',
+        'Middle Tennessee State University': 'mtsu.campuslabs.com',
+        
+        // Ohio
+        'The Ohio State University': 'osu.campuslabs.com',
+        'Ohio University': 'ohio.campuslabs.com',
+        'University of Cincinnati': 'uc.campuslabs.com',
+        'Miami University': 'miamioh.campuslabs.com',
+        
+        // Georgia
+        'University of Georgia': 'uga.campuslabs.com',
+        'Georgia Institute of Technology': 'gatech.campuslabs.com',
+        'Georgia State University': 'gsu.campuslabs.com',
+        'Georgia Southern University': 'georgiasouthern.campuslabs.com',
+        
+        // Virginia
+        'University of Virginia': 'virginia.campuslabs.com',
+        'Virginia Tech': 'vt.campuslabs.com',
+        'James Madison University': 'jmu.campuslabs.com',
+        'George Mason University': 'gmu.campuslabs.com',
+        
+        // North Carolina
+        'University of North Carolina at Chapel Hill': 'unc.campuslabs.com',
+        'North Carolina State University': 'ncsu.campuslabs.com',
+        'Duke University': 'duke.campuslabs.com',
+        'Wake Forest University': 'wfu.campuslabs.com',
+        
+        // Michigan
+        'University of Michigan': 'umich.campuslabs.com',
+        'Michigan State University': 'msu.campuslabs.com',
+        'Western Michigan University': 'wmich.campuslabs.com',
+        
+        // Pennsylvania
+        'Penn State University': 'psu.campuslabs.com',
+        'University of Pennsylvania': 'upenn.campuslabs.com',
+        'Temple University': 'temple.campuslabs.com',
+        'Drexel University': 'drexel.campuslabs.com',
+        
+        // New York
+        'Columbia University': 'columbia.campuslabs.com',
+        'New York University': 'nyu.campuslabs.com',
+        'Syracuse University': 'syracuse.campuslabs.com',
+        'University at Buffalo': 'buffalo.campuslabs.com',
+        
+        // Illinois
+        'University of Illinois at Urbana-Champaign': 'illinois.campuslabs.com',
+        'Northwestern University': 'northwestern.campuslabs.com',
+        'University of Chicago': 'uchicago.campuslabs.com',
+        'Illinois State University': 'ilstu.campuslabs.com',
+        
+        // Wisconsin
+        'University of Wisconsin-Madison': 'wisc.campuslabs.com',
+        'Marquette University': 'marquette.campuslabs.com',
+        
+        // Indiana
+        'Indiana University': 'iu.campuslabs.com',
+        'Purdue University': 'purdue.campuslabs.com',
+        'Butler University': 'butler.campuslabs.com',
+        
+        // Missouri
+        'University of Missouri': 'missouri.campuslabs.com',
+        'Washington University in St. Louis': 'wustl.campuslabs.com',
+        
+        // Louisiana
+        'Louisiana State University': 'lsu.campuslabs.com',
+        'Tulane University': 'tulane.campuslabs.com',
+        
+        // Kentucky
+        'University of Kentucky': 'uky.campuslabs.com',
+        'University of Louisville': 'louisville.campuslabs.com',
+        
+        // South Carolina
+        'University of South Carolina': 'sc.campuslabs.com',
+        'Clemson University': 'clemson.campuslabs.com',
+        
+        // Maryland
+        'University of Maryland': 'umd.campuslabs.com',
+        'Johns Hopkins University': 'jhu.campuslabs.com',
+        
+        // Massachusetts
+        'Harvard University': 'harvard.campuslabs.com',
+        'MIT': 'mit.campuslabs.com',
+        'Boston University': 'bu.campuslabs.com',
+        'University of Massachusetts': 'umass.campuslabs.com'
+      }
+      
+      const subdomain = universityMappings[chapter.universityName]
+      if (subdomain) {
+        return `https://${subdomain}/engage/organization/turning-point-usa`
+      }
+      
+      // Enhanced fallback: Generate URL based on university name patterns
+      let universityCode = chapter.universityName.toLowerCase()
+      
+      // Common university name patterns to subdomain mappings
+      if (universityCode.includes('university of ')) {
+        // "University of [State]" -> "[state].campuslabs.com"
+        universityCode = universityCode
+          .replace('university of ', '')
+          .replace(/[^a-z0-9]/g, '')
+      } else if (universityCode.includes(' state university')) {
+        // "[Name] State University" -> "[name]state.campuslabs.com"  
+        universityCode = universityCode
+          .replace(' state university', 'state')
+          .replace(/[^a-z0-9]/g, '')
+      } else if (universityCode.includes(' university')) {
+        // "[Name] University" -> "[name].campuslabs.com"
+        universityCode = universityCode
+          .replace(' university', '')
+          .replace(/[^a-z0-9]/g, '')
+      } else {
+        // General cleanup for any other patterns
+        universityCode = universityCode
+          .replace(/[^a-z0-9]/g, '')
+      }
+      
+      // Limit length for practical URLs
+      universityCode = universityCode.substring(0, 15)
+      
+      return `https://${universityCode}.campuslabs.com/engage/organization/turning-point-usa`
+    },
+    
+    trackCampusLabsClick(chapter) {
+      // Track clicks for analytics (could be enhanced with actual analytics service)
+      console.log(`Campus Labs link clicked for: ${chapter.universityName}`)
+      
+      // Future enhancement: Could validate if the URL exists and provide feedback
+      // This could help improve our university mappings over time
+    },
+    
+    getAlternateCampusLabsSearch(chapter) {
+      // Provide a fallback search URL if the direct link doesn't work
+      const searchTerm = encodeURIComponent(`${chapter.universityName} turning point usa`)
+      return `https://www.google.com/search?q=site:campuslabs.com+${searchTerm}`
     },
     editChapter(chapter) {
       this.chapterForm = {
