@@ -56,6 +56,14 @@ public class MemberService {
     }
 
     /**
+     * Get all members across all chapters
+     */
+    @Transactional(readOnly = true)
+    public List<Member> getAllMembers() {
+        return memberRepository.findAll();
+    }
+
+    /**
      * Get member by ID
      */
     @Transactional(readOnly = true)

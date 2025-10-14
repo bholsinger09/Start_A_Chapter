@@ -24,6 +24,13 @@ public class EventController {
         this.eventService = eventService;
     }
 
+    // GET /api/events - Get all events across all chapters
+    @GetMapping
+    public ResponseEntity<List<Event>> getAllEvents() {
+        List<Event> events = eventService.getAllEvents();
+        return ResponseEntity.ok(events);
+    }
+
     // GET /api/events/{id} - Get event by ID
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEventById(@PathVariable Long id) {

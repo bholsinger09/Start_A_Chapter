@@ -24,6 +24,13 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    // GET /api/members - Get all members across all chapters
+    @GetMapping
+    public ResponseEntity<List<Member>> getAllMembers() {
+        List<Member> members = memberService.getAllMembers();
+        return ResponseEntity.ok(members);
+    }
+
     // GET /api/members/chapter/{chapterId}/all - Get all members (including inactive)
     @GetMapping("/chapter/{chapterId}/all")
     public ResponseEntity<List<Member>> getAllMembers(@PathVariable Long chapterId) {
