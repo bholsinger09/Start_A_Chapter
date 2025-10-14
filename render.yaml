@@ -1,12 +1,9 @@
 services:
-  # Backend Spring Boot Application
   - type: web
     name: chapter-organizer-backend
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
-    databases:
-      - chapter-organizer-db
     envVars:
       - key: JAVA_VERSION
         value: "21"
@@ -19,7 +16,6 @@ services:
       - key: CORS_ALLOWED_ORIGINS
         value: "https://chapter-organizer-frontend.onrender.com"
 
-  # Frontend Vue.js Application  
   - type: web
     name: chapter-organizer-frontend
     env: node
@@ -30,7 +26,6 @@ services:
       - key: VITE_API_BASE_URL
         value: "https://chapter-organizer-backend.onrender.com"
 
-# PostgreSQL Database
 databases:
   - name: chapter-organizer-db
     databaseName: chapter_organizer
