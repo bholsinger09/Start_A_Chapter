@@ -1,0 +1,12 @@
+com/turningpoint/chapterorganizer/repository/EventRepository.class
+com/turningpoint/chapterorganizer/entity/EventType.class
+com/turningpoint/chapterorganizer/repository/MemberRepository.class
+com/turningpoint/chapterorganizer/service/EventService.class
+com/turningpoint/chapterorganizer/CampusChapterOrganizerApplication.class
+com/turningpoint/chapterorganizer/entity/Member.class
+com/turningpoint/chapterorganizer/repository/ChapterRepository.class
+com/turningpoint/chapterorganizer/entity/Event.class
+com/turningpoint/chapterorganizer/entity/Chapter.class
+com/turningpoint/chapterorganizer/entity/MemberRole.class
+com/turningpoint/chapterorganizer/service/MemberService.class
+com/turningpoint/chapterorganizer/service/ChapterService.class
