@@ -45,6 +45,9 @@ public class Chapter {
     @Column(length = 500)
     private String description;
 
+    @Column(name = "founded_date")
+    private LocalDateTime foundedDate;
+
     @NotNull(message = "Active status is required")
     @Column(nullable = false)
     private Boolean active = true;
@@ -123,6 +126,14 @@ public class Chapter {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public LocalDateTime getFoundedDate() {
+        return foundedDate;
+    }
+
+    public void setFoundedDate(LocalDateTime foundedDate) {
+        this.foundedDate = foundedDate;
     }
 
     public Boolean getActive() {

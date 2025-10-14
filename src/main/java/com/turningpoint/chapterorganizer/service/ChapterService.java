@@ -92,6 +92,12 @@ public class ChapterService {
     @Transactional(readOnly = true)
     public List<Chapter> searchChapters(String name, String universityName, String state,
             String city, Boolean active) {
+        // Convert empty strings to null so the query treats them as "not specified"
+        name = (name != null && name.trim().isEmpty()) ? null : name;
+        universityName = (universityName != null && universityName.trim().isEmpty()) ? null : universityName;
+        state = (state != null && state.trim().isEmpty()) ? null : state;
+        city = (city != null && city.trim().isEmpty()) ? null : city;
+        
         return chapterRepository.findChaptersByCriteria(name, universityName, state, city, active);
     }
 

@@ -2,6 +2,7 @@ package com.turningpoint.chapterorganizer.config;
 
 import com.turningpoint.chapterorganizer.entity.*;
 import com.turningpoint.chapterorganizer.repository.*;
+import com.turningpoint.chapterorganizer.service.RealTimeDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -20,14 +21,17 @@ public class DataInitializer implements CommandLineRunner {
     private final ChapterRepository chapterRepository;
     private final MemberRepository memberRepository;
     private final EventRepository eventRepository;
+    private final RealTimeDataService realTimeDataService;
 
     @Autowired
     public DataInitializer(ChapterRepository chapterRepository, 
                           MemberRepository memberRepository,
-                          EventRepository eventRepository) {
+                          EventRepository eventRepository,
+                          RealTimeDataService realTimeDataService) {
         this.chapterRepository = chapterRepository;
         this.memberRepository = memberRepository;
         this.eventRepository = eventRepository;
+        this.realTimeDataService = realTimeDataService;
     }
 
     @Override
@@ -275,8 +279,8 @@ public class DataInitializer implements CommandLineRunner {
                     MemberRole.TREASURER, chapter);
             }
             
-            // Regular members (2-8 per chapter)
-            int memberCount = 2 + random.nextInt(7);
+            // Get real-time based member count
+            int memberCount = realTimeDataService.getMemberCountForChapter(chapter.getUniversityName(), chapter.getState());
             List<Member> allMembers = new ArrayList<>();
             allMembers.add(president);
             allMembers.add(vicePresident);
@@ -352,6 +356,8 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
     
+
+    
     private String getUniversityEmailDomain(String universityName) {
         // Simplified email domain mapping
         if (universityName.contains("Berkeley")) return "berkeley.edu";
@@ -421,6 +427,12 @@ public class DataInitializer implements CommandLineRunner {
         chapter.setCity(city);
         chapter.setDescription(description);
         chapter.setActive(true);
+        // Set a random founded date between 2018 and 2023
+        LocalDateTime foundedDate = LocalDateTime.of(2018 + (int)(Math.random() * 6), 
+                                                   1 + (int)(Math.random() * 12), 
+                                                   1 + (int)(Math.random() * 28), 
+                                                   0, 0);
+        chapter.setFoundedDate(foundedDate);
         return chapter;
     }
 
