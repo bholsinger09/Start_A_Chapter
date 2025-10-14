@@ -153,6 +153,7 @@ class MemberServiceTest {
     @Test
     void getMembersByRole_ShouldReturnMembersWithSpecificRole() {
         // Given
+        testMember.setRole(MemberRole.PRESIDENT);
         List<Member> presidents = Arrays.asList(testMember);
         when(memberRepository.findByChapterIdAndRoleAndActiveTrue(1L, MemberRole.PRESIDENT)).thenReturn(presidents);
 
