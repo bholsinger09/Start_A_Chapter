@@ -2,11 +2,13 @@ services:
   # Backend Spring Boot Application
   - type: web
     name: chapter-organizer-backend
-    runtime: java
+    env: java
     buildCommand: "./mvnw clean package -DskipTests"
     startCommand: "java -Dserver.port=$PORT -jar target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar"
     plan: free
     envVars:
+      - key: JAVA_VERSION
+        value: "21"
       - key: SPRING_PROFILES_ACTIVE
         value: production
       - key: SPRING_DATASOURCE_URL
@@ -31,7 +33,7 @@ services:
   # Frontend Vue.js Application  
   - type: web
     name: chapter-organizer-frontend
-    runtime: node
+    env: node
     buildCommand: cd frontend && npm ci && npm run build:prod
     startCommand: cd frontend && npm run preview -- --host 0.0.0.0 --port $PORT
     plan: free
