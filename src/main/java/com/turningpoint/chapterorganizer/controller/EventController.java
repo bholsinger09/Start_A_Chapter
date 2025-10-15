@@ -1,7 +1,6 @@
 package com.turningpoint.chapterorganizer.controller;
 
-import com.turningpoint.chapterorganizer.entity.Event;
-import com.turningpoint.chapterorganizer.entity.EventType;
+import com.turningpoint.chapterorganizer.entity.*;
 import com.turningpoint.chapterorganizer.service.EventService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -174,5 +174,118 @@ public class EventController {
             this.active = active;
             this.type = type;
         }
+    }
+
+    // RSVP Management Endpoints
+
+    // POST /api/events/{eventId}/rsvp - Create or update RSVP
+    @PostMapping("/{eventId}/rsvp")
+    public ResponseEntity<EventRSVP> createOrUpdateRSVP(
+            @PathVariable Long eventId,
+            @RequestBody RSVPRequest rsvpRequest) {
+        try {
+            EventRSVP rsvp = eventService.createOrUpdateRSVP(
+                    eventId, 
+                    rsvpRequest.getMemberId(), 
+                    rsvpRequest.getStatus(), 
+                    rsvpRequest.getNotes()
+            );
+            return ResponseEntity.ok(rsvp);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // GET /api/events/{eventId}/rsvps - Get all RSVPs for an event
+    @GetMapping("/{eventId}/rsvps")
+    public ResponseEntity<List<EventRSVP>> getEventRSVPs(@PathVariable Long eventId) {
+        List<EventRSVP> rsvps = eventService.getEventRSVPs(eventId);
+        return ResponseEntity.ok(rsvps);
+    }
+
+    // GET /api/events/{eventId}/attendees/count - Get attendee count
+    @GetMapping("/{eventId}/attendees/count")
+    public ResponseEntity<Long> getAttendeeCount(@PathVariable Long eventId) {
+        long count = eventService.getAttendeeCount(eventId);
+        return ResponseEntity.ok(count);
+    }
+
+    // PUT /api/events/{eventId}/attendance/{memberId} - Mark attendance
+    @PutMapping("/{eventId}/attendance/{memberId}")
+    public ResponseEntity<Void> markAttendance(
+            @PathVariable Long eventId,
+            @PathVariable Long memberId,
+            @RequestParam boolean attended) {
+        try {
+            eventService.markAttendance(eventId, memberId, attended);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // POST /api/events/{eventId}/recurring - Make event recurring
+    @PostMapping("/{eventId}/recurring")
+    public ResponseEntity<RecurringEvent> createRecurringEvent(
+            @PathVariable Long eventId,
+            @RequestBody RecurringEventRequest request) {
+        try {
+            RecurringEvent recurringEvent = eventService.createRecurringEvent(
+                    eventId, 
+                    request.getPattern(), 
+                    request.getInterval(),
+                    request.getEndDate(),
+                    request.getMaxOccurrences()
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(recurringEvent);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // POST /api/events/recurring/generate - Generate next occurrences for all recurring events
+    @PostMapping("/recurring/generate")
+    public ResponseEntity<String> generateNextOccurrences() {
+        eventService.generateNextOccurrences();
+        return ResponseEntity.ok("Next occurrences generated successfully");
+    }
+
+    // DTOs for requests
+    public static class RSVPRequest {
+        private Long memberId;
+        private RSVPStatus status;
+        private String notes;
+
+        public RSVPRequest() {}
+
+        public Long getMemberId() { return memberId; }
+        public void setMemberId(Long memberId) { this.memberId = memberId; }
+
+        public RSVPStatus getStatus() { return status; }
+        public void setStatus(RSVPStatus status) { this.status = status; }
+
+        public String getNotes() { return notes; }
+        public void setNotes(String notes) { this.notes = notes; }
+    }
+
+    public static class RecurringEventRequest {
+        private RecurrencePattern pattern;
+        private Integer interval;
+        private LocalDateTime endDate;
+        private Integer maxOccurrences;
+
+        public RecurringEventRequest() {}
+
+        public RecurrencePattern getPattern() { return pattern; }
+        public void setPattern(RecurrencePattern pattern) { this.pattern = pattern; }
+
+        public Integer getInterval() { return interval; }
+        public void setInterval(Integer interval) { this.interval = interval; }
+
+        public LocalDateTime getEndDate() { return endDate; }
+        public void setEndDate(LocalDateTime endDate) { this.endDate = endDate; }
+
+        public Integer getMaxOccurrences() { return maxOccurrences; }
+        public void setMaxOccurrences(Integer maxOccurrences) { this.maxOccurrences = maxOccurrences; }
     }
 }

@@ -1,10 +1,13 @@
 package com.turningpoint.chapterorganizer.service;
 
-import com.turningpoint.chapterorganizer.entity.Event;
-import com.turningpoint.chapterorganizer.entity.EventType;
+import com.turningpoint.chapterorganizer.entity.*;
 import com.turningpoint.chapterorganizer.repository.EventRepository;
+import com.turningpoint.chapterorganizer.repository.EventRSVPRepository;
+import com.turningpoint.chapterorganizer.repository.RecurringEventRepository;
+import com.turningpoint.chapterorganizer.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,11 +17,21 @@ import java.util.Optional;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final EventRSVPRepository eventRSVPRepository;
+    private final RecurringEventRepository recurringEventRepository;
+    private final MemberRepository memberRepository;
     private final ChapterService chapterService;
 
     @Autowired
-    public EventService(EventRepository eventRepository, ChapterService chapterService) {
+    public EventService(EventRepository eventRepository, 
+                       EventRSVPRepository eventRSVPRepository,
+                       RecurringEventRepository recurringEventRepository,
+                       MemberRepository memberRepository,
+                       ChapterService chapterService) {
         this.eventRepository = eventRepository;
+        this.eventRSVPRepository = eventRSVPRepository;
+        this.recurringEventRepository = recurringEventRepository;
+        this.memberRepository = memberRepository;
         this.chapterService = chapterService;
     }
 
@@ -144,5 +157,118 @@ public class EventService {
 
     public List<Event> getPastEventsByChapter(Long chapterId) {
         return eventRepository.findPastEventsByChapter(chapterId, LocalDateTime.now());
+    }
+
+    // RSVP Management Methods
+
+    @Transactional
+    public EventRSVP createOrUpdateRSVP(Long eventId, Long memberId, RSVPStatus status, String notes) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
+        
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + memberId));
+
+        // Check if RSVP already exists
+        Optional<EventRSVP> existingRSVP = eventRSVPRepository.findByEventIdAndMemberId(eventId, memberId);
+        
+        EventRSVP rsvp;
+        if (existingRSVP.isPresent()) {
+            // Update existing RSVP
+            rsvp = existingRSVP.get();
+            rsvp.setStatus(status);
+            rsvp.setNotes(notes);
+        } else {
+            // Create new RSVP
+            rsvp = new EventRSVP(event, member, status);
+            rsvp.setNotes(notes);
+            
+            // Check capacity for ATTENDING status
+            if (status == RSVPStatus.ATTENDING && !event.canAddAttendee()) {
+                rsvp.setStatus(RSVPStatus.WAITLIST);
+            }
+        }
+
+        return eventRSVPRepository.save(rsvp);
+    }
+
+    public List<EventRSVP> getEventRSVPs(Long eventId) {
+        return eventRSVPRepository.findByEventId(eventId);
+    }
+
+    public List<EventRSVP> getMemberRSVPs(Long memberId) {
+        return eventRSVPRepository.findByMemberId(memberId);
+    }
+
+    public long getAttendeeCount(Long eventId) {
+        return eventRSVPRepository.countByEventIdAndStatus(eventId, RSVPStatus.ATTENDING);
+    }
+
+    public boolean hasUserRSVPd(Long eventId, Long memberId) {
+        return eventRSVPRepository.existsByEventIdAndMemberId(eventId, memberId);
+    }
+
+    @Transactional
+    public void markAttendance(Long eventId, Long memberId, boolean attended) {
+        EventRSVP rsvp = eventRSVPRepository.findByEventIdAndMemberId(eventId, memberId)
+                .orElseThrow(() -> new IllegalArgumentException("RSVP not found for event and member"));
+        
+        rsvp.setAttended(attended);
+        eventRSVPRepository.save(rsvp);
+    }
+
+    // Recurring Event Management
+
+    @Transactional
+    public RecurringEvent createRecurringEvent(Long baseEventId, RecurrencePattern pattern, 
+                                             Integer interval, LocalDateTime endDate, Integer maxOccurrences) {
+        Event baseEvent = eventRepository.findById(baseEventId)
+                .orElseThrow(() -> new IllegalArgumentException("Base event not found with id: " + baseEventId));
+
+        RecurringEvent recurringEvent = new RecurringEvent(baseEvent, pattern, interval);
+        recurringEvent.setEndDate(endDate);
+        recurringEvent.setMaxOccurrences(maxOccurrences);
+
+        return recurringEventRepository.save(recurringEvent);
+    }
+
+    @Transactional
+    public void generateNextOccurrences() {
+        List<RecurringEvent> activeRecurring = recurringEventRepository
+                .findActiveRecurringEventsNeedingOccurrences(LocalDateTime.now());
+
+        for (RecurringEvent recurring : activeRecurring) {
+            if (recurring.shouldCreateNextOccurrence()) {
+                createNextOccurrence(recurring);
+            }
+        }
+    }
+
+    @Transactional
+    public Event createNextOccurrence(RecurringEvent recurringEvent) {
+        Event baseEvent = recurringEvent.getBaseEvent();
+        LocalDateTime nextEventDate = recurringEvent.calculateNextEventDate();
+
+        Event nextEvent = new Event();
+        nextEvent.setTitle(baseEvent.getTitle());
+        nextEvent.setDescription(baseEvent.getDescription());
+        nextEvent.setEventDateTime(nextEventDate);
+        nextEvent.setLocation(baseEvent.getLocation());
+        nextEvent.setType(baseEvent.getType());
+        nextEvent.setMaxAttendees(baseEvent.getMaxAttendees());
+        nextEvent.setChapter(baseEvent.getChapter());
+        nextEvent.setActive(true);
+
+        Event savedEvent = eventRepository.save(nextEvent);
+
+        // Update occurrences count
+        recurringEvent.setOccurrencesCreated(recurringEvent.getOccurrencesCreated() + 1);
+        recurringEventRepository.save(recurringEvent);
+
+        return savedEvent;
+    }
+
+    public List<RecurringEvent> getRecurringEventsByChapter(Long chapterId) {
+        return recurringEventRepository.findByChapterId(chapterId);
     }
 }

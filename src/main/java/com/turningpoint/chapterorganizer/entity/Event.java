@@ -9,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -54,6 +56,12 @@ public class Event {
     @JoinColumn(name = "chapter_id", nullable = false)
     @JsonBackReference
     private Chapter chapter;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<EventRSVP> rsvps = new ArrayList<>();
+
+    @OneToOne(mappedBy = "baseEvent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private RecurringEvent recurringEvent;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -168,6 +176,37 @@ public class Event {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<EventRSVP> getRsvps() {
+        return rsvps;
+    }
+
+    public void setRsvps(List<EventRSVP> rsvps) {
+        this.rsvps = rsvps;
+    }
+
+    public RecurringEvent getRecurringEvent() {
+        return recurringEvent;
+    }
+
+    public void setRecurringEvent(RecurringEvent recurringEvent) {
+        this.recurringEvent = recurringEvent;
+    }
+
+    // Helper methods for RSVP management
+    public long getAttendingCount() {
+        return rsvps.stream()
+                .filter(rsvp -> rsvp.getStatus() == RSVPStatus.ATTENDING)
+                .count();
+    }
+
+    public boolean hasCapacity() {
+        return maxAttendees == null || getAttendingCount() < maxAttendees;
+    }
+
+    public boolean canAddAttendee() {
+        return hasCapacity();
     }
 
     // Helper methods
