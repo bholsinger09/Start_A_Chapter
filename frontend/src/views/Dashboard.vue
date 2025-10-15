@@ -12,12 +12,23 @@
             <p class="text-muted mb-0">Campus Chapter Organizer Management</p>
           </div>
           <div class="col-auto">
-            <button class="btn btn-outline-primary btn-sm">
-              <i class="fas fa-sync-alt me-2"></i>
-              Refresh
+            <button 
+              class="btn btn-outline-primary btn-sm" 
+              @click="fetchPublicStats"
+              :disabled="loading"
+            >
+              <i class="fas fa-sync-alt me-2" :class="{ 'fa-spin': loading }"></i>
+              {{ loading ? 'Loading...' : 'Refresh' }}
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- Error Message -->
+      <div v-if="error" class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {{ error }}
+        <button type="button" class="btn-close" @click="error = null"></button>
       </div>
 
       <!-- Quick Stats -->
@@ -164,21 +175,60 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 export default {
   name: 'Dashboard',
   setup() {
-    const totalMembers = ref(156)
-    const activeEvents = ref(12)
-    const totalChapters = ref(8)
-    const totalRsvps = ref(342)
+    const totalMembers = ref(0)
+    const activeEvents = ref(0)
+    const totalChapters = ref(0)
+    const totalRsvps = ref(0)
+    const loading = ref(true)
+    const error = ref(null)
+
+    const fetchPublicStats = async () => {
+      try {
+        loading.value = true
+        const response = await fetch('http://localhost:8080/api/stats/public/overview')
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch statistics')
+        }
+        
+        const data = await response.json()
+        
+        totalMembers.value = data.totalMembers || 0
+        activeEvents.value = data.totalEvents || 0
+        totalChapters.value = data.totalChapters || 0
+        totalRsvps.value = data.totalRsvps || 0
+        
+        error.value = null
+      } catch (err) {
+        console.error('Error fetching public stats:', err)
+        error.value = 'Unable to load statistics'
+        // Set default values on error
+        totalMembers.value = 0
+        activeEvents.value = 0
+        totalChapters.value = 0
+        totalRsvps.value = 0
+      } finally {
+        loading.value = false
+      }
+    }
+
+    onMounted(() => {
+      fetchPublicStats()
+    })
     
     return {
       totalMembers,
       activeEvents,
       totalChapters,
-      totalRsvps
+      totalRsvps,
+      loading,
+      error,
+      fetchPublicStats
     }
   }
 }

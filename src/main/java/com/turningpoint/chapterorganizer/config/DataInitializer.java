@@ -3,6 +3,7 @@ package com.turningpoint.chapterorganizer.config;
 import com.turningpoint.chapterorganizer.entity.*;
 import com.turningpoint.chapterorganizer.repository.*;
 import com.turningpoint.chapterorganizer.service.RealTimeDataService;
+import com.turningpoint.chapterorganizer.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -504,6 +505,8 @@ public class DataInitializer implements CommandLineRunner {
             testUser.setFirstName("Test");
             testUser.setLastName("User");
             testUser.setEmail("testuser@turningpoint.org");
+            testUser.setUsername("testuser"); // Set username for authentication
+            testUser.setPasswordHash(PasswordUtil.encode("password123")); // Set password hash
             testUser.setPhoneNumber("555-0123");
             testUser.setRole(MemberRole.PRESIDENT); // Give high-level access
             testUser.setActive(true);
