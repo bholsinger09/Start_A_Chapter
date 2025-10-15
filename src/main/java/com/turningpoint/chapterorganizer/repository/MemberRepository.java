@@ -15,6 +15,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // Find member by email
     Optional<Member> findByEmail(String email);
+    
+    // Find member by username
+    Optional<Member> findByUsername(String username);
 
     // Find members by chapter ID
     List<Member> findByChapterId(Long chapterId);
@@ -43,6 +46,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // Check if email exists
     boolean existsByEmail(String email);
+    
+    // Check if username exists
+    boolean existsByUsername(String username);
 
     // Check if email exists for a different member (for updates)
     boolean existsByEmailAndIdNot(String email, Long id);

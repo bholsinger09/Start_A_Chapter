@@ -82,6 +82,30 @@ public class MemberService {
     }
 
     /**
+     * Get member by username
+     */
+    @Transactional(readOnly = true)
+    public Optional<Member> getMemberByUsername(String username) {
+        return memberRepository.findByUsername(username);
+    }
+
+    /**
+     * Check if member exists by username
+     */
+    @Transactional(readOnly = true)
+    public boolean existsByUsername(String username) {
+        return memberRepository.existsByUsername(username);
+    }
+
+    /**
+     * Check if member exists by email
+     */
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
+    /**
      * Get all active members by chapter
      */
     @Transactional(readOnly = true)

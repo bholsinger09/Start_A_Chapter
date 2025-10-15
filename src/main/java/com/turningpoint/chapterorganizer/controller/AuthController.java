@@ -1,14 +1,21 @@
 package com.turningpoint.chapterorganizer.controller;
 
+import com.turningpoint.chapterorganizer.dto.RegistrationRequestDto;
+import com.turningpoint.chapterorganizer.dto.RegistrationResponseDto;
+import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.security.service.SecurityService;
+import com.turningpoint.chapterorganizer.service.ChapterService;
 import com.turningpoint.chapterorganizer.service.MemberService;
+import com.turningpoint.chapterorganizer.util.PasswordUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Authentication controller for login/logout operations
@@ -20,11 +27,14 @@ public class AuthController {
     
     private final MemberService memberService;
     private final SecurityService securityService;
+    private final ChapterService chapterService;
     
     @Autowired
-    public AuthController(MemberService memberService, SecurityService securityService) {
+    public AuthController(MemberService memberService, SecurityService securityService, 
+                         ChapterService chapterService) {
         this.memberService = memberService;
         this.securityService = securityService;
+        this.chapterService = chapterService;
     }
     
     /**
@@ -35,7 +45,7 @@ public class AuthController {
         try {
             // For now, let's create a simple test user authentication
             // In production, this would validate against stored credentials
-            Member testUser = authenticateTestUser(request.getUsername(), request.getPassword());
+            Member testUser = authenticateUser(request.getUsername(), request.getPassword());
             
             if (testUser != null) {
                 // Initialize security context for the authenticated user
@@ -83,6 +93,67 @@ public class AuthController {
     }
     
     /**
+     * Registration endpoint
+     */
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequestDto request) {
+        try {
+            // Validate chapter exists
+            Optional<Chapter> chapterOptional = chapterService.getChapterById(request.getChapterId());
+            if (chapterOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "message", "Invalid chapter ID")
+                );
+            }
+            Chapter chapter = chapterOptional.get();
+
+            // Check if username already exists
+            if (memberService.existsByUsername(request.getUsername())) {
+                return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "message", "Username already exists")
+                );
+            }
+
+            // Check if email already exists
+            if (memberService.existsByEmail(request.getEmail())) {
+                return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "message", "Email already exists")
+                );
+            }
+
+            // Create new member
+            Member newMember = new Member();
+            newMember.setFirstName(request.getFirstName());
+            newMember.setLastName(request.getLastName());
+            newMember.setEmail(request.getEmail());
+            newMember.setUsername(request.getUsername());
+            newMember.setPasswordHash(PasswordUtil.encode(request.getPassword()));
+            newMember.setChapter(chapter);
+            newMember.setPhoneNumber(request.getPhoneNumber());
+            newMember.setMajor(request.getMajor());
+            newMember.setGraduationYear(request.getGraduationYear());
+            newMember.setActive(true);
+
+            // Save the member
+            Member savedMember = memberService.createMember(newMember);
+
+            // Return success response
+            RegistrationResponseDto response = new RegistrationResponseDto(
+                "Registration successful",
+                savedMember.getId(),
+                savedMember.getUsername()
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                Map.of("success", false, "message", "Registration failed: " + e.getMessage())
+            );
+        }
+    }
+
+    /**
      * Get current user endpoint
      */
     @GetMapping("/me")
@@ -115,24 +186,37 @@ public class AuthController {
     }
     
     /**
-     * Simple test user authentication
-     * In production, this would check against encrypted passwords in database
+     * Authenticate user with username and password
      */
-    private Member authenticateTestUser(String username, String password) {
-        // Simple test credentials
-        if ("testuser".equals(username) && "password123".equals(password)) {
-            // Find the first member to use as our authenticated test user
-            // In production, you'd find by username or create a dedicated user table
-            try {
+    private Member authenticateUser(String username, String password) {
+        try {
+            // Find member by username
+            Optional<Member> memberOpt = memberService.getMemberByUsername(username);
+            if (memberOpt.isEmpty()) {
+                return null;
+            }
+            
+            Member member = memberOpt.get();
+            
+            // Check if member has a password hash and verify it
+            if (member.getPasswordHash() != null && 
+                PasswordUtil.matches(password, member.getPasswordHash())) {
+                return member;
+            }
+            
+            // Fallback: Check for legacy test user
+            if ("testuser".equals(username) && "password123".equals(password)) {
+                // Find the first member to use as our authenticated test user
                 return memberService.getAllMembers().stream()
                     .filter(m -> m.getEmail().contains("test") || m.getId() == 1L)
                     .findFirst()
                     .orElse(memberService.getAllMembers().get(0)); // Fallback to first member
-            } catch (Exception e) {
-                return null;
             }
+            
+            return null;
+        } catch (Exception e) {
+            return null;
         }
-        return null;
     }
     
     /**

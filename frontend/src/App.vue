@@ -44,6 +44,11 @@
                 <i class="bi bi-box-arrow-in-right me-1"></i>Login
               </router-link>
             </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/register" active-class="active">
+                <i class="bi bi-person-plus me-1"></i>Register
+              </router-link>
+            </li>
           </ul>
         </div>
       </div>

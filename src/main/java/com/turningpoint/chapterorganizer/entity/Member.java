@@ -35,6 +35,13 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Column(nullable = true, unique = true)
+    private String username;
+
+    @Column(name = "password_hash")
+    private String passwordHash;
+
     @Size(max = 15, message = "Phone number cannot exceed 15 characters")
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -79,6 +86,15 @@ public class Member {
         this.chapter = chapter;
     }
 
+    public Member(String firstName, String lastName, String email, String username, String passwordHash, Chapter chapter) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.chapter = chapter;
+    }
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -110,6 +126,22 @@ public class Member {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public String getPhoneNumber() {
