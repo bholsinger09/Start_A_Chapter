@@ -39,6 +39,11 @@
                 <i class="bi bi-calendar-event me-1"></i>Events
               </router-link>
             </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/login" active-class="active">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+              </router-link>
+            </li>
           </ul>
         </div>
       </div>

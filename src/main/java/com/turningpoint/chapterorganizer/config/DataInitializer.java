@@ -22,16 +22,25 @@ public class DataInitializer implements CommandLineRunner {
     private final MemberRepository memberRepository;
     private final EventRepository eventRepository;
     private final RealTimeDataService realTimeDataService;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Autowired
     public DataInitializer(ChapterRepository chapterRepository, 
                           MemberRepository memberRepository,
                           EventRepository eventRepository,
-                          RealTimeDataService realTimeDataService) {
+                          RealTimeDataService realTimeDataService,
+                          RoleRepository roleRepository,
+                          PermissionRepository permissionRepository,
+                          UserRoleRepository userRoleRepository) {
         this.chapterRepository = chapterRepository;
         this.memberRepository = memberRepository;
         this.eventRepository = eventRepository;
         this.realTimeDataService = realTimeDataService;
+        this.roleRepository = roleRepository;
+        this.permissionRepository = permissionRepository;
+        this.userRoleRepository = userRoleRepository;
     }
 
     @Override
@@ -52,6 +61,9 @@ public class DataInitializer implements CommandLineRunner {
         
         // Create events for each chapter
         createEventsForAllChapters(chapters);
+        
+        // Create test user with roles and permissions
+        createTestUserWithPermissions(chapters[0]); // Use first chapter
 
         System.out.println("Sample data initialization completed successfully!");
         System.out.println("Created " + chapterRepository.count() + " chapters, " + 
@@ -460,5 +472,94 @@ public class DataInitializer implements CommandLineRunner {
         event.setCurrentAttendees(0);
         event.setActive(true);
         return event;
+    }
+    
+    /**
+     * Create a test user with roles and permissions for authentication testing
+     */
+    private void createTestUserWithPermissions(Chapter chapter) {
+        try {
+            System.out.println("Creating test user with roles and permissions...");
+            
+            // Create basic permissions
+            Permission readPermission = createOrGetPermission("chapter:read", "Read chapter data");
+            Permission writePermission = createOrGetPermission("chapter:write", "Write chapter data");
+            Permission memberReadPermission = createOrGetPermission("member:read", "Read member data");
+            Permission memberWritePermission = createOrGetPermission("member:write", "Write member data");
+            Permission eventReadPermission = createOrGetPermission("event:read", "Read event data");
+            Permission eventWritePermission = createOrGetPermission("event:write", "Write event data");
+            
+            // Create test role with permissions
+            Role testRole = createOrGetRole("TEST_USER", "Test user role with basic permissions", 5);
+            if (testRole.getPermissions().isEmpty()) {
+                testRole.getPermissions().addAll(Arrays.asList(
+                    readPermission, writePermission, memberReadPermission, 
+                    memberWritePermission, eventReadPermission, eventWritePermission
+                ));
+                roleRepository.save(testRole);
+            }
+            
+            // Create test user
+            Member testUser = new Member();
+            testUser.setFirstName("Test");
+            testUser.setLastName("User");
+            testUser.setEmail("testuser@turningpoint.org");
+            testUser.setPhoneNumber("555-0123");
+            testUser.setRole(MemberRole.PRESIDENT); // Give high-level access
+            testUser.setActive(true);
+            testUser.setMajor("Political Science");
+            testUser.setGraduationYear("2025");
+            testUser.setChapter(chapter);
+            testUser = memberRepository.save(testUser);
+            
+            // Assign role to test user
+            UserRole userRole = new UserRole();
+            userRole.setUser(testUser);
+            userRole.setRole(testRole);
+            userRole.setChapter(chapter); // Chapter-scoped role
+            userRole.setIsActive(true);
+            userRole.setGrantedAt(LocalDateTime.now());
+            userRole.setGrantedBy(testUser); // Self-granted for initialization
+            userRoleRepository.save(userRole);
+            
+            System.out.println("Test user created successfully:");
+            System.out.println("Username: testuser");
+            System.out.println("Password: password123");
+            System.out.println("Email: testuser@turningpoint.org");
+            System.out.println("Role: " + testRole.getName() + " with " + testRole.getPermissions().size() + " permissions");
+            
+        } catch (Exception e) {
+            System.err.println("Error creating test user: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private Permission createOrGetPermission(String name, String description) {
+        return permissionRepository.findByName(name).orElseGet(() -> {
+            String[] parts = name.split(":");
+            String resource = parts.length > 0 ? parts[0] : "general";
+            String action = parts.length > 1 ? parts[1] : "access";
+            
+            Permission permission = new Permission();
+            permission.setName(name);
+            permission.setResource(resource);
+            permission.setAction(action);
+            permission.setDescription(description);
+            permission.setIsSystemPermission(false);
+            return permissionRepository.save(permission);
+        });
+    }
+    
+    private Role createOrGetRole(String name, String description, int hierarchyLevel) {
+        return roleRepository.findByName(name).orElseGet(() -> {
+            Role role = new Role();
+            role.setName(name);
+            role.setDescription(description);
+            role.setHierarchyLevel(hierarchyLevel);
+            role.setIsSystemRole(false);
+            role.setIsAssignable(true);
+            role.setCreatedAt(LocalDateTime.now());
+            return roleRepository.save(role);
+        });
     }
 }

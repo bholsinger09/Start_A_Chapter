@@ -244,6 +244,20 @@ public class SecurityService {
     }
     
     /**
+     * Get current authenticated user
+     */
+    public Member getCurrentUser() {
+        return SecurityContextHolder.getCurrentUser();
+    }
+    
+    /**
+     * Clear security context (for logout)
+     */
+    public void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+    
+    /**
      * Get current user's security information summary
      */
     public SecuritySummary getCurrentUserSecuritySummary() {

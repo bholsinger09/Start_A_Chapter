@@ -4,6 +4,7 @@ import Chapters from '../views/Chapters.vue'
 import Members from '../views/Members.vue'
 import Events from '../views/Events.vue'
 import ChapterDetail from '../views/ChapterDetail.vue'
+import Login from '../views/Login.vue'
 
 const routes = [
   {
@@ -31,6 +32,11 @@ const routes = [
     path: '/events',
     name: 'Events',
     component: Events
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
   }
 ]
 
