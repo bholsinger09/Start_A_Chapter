@@ -36,30 +36,14 @@ public class ProductionDataInitializer implements CommandLineRunner {
     }
 
     private void initializeBasicData() {
-        // Create a few sample chapters for production
-        Chapter stanford = new Chapter();
-        stanford.setName("Stanford Turning Point");
-        stanford.setUniversityName("Stanford University");
-        stanford.setState("California");
-        stanford.setCity("Stanford");
-        stanford.setFoundedDate(LocalDateTime.now().minusMonths(6));
+        // Create a few sample chapters for production using constructor
+        Chapter stanford = new Chapter("Stanford Turning Point", "Stanford University", "California", "Stanford");
         stanford.setDescription("Turning Point chapter at Stanford University");
-        stanford.setWebsiteUrl("https://turningpoint.stanford.edu");
-        stanford.setContactEmail("contact@turningpoint.stanford.edu");
-        stanford.setIsActive(true);
-        stanford.setCurrentMemberCount(25);
+        stanford.setActive(true);
 
-        Chapter berkeley = new Chapter();
-        berkeley.setName("UC Berkeley Turning Point");
-        berkeley.setUniversityName("University of California, Berkeley");
-        berkeley.setState("California");
-        berkeley.setCity("Berkeley");
-        berkeley.setFoundedDate(LocalDateTime.now().minusMonths(4));
+        Chapter berkeley = new Chapter("UC Berkeley Turning Point", "University of California, Berkeley", "California", "Berkeley");
         berkeley.setDescription("Turning Point chapter at UC Berkeley");
-        berkeley.setWebsiteUrl("https://turningpoint.berkeley.edu");
-        berkeley.setContactEmail("contact@turningpoint.berkeley.edu");
-        berkeley.setIsActive(true);
-        berkeley.setCurrentMemberCount(18);
+        berkeley.setActive(true);
 
         // Save chapters
         stanford = chapterRepository.save(stanford);
@@ -71,8 +55,7 @@ public class ProductionDataInitializer implements CommandLineRunner {
         member1.setLastName("Smith");
         member1.setEmail("john.smith@stanford.edu");
         member1.setRole(MemberRole.PRESIDENT);
-        member1.setJoinedDate(LocalDateTime.now().minusMonths(3));
-        member1.setIsActive(true);
+        member1.setActive(true);
         member1.setChapter(stanford);
 
         Member member2 = new Member();
@@ -80,27 +63,28 @@ public class ProductionDataInitializer implements CommandLineRunner {
         member2.setLastName("Doe");
         member2.setEmail("jane.doe@berkeley.edu");
         member2.setRole(MemberRole.PRESIDENT);
-        member2.setJoinedDate(LocalDateTime.now().minusMonths(2));
-        member2.setIsActive(true);
+        member2.setActive(true);
         member2.setChapter(berkeley);
 
         memberRepository.saveAll(Arrays.asList(member1, member2));
 
         // Create sample events
         Event event1 = new Event();
-        event1.setName("Welcome Meeting");
+        event1.setTitle("Welcome Meeting");
         event1.setDescription("Welcome new members to our chapter");
-        event1.setEventType(EventType.MEETING);
-        event1.setEventDate(LocalDateTime.now().plusDays(7));
+        event1.setType(EventType.MEETING);
+        event1.setEventDateTime(LocalDateTime.now().plusDays(7));
         event1.setLocation("Student Center Room 101");
+        event1.setActive(true);
         event1.setChapter(stanford);
 
         Event event2 = new Event();
-        event2.setName("Community Service Day");
+        event2.setTitle("Community Service Day");
         event2.setDescription("Volunteer at local food bank");
-        event2.setEventType(EventType.SERVICE);
-        event2.setEventDate(LocalDateTime.now().plusDays(14));
+        event2.setType(EventType.VOLUNTEER);
+        event2.setEventDateTime(LocalDateTime.now().plusDays(14));
         event2.setLocation("Berkeley Food Bank");
+        event2.setActive(true);
         event2.setChapter(berkeley);
 
         eventRepository.saveAll(Arrays.asList(event1, event2));
