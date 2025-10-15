@@ -30,7 +30,7 @@ public class ChapterController {
     // GET /api/chapters - Get all chapters
     @GetMapping
     public ResponseEntity<List<Chapter>> getAllChapters() {
-        List<Chapter> chapters = chapterService.getAllChapters();
+        List<Chapter> chapters = chapterService.getAllActiveChapters();
         return ResponseEntity.ok(chapters);
     }
 
