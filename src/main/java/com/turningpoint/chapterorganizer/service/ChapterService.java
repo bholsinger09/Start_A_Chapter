@@ -3,6 +3,8 @@ package com.turningpoint.chapterorganizer.service;
 import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.repository.ChapterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -187,5 +189,13 @@ public class ChapterService {
     @Transactional(readOnly = true)
     public List<Chapter> getActiveChaptersByStateOrderByMemberCount(String state) {
         return chapterRepository.findActiveChaptersByStateOrderByMemberCount(state);
+    }
+
+    /**
+     * Get paginated chapters with sorting
+     */
+    @Transactional(readOnly = true)
+    public Page<Chapter> getPaginatedChapters(Pageable pageable) {
+        return chapterRepository.findAll(pageable);
     }
 }

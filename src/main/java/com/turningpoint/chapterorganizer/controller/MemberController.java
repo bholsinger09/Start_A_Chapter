@@ -5,6 +5,10 @@ import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +32,21 @@ public class MemberController {
     @GetMapping
     public ResponseEntity<List<Member>> getAllMembers() {
         List<Member> members = memberService.getAllMembers();
+        return ResponseEntity.ok(members);
+    }
+
+    // GET /api/members/paginated - Get paginated members with sorting
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<Member>> getPaginatedMembers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "lastName") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") 
+            ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<Member> members = memberService.getPaginatedMembers(pageable);
         return ResponseEntity.ok(members);
     }
 

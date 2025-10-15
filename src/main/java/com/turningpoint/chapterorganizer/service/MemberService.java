@@ -5,6 +5,8 @@ import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -238,5 +240,13 @@ public class MemberService {
 
         member.setChapter(newChapter);
         return memberRepository.save(member);
+    }
+
+    /**
+     * Get paginated members with sorting
+     */
+    @Transactional(readOnly = true)
+    public Page<Member> getPaginatedMembers(Pageable pageable) {
+        return memberRepository.findAll(pageable);
     }
 }

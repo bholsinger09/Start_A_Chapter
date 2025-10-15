@@ -4,6 +4,10 @@ import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.service.ChapterService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +31,21 @@ public class ChapterController {
     @GetMapping
     public ResponseEntity<List<Chapter>> getAllChapters() {
         List<Chapter> chapters = chapterService.getAllChapters();
+        return ResponseEntity.ok(chapters);
+    }
+
+    // GET /api/chapters/paginated - Get paginated chapters with sorting
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<Chapter>> getPaginatedChapters(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") 
+            ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<Chapter> chapters = chapterService.getPaginatedChapters(pageable);
         return ResponseEntity.ok(chapters);
     }
 
