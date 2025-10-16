@@ -292,6 +292,18 @@ public class AuthController {
     }
 
     /**
+     * Ultra simple test endpoint without any dependencies
+     */
+    @GetMapping("/ping")
+    public ResponseEntity<Map<String, Object>> ping() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Controller is working");
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Simple test endpoint to check database connectivity
      */
     @GetMapping("/chapters/count")
