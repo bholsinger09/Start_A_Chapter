@@ -3,8 +3,8 @@ package com.turningpoint.chapterorganizer.controller;
 import com.turningpoint.chapterorganizer.dto.RegistrationRequestDto;
 import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
+import com.turningpoint.chapterorganizer.repository.ChapterRepository;
 import com.turningpoint.chapterorganizer.security.service.SecurityService;
-import com.turningpoint.chapterorganizer.service.ChapterService;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import com.turningpoint.chapterorganizer.util.PasswordUtil;
 import jakarta.validation.Valid;
@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Authentication controller for login/logout operations
@@ -28,13 +27,13 @@ public class AuthController {
     
     private final MemberService memberService;
     private final SecurityService securityService;
-    private final ChapterService chapterService;
+    private final ChapterRepository chapterRepository;
     
     @Autowired
-    public AuthController(MemberService memberService, SecurityService securityService, ChapterService chapterService) {
+    public AuthController(MemberService memberService, SecurityService securityService, ChapterRepository chapterRepository) {
         this.memberService = memberService;
         this.securityService = securityService;
-        this.chapterService = chapterService;
+        this.chapterRepository = chapterRepository;
     }
     
     /**
@@ -122,15 +121,13 @@ public class AuthController {
             
             // Temporary workaround: assign to first chapter in state (database constraint requires chapter)
             String stateName = getStateName(request.getStateOfResidence());
-            List<Chapter> chaptersInState = chapterService.getAllActiveChapters().stream()
-                .filter(chapter -> stateName.equalsIgnoreCase(chapter.getState()))
-                .collect(Collectors.toList());
+            List<Chapter> chaptersInState = chapterRepository.findByStateIgnoreCaseAndActive(stateName, true);
             
             if (!chaptersInState.isEmpty()) {
                 newMember.setChapter(chaptersInState.get(0)); // Assign to first chapter in state
             } else {
                 // If no chapters in state, assign to first available chapter
-                List<Chapter> allChapters = chapterService.getAllActiveChapters();
+                List<Chapter> allChapters = chapterRepository.findByActiveTrue();
                 if (!allChapters.isEmpty()) {
                     newMember.setChapter(allChapters.get(0));
                 } else {
