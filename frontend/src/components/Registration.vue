@@ -107,31 +107,31 @@
                 </div>
               </div>
 
-              <!-- Chapter Selection -->
+              <!-- State of Residence -->
               <div class="mb-3">
-                <label for="chapterId" class="form-label">Select Chapter *</label>
+                <label for="stateOfResidence" class="form-label">State of Residence *</label>
                 <select
                   class="form-select"
-                  id="chapterId"
-                  v-model="form.chapterId"
-                  :class="{ 'is-invalid': errors.chapterId }"
+                  id="stateOfResidence"
+                  v-model="form.stateOfResidence"
+                  :class="{ 'is-invalid': errors.stateOfResidence }"
                   required
                 >
-                  <option value="">Choose a chapter...</option>
+                  <option value="">Choose your state...</option>
                   <option
-                    v-for="chapter in chapters"
-                    :key="chapter.id"
-                    :value="chapter.id"
+                    v-for="state in states"
+                    :key="state.code"
+                    :value="state.code"
                   >
-                    {{ chapter.name }} - {{ chapter.university }}
+                    {{ state.name }}
                   </option>
                 </select>
-                <div v-if="errors.chapterId" class="invalid-feedback">
-                  {{ errors.chapterId }}
+                <div v-if="errors.stateOfResidence" class="invalid-feedback">
+                  {{ errors.stateOfResidence }}
                 </div>
-                <div v-if="chaptersError" class="form-text text-danger">
-                  Error loading chapters: {{ chaptersError }}
-                </div>
+                <small class="form-text text-muted">
+                  We'll help you find chapters in your area after registration
+                </small>
               </div>
 
               <!-- Optional Information -->
@@ -208,36 +208,71 @@ export default {
         email: '',
         username: '',
         password: '',
-        chapterId: '',
+        stateOfResidence: '',
         major: '',
         graduationYear: '',
         phoneNumber: ''
       },
-      chapters: [],
+      states: [
+        { code: 'AL', name: 'Alabama' },
+        { code: 'AK', name: 'Alaska' },
+        { code: 'AZ', name: 'Arizona' },
+        { code: 'AR', name: 'Arkansas' },
+        { code: 'CA', name: 'California' },
+        { code: 'CO', name: 'Colorado' },
+        { code: 'CT', name: 'Connecticut' },
+        { code: 'DE', name: 'Delaware' },
+        { code: 'FL', name: 'Florida' },
+        { code: 'GA', name: 'Georgia' },
+        { code: 'HI', name: 'Hawaii' },
+        { code: 'ID', name: 'Idaho' },
+        { code: 'IL', name: 'Illinois' },
+        { code: 'IN', name: 'Indiana' },
+        { code: 'IA', name: 'Iowa' },
+        { code: 'KS', name: 'Kansas' },
+        { code: 'KY', name: 'Kentucky' },
+        { code: 'LA', name: 'Louisiana' },
+        { code: 'ME', name: 'Maine' },
+        { code: 'MD', name: 'Maryland' },
+        { code: 'MA', name: 'Massachusetts' },
+        { code: 'MI', name: 'Michigan' },
+        { code: 'MN', name: 'Minnesota' },
+        { code: 'MS', name: 'Mississippi' },
+        { code: 'MO', name: 'Missouri' },
+        { code: 'MT', name: 'Montana' },
+        { code: 'NE', name: 'Nebraska' },
+        { code: 'NV', name: 'Nevada' },
+        { code: 'NH', name: 'New Hampshire' },
+        { code: 'NJ', name: 'New Jersey' },
+        { code: 'NM', name: 'New Mexico' },
+        { code: 'NY', name: 'New York' },
+        { code: 'NC', name: 'North Carolina' },
+        { code: 'ND', name: 'North Dakota' },
+        { code: 'OH', name: 'Ohio' },
+        { code: 'OK', name: 'Oklahoma' },
+        { code: 'OR', name: 'Oregon' },
+        { code: 'PA', name: 'Pennsylvania' },
+        { code: 'RI', name: 'Rhode Island' },
+        { code: 'SC', name: 'South Carolina' },
+        { code: 'SD', name: 'South Dakota' },
+        { code: 'TN', name: 'Tennessee' },
+        { code: 'TX', name: 'Texas' },
+        { code: 'UT', name: 'Utah' },
+        { code: 'VT', name: 'Vermont' },
+        { code: 'VA', name: 'Virginia' },
+        { code: 'WA', name: 'Washington' },
+        { code: 'WV', name: 'West Virginia' },
+        { code: 'WI', name: 'Wisconsin' },
+        { code: 'WY', name: 'Wyoming' },
+        { code: 'DC', name: 'District of Columbia' }
+      ],
       errors: {},
       successMessage: '',
       errorMessage: '',
-      chaptersError: '',
       isSubmitting: false
     }
   },
-  async mounted() {
-    await this.loadChapters()
-  },
   methods: {
-    async loadChapters() {
-      try {
-        const response = await fetch('http://localhost:8080/api/chapters')
-        if (response.ok) {
-          this.chapters = await response.json()
-        } else {
-          this.chaptersError = 'Failed to load chapters'
-        }
-      } catch (error) {
-        console.error('Error loading chapters:', error)
-        this.chaptersError = 'Network error loading chapters'
-      }
-    },
     validateForm() {
       this.errors = {}
       let isValid = true
@@ -286,8 +321,8 @@ export default {
         isValid = false
       }
 
-      if (!this.form.chapterId) {
-        this.errors.chapterId = 'Please select a chapter'
+      if (!this.form.stateOfResidence) {
+        this.errors.stateOfResidence = 'Please select your state of residence'
         isValid = false
       }
 
@@ -345,7 +380,7 @@ export default {
         email: '',
         username: '',
         password: '',
-        chapterId: '',
+        stateOfResidence: '',
         major: '',
         graduationYear: '',
         phoneNumber: ''
