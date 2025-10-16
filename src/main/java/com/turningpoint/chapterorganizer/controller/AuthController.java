@@ -238,11 +238,36 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("chapters", chapters);
+            response.put("totalCount", chapters.size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "Failed to fetch chapters: " + e.getMessage());
+            response.put("error", e.getClass().getSimpleName());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    /**
+     * Simple test endpoint to check database connectivity
+     */
+    @GetMapping("/chapters/count")
+    public ResponseEntity<Map<String, Object>> getChapterCount() {
+        try {
+            long count = chapterRepository.count();
+            List<Chapter> allChapters = chapterRepository.findAll();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("totalChapters", count);
+            response.put("firstFewChapters", allChapters.stream().limit(3).toList());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Database error: " + e.getMessage());
+            response.put("error", e.getClass().getSimpleName());
             return ResponseEntity.status(500).body(response);
         }
     }
