@@ -71,12 +71,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         // Log the actual exception for debugging
+        System.err.println("EXCEPTION CAUGHT: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
         ex.printStackTrace();
         
         ErrorResponse error = new ErrorResponse(
             HttpStatus.INTERNAL_SERVER_ERROR.value(),
             "Internal Server Error",
-            "An unexpected error occurred: " + ex.getMessage() + " (" + ex.getClass().getSimpleName() + ")",
+            "DEBUG: " + ex.getMessage() + " (" + ex.getClass().getSimpleName() + ")",
             LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
