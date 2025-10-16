@@ -1,8 +1,10 @@
 package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.dto.RegistrationRequestDto;
+import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.security.service.SecurityService;
+import com.turningpoint.chapterorganizer.service.ChapterService;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import com.turningpoint.chapterorganizer.util.PasswordUtil;
 import jakarta.validation.Valid;
@@ -11,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Authentication controller for login/logout operations
@@ -24,11 +28,13 @@ public class AuthController {
     
     private final MemberService memberService;
     private final SecurityService securityService;
+    private final ChapterService chapterService;
     
     @Autowired
-    public AuthController(MemberService memberService, SecurityService securityService) {
+    public AuthController(MemberService memberService, SecurityService securityService, ChapterService chapterService) {
         this.memberService = memberService;
         this.securityService = securityService;
+        this.chapterService = chapterService;
     }
     
     /**
@@ -106,14 +112,34 @@ public class AuthController {
                 );
             }
 
-            // Create new member (without chapter for now)
+            // Create new member - assign to first available chapter in state as temporary workaround
             Member newMember = new Member();
             newMember.setFirstName(request.getFirstName());
             newMember.setLastName(request.getLastName());
             newMember.setEmail(request.getEmail());
             newMember.setUsername(request.getUsername());
             newMember.setPasswordHash(PasswordUtil.encode(request.getPassword()));
-            newMember.setChapter(null); // User will select chapter later
+            
+            // Temporary workaround: assign to first chapter in state (database constraint requires chapter)
+            String stateName = getStateName(request.getStateOfResidence());
+            List<Chapter> chaptersInState = chapterService.getAllChapters().stream()
+                .filter(chapter -> stateName.equalsIgnoreCase(chapter.getState()))
+                .collect(Collectors.toList());
+            
+            if (!chaptersInState.isEmpty()) {
+                newMember.setChapter(chaptersInState.get(0)); // Assign to first chapter in state
+            } else {
+                // If no chapters in state, assign to first available chapter
+                List<Chapter> allChapters = chapterService.getAllChapters();
+                if (!allChapters.isEmpty()) {
+                    newMember.setChapter(allChapters.get(0));
+                } else {
+                    return ResponseEntity.badRequest().body(
+                        Map.of("success", false, "message", "No chapters available for registration")
+                    );
+                }
+            }
+            
             newMember.setPhoneNumber(request.getPhoneNumber());
             newMember.setMajor(request.getMajor());
             newMember.setGraduationYear(request.getGraduationYear());
