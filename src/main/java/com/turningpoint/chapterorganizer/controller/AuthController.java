@@ -284,6 +284,63 @@ public class AuthController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
+    /**
+     * Initialize test chapters if database is empty
+     */
+    @PostMapping("/chapters/init")
+    public ResponseEntity<Map<String, Object>> initializeTestChapters() {
+        try {
+            long count = chapterRepository.count();
+            if (count > 0) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("message", "Chapters already exist. Count: " + count);
+                return ResponseEntity.ok(response);
+            }
+
+            // Create some test chapters
+            Chapter californiaChapter = new Chapter();
+            californiaChapter.setName("UC Berkeley Chapter");
+            californiaChapter.setUniversityName("University of California, Berkeley");
+            californiaChapter.setCity("Berkeley");
+            californiaChapter.setState("California");
+            californiaChapter.setActive(true);
+            californiaChapter = chapterRepository.save(californiaChapter);
+
+            Chapter texasChapter = new Chapter();
+            texasChapter.setName("UT Austin Chapter");
+            texasChapter.setUniversityName("University of Texas at Austin");
+            texasChapter.setCity("Austin");
+            texasChapter.setState("Texas");
+            texasChapter.setActive(true);
+            texasChapter = chapterRepository.save(texasChapter);
+
+            Chapter newYorkChapter = new Chapter();
+            newYorkChapter.setName("NYU Chapter");
+            newYorkChapter.setUniversityName("New York University");
+            newYorkChapter.setCity("New York");
+            newYorkChapter.setState("New York");
+            newYorkChapter.setActive(true);
+            newYorkChapter = chapterRepository.save(newYorkChapter);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Created 3 test chapters");
+            response.put("chapters", List.of(
+                Map.of("id", californiaChapter.getId(), "name", californiaChapter.getName(), "state", californiaChapter.getState()),
+                Map.of("id", texasChapter.getId(), "name", texasChapter.getName(), "state", texasChapter.getState()),
+                Map.of("id", newYorkChapter.getId(), "name", newYorkChapter.getName(), "state", newYorkChapter.getState())
+            ));
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to initialize chapters: " + e.getMessage());
+            response.put("error", e.getClass().getSimpleName());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
     
     /**
      * Authenticate user with username and password
