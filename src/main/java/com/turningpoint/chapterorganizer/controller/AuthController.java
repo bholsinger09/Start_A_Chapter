@@ -292,15 +292,24 @@ public class AuthController {
     }
 
     /**
-     * Ultra simple test endpoint without any dependencies
+     * Minimal registration endpoint for debugging security context issues
      */
-    @GetMapping("/ping")
-    public ResponseEntity<Map<String, Object>> ping() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Controller is working");
-        response.put("timestamp", System.currentTimeMillis());
-        return ResponseEntity.ok(response);
+    @PostMapping("/register-minimal")
+    public ResponseEntity<Map<String, Object>> registerMinimal(@RequestBody Map<String, String> request) {
+        try {
+            // Just return success without any database operations
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Minimal registration test successful");
+            response.put("username", request.get("username"));
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Minimal test failed: " + e.getMessage());
+            response.put("error", e.getClass().getSimpleName());
+            return ResponseEntity.status(500).body(response);
+        }
     }
 
     /**
