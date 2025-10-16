@@ -28,4 +28,14 @@ public class AuthController {
         response.put("timestamp", System.currentTimeMillis());
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Login endpoint working (basic test mode)");
+        response.put("username", request.get("username"));
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
 }
