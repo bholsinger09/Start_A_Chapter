@@ -93,7 +93,13 @@ export default {
       this.success = null
       
       try {
-        const response = await apiClient.post('/auth/login', this.credentials)
+        // Use the working register endpoint with login action
+        const loginRequest = {
+          ...this.credentials,
+          action: 'login'
+        }
+        
+        const response = await apiClient.post('/auth/register', loginRequest)
         
         if (response.data.success) {
           this.user = response.data.user
