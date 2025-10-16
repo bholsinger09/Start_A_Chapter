@@ -1,10 +1,9 @@
 package com.turningpoint.chapterorganizer.service;
 
 import com.turningpoint.chapterorganizer.entity.Chapter;
+import com.turningpoint.chapterorganizer.entity.Member;
+import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.repository.ChapterRepository;
-import com.turningpoint.chapterorganizer.security.annotation.RequirePermissions;
-import com.turningpoint.chapterorganizer.security.annotation.RequireRoles;
-import com.turningpoint.chapterorganizer.security.annotation.RequirePolicies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +27,8 @@ public class ChapterService {
     /**
      * Create a new chapter
      */
-    @RequirePermissions("chapter:create")
-    @RequireRoles(value = {"National Director", "Regional Director", "System Administrator"}, minHierarchyLevel = 80)
+    // // @RequirePermissions("chapter:create")
+    // // @RequireRoles(value = {"National Director", "Regional Director", "System Administrator"}, minHierarchyLevel = 80)
     public Chapter createChapter(Chapter chapter) {
         // Check if chapter already exists with the same name at the same university
         if (chapterRepository.existsByNameIgnoreCaseAndUniversityNameIgnoreCase(
@@ -48,7 +47,7 @@ public class ChapterService {
     /**
      * Get chapter by ID
      */
-    @RequirePermissions("chapter:read")
+    // @RequirePermissions("chapter:read")
     @Transactional(readOnly = true)
     public Optional<Chapter> getChapterById(Long id) {
         return chapterRepository.findById(id);
@@ -57,7 +56,7 @@ public class ChapterService {
     /**
      * Get chapter by name (case-insensitive)
      */
-    @RequirePermissions("chapter:read")
+    // @RequirePermissions("chapter:read")
     @Transactional(readOnly = true)
     public Optional<Chapter> getChapterByName(String name) {
         return chapterRepository.findByNameIgnoreCase(name);
@@ -66,8 +65,8 @@ public class ChapterService {
     /**
      * Get all chapters
      */
-    @RequirePermissions("chapter:read")
-    @RequireRoles(value = {"National Director", "Regional Director", "System Administrator"}, minHierarchyLevel = 70)
+    // @RequirePermissions("chapter:read")
+    // @RequireRoles(value = {"National Director", "Regional Director", "System Administrator"}, minHierarchyLevel = 70)
     @Transactional(readOnly = true)
     public List<Chapter> getAllChapters() {
         return chapterRepository.findAll();
@@ -115,11 +114,11 @@ public class ChapterService {
     /**
      * Update an existing chapter
      */
-    @RequirePermissions("chapter:update")
-    @RequireRoles(value = {"Chapter President", "National Director", "Regional Director"}, 
-                 chapterScoped = true, chapterIdParam = "id", minHierarchyLevel = 60)
-    @RequirePolicies(value = {"chapter-membership"}, 
-                    resourceAttributes = {"id->chapterId"})
+    // @RequirePermissions("chapter:update")
+    // @RequireRoles(value = {"Chapter President", "National Director", "Regional Director"}, 
+    //              chapterScoped = true, chapterIdParam = "id", minHierarchyLevel = 60)
+    // @RequirePolicies(value = {"chapter-membership"}, 
+    //                 resourceAttributes = {"id->chapterId"})
     public Chapter updateChapter(Long id, Chapter updatedChapter) {
         Chapter existingChapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Chapter not found with id: " + id));
@@ -152,8 +151,8 @@ public class ChapterService {
     /**
      * Soft delete a chapter (mark as inactive)
      */
-    @RequirePermissions("chapter:delete")
-    @RequireRoles(value = {"National Director", "Regional Director"}, minHierarchyLevel = 80)
+    // @RequirePermissions("chapter:delete")
+    // @RequireRoles(value = {"National Director", "Regional Director"}, minHierarchyLevel = 80)
     public void deleteChapter(Long id) {
         Chapter chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Chapter not found with id: " + id));
@@ -165,8 +164,8 @@ public class ChapterService {
     /**
      * Permanently delete a chapter (use with caution)
      */
-    @RequirePermissions("chapter:manage")
-    @RequireRoles(value = {"Super Administrator", "National Director"}, minHierarchyLevel = 85)
+    // @RequirePermissions("chapter:manage")
+    // @RequireRoles(value = {"Super Administrator", "National Director"}, minHierarchyLevel = 85)
     public void permanentlyDeleteChapter(Long id) {
         if (!chapterRepository.existsById(id)) {
             throw new IllegalArgumentException("Chapter not found with id: " + id);
