@@ -19,6 +19,16 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/simple-test")
+    public ResponseEntity<Map<String, Object>> loginViaSimpleTest(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Login working via simple-test POST endpoint");
+        response.put("username", request.get("username"));
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, Object> request) {
         Map<String, Object> response = new HashMap<>();
