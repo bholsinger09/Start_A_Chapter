@@ -235,9 +235,23 @@ public class AuthController {
                 chapters = chapterRepository.findByActiveTrue();
             }
             
+            // Convert to simple DTOs to avoid serialization issues
+            List<Map<String, Object>> chapterDtos = chapters.stream()
+                .map(chapter -> {
+                    Map<String, Object> dto = new HashMap<>();
+                    dto.put("id", chapter.getId());
+                    dto.put("name", chapter.getName());
+                    dto.put("universityName", chapter.getUniversityName());
+                    dto.put("city", chapter.getCity());
+                    dto.put("state", chapter.getState());
+                    dto.put("active", chapter.getActive());
+                    return dto;
+                })
+                .toList();
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("chapters", chapters);
+            response.put("chapters", chapterDtos);
             response.put("totalCount", chapters.size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -256,12 +270,11 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> getChapterCount() {
         try {
             long count = chapterRepository.count();
-            List<Chapter> allChapters = chapterRepository.findAll();
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("totalChapters", count);
-            response.put("firstFewChapters", allChapters.stream().limit(3).toList());
+            response.put("message", "Database connection successful");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
