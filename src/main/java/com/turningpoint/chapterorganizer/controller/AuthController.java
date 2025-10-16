@@ -264,6 +264,18 @@ public class AuthController {
     }
 
     /**
+     * Simple health check endpoint without dependencies
+     */
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, Object>> healthCheck() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "AuthController is working");
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Simple test endpoint to check database connectivity
      */
     @GetMapping("/chapters/count")
