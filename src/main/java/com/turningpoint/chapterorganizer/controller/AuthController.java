@@ -4,6 +4,7 @@ import com.turningpoint.chapterorganizer.dto.RegistrationRequestDto;
 import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.repository.ChapterRepository;
+import com.turningpoint.chapterorganizer.repository.MemberRepository;
 import com.turningpoint.chapterorganizer.security.service.SecurityService;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import com.turningpoint.chapterorganizer.util.PasswordUtil;
@@ -28,12 +29,14 @@ public class AuthController {
     private final MemberService memberService;
     private final SecurityService securityService;
     private final ChapterRepository chapterRepository;
+    private final MemberRepository memberRepository;
     
     @Autowired
-    public AuthController(MemberService memberService, SecurityService securityService, ChapterRepository chapterRepository) {
+    public AuthController(MemberService memberService, SecurityService securityService, ChapterRepository chapterRepository, MemberRepository memberRepository) {
         this.memberService = memberService;
         this.securityService = securityService;
         this.chapterRepository = chapterRepository;
+        this.memberRepository = memberRepository;
     }
     
     /**
@@ -98,14 +101,14 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequestDto request) {
         try {
             // Check if username already exists
-            if (memberService.existsByUsername(request.getUsername())) {
+            if (memberRepository.existsByUsername(request.getUsername())) {
                 return ResponseEntity.badRequest().body(
                     Map.of("success", false, "message", "Username already exists")
                 );
             }
 
             // Check if email already exists
-            if (memberService.existsByEmail(request.getEmail())) {
+            if (memberRepository.existsByEmail(request.getEmail())) {
                 return ResponseEntity.badRequest().body(
                     Map.of("success", false, "message", "Email already exists")
                 );
@@ -143,7 +146,7 @@ public class AuthController {
             newMember.setActive(true);
 
             // Save the member
-            Member savedMember = memberService.createMember(newMember);
+            Member savedMember = memberRepository.save(newMember);
 
             // Return success response with state information for future chapter matching
             Map<String, Object> responseData = new HashMap<>();
