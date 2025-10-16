@@ -35,16 +35,15 @@ public class MemberService {
             throw new IllegalArgumentException("Member with this email already exists");
         }
 
-        // Validate that the chapter exists
-        if (member.getChapter() != null && member.getChapter().getId() != null) {
+                // Validate chapter exists if provided (chapter is now optional)
+        if (member.getChapter() != null) {
             Optional<Chapter> chapter = chapterService.getChapterById(member.getChapter().getId());
             if (chapter.isEmpty()) {
                 throw new IllegalArgumentException("Chapter not found with id: " + member.getChapter().getId());
             }
             member.setChapter(chapter.get());
-        } else {
-            throw new IllegalArgumentException("Chapter is required for member creation");
         }
+        // Chapter is optional - members can be created without a chapter and join one later
 
         // Set default values
         if (member.getActive() == null) {
