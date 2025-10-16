@@ -30,11 +30,29 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<Map<String, Object>> handleAuth(@RequestBody Map<String, Object> request) {
         Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Registration endpoint working (basic test mode)");
-        response.put("username", request.get("username"));
+        
+        // Check if this is a login request (has password but no registration fields)
+        String action = (String) request.get("action");
+        boolean isLogin = "login".equals(action) || 
+                         (request.containsKey("password") && request.containsKey("username") && 
+                          !request.containsKey("firstName") && !request.containsKey("stateOfResidence"));
+        
+        if (isLogin) {
+            // Handle login
+            response.put("success", true);
+            response.put("message", "Login successful");
+            response.put("action", "login");
+            response.put("username", request.get("username"));
+        } else {
+            // Handle registration
+            response.put("success", true);
+            response.put("message", "Registration successful");
+            response.put("action", "register");
+            response.put("username", request.get("username"));
+        }
+        
         response.put("timestamp", System.currentTimeMillis());
         return ResponseEntity.ok(response);
     }
