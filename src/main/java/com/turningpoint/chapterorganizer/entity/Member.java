@@ -63,7 +63,7 @@ public class Member {
     private String graduationYear;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chapter_id", nullable = false)
+    @JoinColumn(name = "chapter_id", nullable = true)
     @JsonBackReference
     private Chapter chapter;
 
