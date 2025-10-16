@@ -122,7 +122,7 @@ public class AuthController {
             
             // Temporary workaround: assign to first chapter in state (database constraint requires chapter)
             String stateName = getStateName(request.getStateOfResidence());
-            List<Chapter> chaptersInState = chapterService.getAllChapters().stream()
+            List<Chapter> chaptersInState = chapterService.getAllActiveChapters().stream()
                 .filter(chapter -> stateName.equalsIgnoreCase(chapter.getState()))
                 .collect(Collectors.toList());
             
@@ -130,7 +130,7 @@ public class AuthController {
                 newMember.setChapter(chaptersInState.get(0)); // Assign to first chapter in state
             } else {
                 // If no chapters in state, assign to first available chapter
-                List<Chapter> allChapters = chapterService.getAllChapters();
+                List<Chapter> allChapters = chapterService.getAllActiveChapters();
                 if (!allChapters.isEmpty()) {
                     newMember.setChapter(allChapters.get(0));
                 } else {
