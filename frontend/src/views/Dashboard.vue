@@ -190,7 +190,8 @@ export default {
     const fetchPublicStats = async () => {
       try {
         loading.value = true
-        const response = await fetch('http://localhost:8080/api/stats/public/overview')
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+        const response = await fetch(`${API_BASE_URL}/api/stats/public/overview`)
         
         if (!response.ok) {
           throw new Error('Failed to fetch statistics')
