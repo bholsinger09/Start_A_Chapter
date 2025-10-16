@@ -219,6 +219,33 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    /**
+     * Get active chapters by state for registration
+     */
+    @GetMapping("/chapters/active")
+    public ResponseEntity<Map<String, Object>> getActiveChaptersByState(@RequestParam(required = false) String state) {
+        try {
+            List<Chapter> chapters;
+            if (state != null && !state.trim().isEmpty()) {
+                // Get chapters for specific state
+                chapters = chapterRepository.findByStateIgnoreCaseAndActive(state.trim(), true);
+            } else {
+                // Get all active chapters
+                chapters = chapterRepository.findByActiveTrue();
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("chapters", chapters);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to fetch chapters: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
     
     /**
      * Authenticate user with username and password
