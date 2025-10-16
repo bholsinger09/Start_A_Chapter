@@ -1081,6 +1081,27 @@ export default {
 
     uniqueUniversities() {
       return [...new Set(this.chapters.map(c => c.universityName).filter(Boolean))].sort()
+    },
+
+    healthStats() {
+      const stats = {
+        excellent: 0,
+        good: 0,
+        needsAttention: 0
+      }
+      
+      this.searchResults.forEach(chapter => {
+        const score = this.getChapterHealthScore(chapter)
+        if (score >= 80) {
+          stats.excellent++
+        } else if (score >= 60) {
+          stats.good++
+        } else {
+          stats.needsAttention++
+        }
+      })
+      
+      return stats
     }
   },
   async mounted() {
@@ -1588,6 +1609,11 @@ export default {
         alert('Error deleting chapter. Please try again.')
       }
     },
+
+    getStateChapterCount(state) {
+      return this.chapters.filter(chapter => chapter.state === state).length
+    },
+
     closeModal() {
       this.showCreateModal = false
       this.showEditModal = false
