@@ -9,7 +9,10 @@
               <i class="fas fa-tachometer-alt text-primary me-3"></i>
               System Dashboard
             </h1>
-            <p class="text-muted mb-0">Campus Chapter Organizer Management</p>
+            <p class="text-muted mb-0">
+              <span v-if="currentUser">Welcome back, {{ currentUser.username }}! | </span>
+              Campus Chapter Organizer Management
+            </p>
           </div>
           <div class="col-auto">
             <button 
@@ -186,6 +189,25 @@ export default {
     const totalRsvps = ref(0)
     const loading = ref(true)
     const error = ref(null)
+    const currentUser = ref(null)
+
+    // Check for logged in user
+    const checkUser = () => {
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          currentUser.value = JSON.parse(storedUser)
+        } catch (error) {
+          console.error('Error parsing stored user:', error)
+          currentUser.value = null
+        }
+      }
+    }
+
+    // Check user on component mount
+    onMounted(() => {
+      checkUser()
+    })
 
     const fetchPublicStats = async () => {
       try {
@@ -229,7 +251,8 @@ export default {
       totalRsvps,
       loading,
       error,
-      fetchPublicStats
+      fetchPublicStats,
+      currentUser
     }
   }
 }

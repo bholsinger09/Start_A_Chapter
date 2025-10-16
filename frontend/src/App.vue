@@ -39,15 +39,31 @@
                 <i class="bi bi-calendar-event me-1"></i>Events
               </router-link>
             </li>
-            <li class="nav-item">
+            
+            <!-- Show login/register or user info based on authentication state -->
+            <li v-if="!currentUser" class="nav-item">
               <router-link class="nav-link" to="/login" active-class="active">
                 <i class="bi bi-box-arrow-in-right me-1"></i>Login
               </router-link>
             </li>
-            <li class="nav-item">
+            <li v-if="!currentUser" class="nav-item">
               <router-link class="nav-link" to="/register" active-class="active">
                 <i class="bi bi-person-plus me-1"></i>Register
               </router-link>
+            </li>
+            
+            <!-- User info dropdown when logged in -->
+            <li v-if="currentUser" class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-1"></i>{{ currentUser.username }}
+              </a>
+              <ul class="dropdown-menu">
+                <li><h6 class="dropdown-header">Welcome, {{ currentUser.username }}!</h6></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" @click="logout">
+                  <i class="bi bi-box-arrow-right me-1"></i>Logout
+                </a></li>
+              </ul>
             </li>
           </ul>
         </div>
@@ -82,7 +98,52 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data() {
+    return {
+      currentUser: null
+    }
+  },
+  mounted() {
+    // Check for stored user on app load
+    this.checkAuthState()
+    
+    // Listen for storage changes (when user logs in from another tab)
+    window.addEventListener('storage', this.checkAuthState)
+  },
+  beforeUnmount() {
+    window.removeEventListener('storage', this.checkAuthState)
+  },
+  methods: {
+    checkAuthState() {
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          this.currentUser = JSON.parse(storedUser)
+        } catch (error) {
+          console.error('Error parsing stored user:', error)
+          localStorage.removeItem('user')
+          this.currentUser = null
+        }
+      } else {
+        this.currentUser = null
+      }
+    },
+    logout() {
+      // Clear user data
+      localStorage.removeItem('user')
+      this.currentUser = null
+      
+      // Redirect to login page
+      this.$router.push('/login')
+    }
+  },
+  watch: {
+    // Watch for route changes to update auth state
+    '$route'() {
+      this.checkAuthState()
+    }
+  }
 }
 </script>
 

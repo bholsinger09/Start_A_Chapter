@@ -102,11 +102,23 @@ export default {
         const response = await apiClient.post('/auth/register', loginRequest)
         
         if (response.data.success) {
-          this.user = response.data.user
-          this.success = 'Login successful!'
+          // Create user object from the response
+          const userData = {
+            username: response.data.username,
+            action: response.data.action,
+            loginTime: new Date().toISOString()
+          }
+          
+          this.user = userData
+          this.success = 'Login successful! Redirecting to dashboard...'
           
           // Store user info in localStorage for persistence
-          localStorage.setItem('user', JSON.stringify(this.user))
+          localStorage.setItem('user', JSON.stringify(userData))
+          
+          // Redirect to dashboard after a brief delay to show success message
+          setTimeout(() => {
+            this.$router.push('/')
+          }, 1500)
         } else {
           this.error = response.data.message || 'Login failed'
         }
