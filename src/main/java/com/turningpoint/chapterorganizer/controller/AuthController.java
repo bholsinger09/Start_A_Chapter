@@ -267,15 +267,28 @@ public class AuthController {
     }
 
     /**
-     * Simple health check endpoint without dependencies
+     * Simplified test registration endpoint for debugging
      */
-    @GetMapping("/health")
-    public ResponseEntity<Map<String, Object>> healthCheck() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "AuthController is working");
-        response.put("timestamp", System.currentTimeMillis());
-        return ResponseEntity.ok(response);
+    @PostMapping("/register-test")
+    public ResponseEntity<Map<String, Object>> registerTest(@RequestBody @Valid RegistrationRequestDto request) {
+        try {
+            // Simple test - just check if we can access repositories without security context
+            long memberCount = memberRepository.count();
+            long chapterCount = chapterRepository.count();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Repository access successful");
+            response.put("memberCount", memberCount);
+            response.put("chapterCount", chapterCount);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Test failed: " + e.getMessage());
+            response.put("error", e.getClass().getSimpleName());
+            return ResponseEntity.status(500).body(response);
+        }
     }
 
     /**
