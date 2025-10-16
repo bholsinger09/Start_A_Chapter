@@ -25,8 +25,8 @@ import java.util.Map;
 /**
  * Security aspect for handling RBAC and ABAC annotations.
  */
-@Aspect
-@Component
+// @Aspect
+// @Component
 public class SecurityAspect {
     
     private final SecurityService securityService;
