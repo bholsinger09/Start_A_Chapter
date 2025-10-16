@@ -1,11 +1,8 @@
 package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.dto.RegistrationRequestDto;
-import com.turningpoint.chapterorganizer.dto.RegistrationResponseDto;
-import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.security.service.SecurityService;
-import com.turningpoint.chapterorganizer.service.ChapterService;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import com.turningpoint.chapterorganizer.util.PasswordUtil;
 import jakarta.validation.Valid;
@@ -27,14 +24,11 @@ public class AuthController {
     
     private final MemberService memberService;
     private final SecurityService securityService;
-    private final ChapterService chapterService;
     
     @Autowired
-    public AuthController(MemberService memberService, SecurityService securityService, 
-                         ChapterService chapterService) {
+    public AuthController(MemberService memberService, SecurityService securityService) {
         this.memberService = memberService;
         this.securityService = securityService;
-        this.chapterService = chapterService;
     }
     
     /**
@@ -98,15 +92,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequestDto request) {
         try {
-            // Validate chapter exists
-            Optional<Chapter> chapterOptional = chapterService.getChapterById(request.getChapterId());
-            if (chapterOptional.isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                    Map.of("success", false, "message", "Invalid chapter ID")
-                );
-            }
-            Chapter chapter = chapterOptional.get();
-
             // Check if username already exists
             if (memberService.existsByUsername(request.getUsername())) {
                 return ResponseEntity.badRequest().body(
@@ -121,14 +106,14 @@ public class AuthController {
                 );
             }
 
-            // Create new member
+            // Create new member (without chapter for now)
             Member newMember = new Member();
             newMember.setFirstName(request.getFirstName());
             newMember.setLastName(request.getLastName());
             newMember.setEmail(request.getEmail());
             newMember.setUsername(request.getUsername());
             newMember.setPasswordHash(PasswordUtil.encode(request.getPassword()));
-            newMember.setChapter(chapter);
+            newMember.setChapter(null); // User will select chapter later
             newMember.setPhoneNumber(request.getPhoneNumber());
             newMember.setMajor(request.getMajor());
             newMember.setGraduationYear(request.getGraduationYear());
@@ -137,20 +122,47 @@ public class AuthController {
             // Save the member
             Member savedMember = memberService.createMember(newMember);
 
-            // Return success response
-            RegistrationResponseDto response = new RegistrationResponseDto(
-                "Registration successful",
-                savedMember.getId(),
-                savedMember.getUsername()
-            );
+            // Return success response with state information for future chapter matching
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            responseData.put("message", "Registration successful! You can now find chapters in " + getStateName(request.getStateOfResidence()));
+            responseData.put("userId", savedMember.getId());
+            responseData.put("username", savedMember.getUsername());
+            responseData.put("stateOfResidence", request.getStateOfResidence());
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(responseData);
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
                 Map.of("success", false, "message", "Registration failed: " + e.getMessage())
             );
         }
+    }
+
+    /**
+     * Helper method to convert state code to state name
+     */
+    private String getStateName(String stateCode) {
+        Map<String, String> stateMap = Map.ofEntries(
+            Map.entry("AL", "Alabama"), Map.entry("AK", "Alaska"), Map.entry("AZ", "Arizona"),
+            Map.entry("AR", "Arkansas"), Map.entry("CA", "California"), Map.entry("CO", "Colorado"),
+            Map.entry("CT", "Connecticut"), Map.entry("DE", "Delaware"), Map.entry("FL", "Florida"),
+            Map.entry("GA", "Georgia"), Map.entry("HI", "Hawaii"), Map.entry("ID", "Idaho"),
+            Map.entry("IL", "Illinois"), Map.entry("IN", "Indiana"), Map.entry("IA", "Iowa"),
+            Map.entry("KS", "Kansas"), Map.entry("KY", "Kentucky"), Map.entry("LA", "Louisiana"),
+            Map.entry("ME", "Maine"), Map.entry("MD", "Maryland"), Map.entry("MA", "Massachusetts"),
+            Map.entry("MI", "Michigan"), Map.entry("MN", "Minnesota"), Map.entry("MS", "Mississippi"),
+            Map.entry("MO", "Missouri"), Map.entry("MT", "Montana"), Map.entry("NE", "Nebraska"),
+            Map.entry("NV", "Nevada"), Map.entry("NH", "New Hampshire"), Map.entry("NJ", "New Jersey"),
+            Map.entry("NM", "New Mexico"), Map.entry("NY", "New York"), Map.entry("NC", "North Carolina"),
+            Map.entry("ND", "North Dakota"), Map.entry("OH", "Ohio"), Map.entry("OK", "Oklahoma"),
+            Map.entry("OR", "Oregon"), Map.entry("PA", "Pennsylvania"), Map.entry("RI", "Rhode Island"),
+            Map.entry("SC", "South Carolina"), Map.entry("SD", "South Dakota"), Map.entry("TN", "Tennessee"),
+            Map.entry("TX", "Texas"), Map.entry("UT", "Utah"), Map.entry("VT", "Vermont"),
+            Map.entry("VA", "Virginia"), Map.entry("WA", "Washington"), Map.entry("WV", "West Virginia"),
+            Map.entry("WI", "Wisconsin"), Map.entry("WY", "Wyoming"), Map.entry("DC", "District of Columbia")
+        );
+        return stateMap.getOrDefault(stateCode, stateCode);
     }
 
     /**

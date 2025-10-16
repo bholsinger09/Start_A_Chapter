@@ -2,7 +2,6 @@ package com.turningpoint.chapterorganizer.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class RegistrationRequestDto {
@@ -27,8 +26,9 @@ public class RegistrationRequestDto {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    @NotNull(message = "Chapter ID is required")
-    private Long chapterId;
+    @NotBlank(message = "State of residence is required")
+    @Size(min = 2, max = 2, message = "State must be a valid 2-character state code")
+    private String stateOfResidence;
 
     @Size(max = 15, message = "Phone number cannot exceed 15 characters")
     private String phoneNumber;
@@ -83,12 +83,12 @@ public class RegistrationRequestDto {
         this.password = password;
     }
 
-    public Long getChapterId() {
-        return chapterId;
+    public String getStateOfResidence() {
+        return stateOfResidence;
     }
 
-    public void setChapterId(Long chapterId) {
-        this.chapterId = chapterId;
+    public void setStateOfResidence(String stateOfResidence) {
+        this.stateOfResidence = stateOfResidence;
     }
 
     public String getPhoneNumber() {
@@ -122,7 +122,7 @@ public class RegistrationRequestDto {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", username='" + username + '\'' +
-                ", chapterId=" + chapterId +
+                ", stateOfResidence='" + stateOfResidence + '\'' +
                 '}';
     }
 }
