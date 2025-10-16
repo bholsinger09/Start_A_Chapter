@@ -38,7 +38,7 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('authToken')
       window.location.href = '/login'
     }
-    
+
     return Promise.reject(error)
   }
 )
@@ -46,13 +46,13 @@ apiClient.interceptors.response.use(
 export function useEventAPI() {
   const isLoading = ref(false)
   const error = ref(null)
-  
+
   // Helper function to handle API calls
   const handleApiCall = async (apiCall) => {
     try {
       isLoading.value = true
       error.value = null
-      
+
       const response = await apiCall()
       return response
     } catch (err) {
@@ -62,177 +62,177 @@ export function useEventAPI() {
       isLoading.value = false
     }
   }
-  
+
   // Event RSVP API Methods
   const fetchEventRSVPs = async (eventId, params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get(`/events/${eventId}/rsvps`, { params })
     )
   }
-  
+
   const createRSVP = async (eventId, rsvpData) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.post(`/events/${eventId}/rsvps`, rsvpData)
     )
   }
-  
+
   const updateRSVP = async (eventId, userId, rsvpData) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.put(`/events/${eventId}/rsvps/${userId}`, rsvpData)
     )
   }
-  
+
   const deleteRSVP = async (eventId, userId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.delete(`/events/${eventId}/rsvps/${userId}`)
     )
   }
-  
+
   const getRSVPStatus = async (eventId, userId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get(`/events/${eventId}/rsvps/${userId}`)
     )
   }
-  
+
   // Event API Methods
   const fetchEvents = async (params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/events', { params })
     )
   }
-  
+
   const fetchEvent = async (eventId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get(`/events/${eventId}`)
     )
   }
-  
+
   const createEvent = async (eventData) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.post('/events', eventData)
     )
   }
-  
+
   const updateEvent = async (eventId, eventData) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.put(`/events/${eventId}`, eventData)
     )
   }
-  
+
   const deleteEvent = async (eventId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.delete(`/events/${eventId}`)
     )
   }
-  
+
   // Recurring Events API Methods
   const fetchRecurringEvents = async (params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/events/recurring', { params })
     )
   }
-  
+
   const createRecurringEvent = async (recurringEventData) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.post('/events/recurring', recurringEventData)
     )
   }
-  
+
   const updateRecurringEvent = async (recurringEventId, recurringEventData) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.put(`/events/recurring/${recurringEventId}`, recurringEventData)
     )
   }
-  
+
   const deleteRecurringEvent = async (recurringEventId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.delete(`/events/recurring/${recurringEventId}`)
     )
   }
-  
+
   // Event Search and Filtering
   const searchEvents = async (query, filters = {}) => {
     const params = {
       q: query,
       ...filters
     }
-    
-    return handleApiCall(() => 
+
+    return handleApiCall(() =>
       apiClient.get('/events/search', { params })
     )
   }
-  
+
   // Event Analytics
   const getEventAnalytics = async (eventId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get(`/events/${eventId}/analytics`)
     )
   }
-  
+
   const getEventsAnalytics = async (params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/events/analytics', { params })
     )
   }
-  
+
   // Member API Methods
   const fetchMembers = async (params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/members', { params })
     )
   }
-  
+
   const fetchMember = async (memberId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get(`/members/${memberId}`)
     )
   }
-  
+
   // Chapter API Methods
   const fetchChapters = async (params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/chapters', { params })
     )
   }
-  
+
   const fetchChapter = async (chapterId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get(`/chapters/${chapterId}`)
     )
   }
-  
+
   // Monitoring API Methods
   const getSystemHealth = async () => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/monitoring/health')
     )
   }
-  
+
   const getMetrics = async (params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/monitoring/metrics', { params })
     )
   }
-  
+
   const getOperationalMetrics = async (params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/monitoring/operational', { params })
     )
   }
-  
+
   const getAuditLogs = async (params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get('/monitoring/audit', { params })
     )
   }
-  
+
   // Utility Methods
   const uploadFile = async (file, type = 'general') => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('type', type)
-    
-    return handleApiCall(() => 
+
+    return handleApiCall(() =>
       apiClient.post('/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -240,41 +240,41 @@ export function useEventAPI() {
       })
     )
   }
-  
+
   const downloadReport = async (reportType, params = {}) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.get(`/reports/${reportType}`, {
         params,
         responseType: 'blob'
       })
     )
   }
-  
+
   // Notification Methods
   const sendNotification = async (notificationData) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.post('/notifications', notificationData)
     )
   }
-  
+
   const markNotificationRead = async (notificationId) => {
-    return handleApiCall(() => 
+    return handleApiCall(() =>
       apiClient.put(`/notifications/${notificationId}/read`)
     )
   }
-  
+
   return {
     // State
     isLoading,
     error,
-    
+
     // RSVP Methods
     fetchEventRSVPs,
     createRSVP,
     updateRSVP,
     deleteRSVP,
     getRSVPStatus,
-    
+
     // Event Methods
     fetchEvents,
     fetchEvent,
@@ -284,33 +284,33 @@ export function useEventAPI() {
     searchEvents,
     getEventAnalytics,
     getEventsAnalytics,
-    
+
     // Recurring Event Methods
     fetchRecurringEvents,
     createRecurringEvent,
     updateRecurringEvent,
     deleteRecurringEvent,
-    
+
     // Member Methods
     fetchMembers,
     fetchMember,
-    
+
     // Chapter Methods
     fetchChapters,
     fetchChapter,
-    
+
     // Monitoring Methods
     getSystemHealth,
     getMetrics,
     getOperationalMetrics,
     getAuditLogs,
-    
+
     // Utility Methods
     uploadFile,
     downloadReport,
     sendNotification,
     markNotificationRead,
-    
+
     // Raw API client for custom calls
     apiClient
   }
