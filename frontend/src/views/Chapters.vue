@@ -1102,6 +1102,11 @@ export default {
       })
       
       return stats
+    },
+
+    allSelected() {
+      return this.selectedChapters.length > 0 && 
+             this.selectedChapters.length === Math.min(3, this.searchResults.length)
     }
   },
   async mounted() {
@@ -1642,6 +1647,41 @@ export default {
 
     getStateChapterCount(state) {
       return this.chapters.filter(chapter => chapter.state === state).length
+    },
+
+    getSortIcon(column) {
+      if (this.sortBy !== column) {
+        return 'bi-chevron-expand'
+      }
+      return this.sortOrder === 'asc' ? 'bi-chevron-up' : 'bi-chevron-down'
+    },
+
+    setSortCriteria(column) {
+      if (this.sortBy === column) {
+        this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc'
+      } else {
+        this.sortBy = column
+        this.sortOrder = 'asc'
+      }
+    },
+
+    truncateText(text, maxLength) {
+      if (!text) return ''
+      if (text.length <= maxLength) return text
+      return text.substring(0, maxLength) + '...'
+    },
+
+    toggleAllSelection() {
+      if (this.allSelected) {
+        this.selectedChapters = []
+      } else {
+        this.selectedChapters = this.searchResults.slice(0, 3).map(chapter => chapter.id)
+      }
+    },
+
+    viewChapterDetails(chapter) {
+      // Navigate to chapter detail view or open modal with detailed information
+      this.$router.push(`/chapters/${chapter.id}`)
     },
 
     closeModal() {
