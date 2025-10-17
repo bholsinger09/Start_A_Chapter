@@ -100,12 +100,28 @@ export default {
       return currentTheme.value === 'dark' ? 'bi bi-moon-stars' : 'bi bi-sun'
     }
 
+    // Wrapper for setTheme with debug logging
+    const setThemeWithDebug = (theme) => {
+      console.log('🎨 ThemeToggle: Setting theme to:', theme)
+      console.log('🎨 ThemeToggle: Current theme before:', currentTheme.value)
+      setTheme(theme)
+      console.log('🎨 ThemeToggle: Current theme after:', currentTheme.value)
+    }
+
+    // Wrapper for useSystemTheme with debug logging
+    const useSystemThemeWithDebug = () => {
+      console.log('🎨 ThemeToggle: Setting to system theme')
+      console.log('🎨 ThemeToggle: System prefers dark:', systemPrefersDark.value)
+      useSystemTheme()
+      console.log('🎨 ThemeToggle: Current theme after system:', currentTheme.value)
+    }
+
     return {
       currentTheme,
       isSystemTheme,
       systemPrefersDark,
-      useSystemTheme,
-      setTheme,
+      useSystemTheme: useSystemThemeWithDebug,
+      setTheme: setThemeWithDebug,
       getCurrentIcon
     }
   }

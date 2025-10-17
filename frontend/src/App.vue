@@ -70,6 +70,22 @@
             <li class="nav-item ms-2">
               <ThemeToggle />
             </li>
+            
+            <!-- Simple Theme Toggle for Testing -->
+            <li class="nav-item ms-2">
+              <SimpleThemeToggle />
+            </li>
+            
+            <!-- Debug Theme Button -->
+            <li class="nav-item ms-2">
+              <button 
+                class="btn btn-outline-light btn-sm" 
+                @click="debugToggleTheme"
+                style="font-size: 0.8rem;"
+              >
+                Debug Theme
+              </button>
+            </li>
           </ul>
         </div>
       </div>
@@ -103,16 +119,18 @@
 
 <script>
 import ThemeToggle from './components/ThemeToggle.vue'
+import SimpleThemeToggle from './components/SimpleThemeToggle.vue'
 import { useTheme } from './composables/useTheme.js'
 import { onMounted } from 'vue'
 
 export default {
   name: 'App',
   components: {
-    ThemeToggle
+    ThemeToggle,
+    SimpleThemeToggle
   },
   setup() {
-    const { initializeTheme } = useTheme()
+    const { initializeTheme, setTheme, currentTheme } = useTheme()
     
     onMounted(() => {
       // Initialize theme on app mount
@@ -125,7 +143,29 @@ export default {
       }, 100)
     })
     
-    return {}
+    // Debug method to test theme toggle
+    const debugToggleTheme = () => {
+      console.log('🔥 DEBUG: Current theme before toggle:', currentTheme.value)
+      const newTheme = currentTheme.value === 'dark' ? 'light' : 'dark'
+      console.log('🔥 DEBUG: Setting theme to:', newTheme)
+      setTheme(newTheme)
+      
+      // Force check DOM after a short delay
+      setTimeout(() => {
+        const html = document.documentElement
+        const body = document.body
+        console.log('🔥 DEBUG: HTML data-theme:', html.getAttribute('data-theme'))
+        console.log('🔥 DEBUG: Body data-theme:', body.getAttribute('data-theme'))
+        console.log('🔥 DEBUG: HTML classes:', html.className)
+        console.log('🔥 DEBUG: Body classes:', body.className)
+        console.log('🔥 DEBUG: Body background color:', body.style.backgroundColor)
+        console.log('🔥 DEBUG: Body color:', body.style.color)
+      }, 100)
+    }
+    
+    return {
+      debugToggleTheme
+    }
   },
   data() {
     return {

@@ -47,11 +47,15 @@ export function useTheme() {
     const body = document.body
     const theme = currentTheme.value
 
-    console.log('Applying theme:', theme) // Debug log
+    console.log('🌙 useTheme: Applying theme:', theme)
+    console.log('🌙 useTheme: HTML element:', html)
+    console.log('🌙 useTheme: Body element:', body)
     
     // Update data attribute for CSS targeting
     html.setAttribute('data-theme', theme)
     body.setAttribute('data-theme', theme)
+    
+    console.log('🌙 useTheme: Set data-theme attribute on html and body')
     
     // Update Bootstrap theme classes
     if (theme === 'dark') {
@@ -59,22 +63,29 @@ export function useTheme() {
       body.setAttribute('data-bs-theme', 'dark')
       html.classList.add('dark-theme')
       body.classList.add('dark-theme')
+      console.log('🌙 useTheme: Added dark theme classes and attributes')
     } else {
       html.removeAttribute('data-bs-theme')
       body.removeAttribute('data-bs-theme')
       html.classList.remove('dark-theme')
       body.classList.remove('dark-theme')
+      console.log('🌙 useTheme: Removed dark theme classes and attributes')
     }
 
     // Force a style update
     body.style.backgroundColor = theme === 'dark' ? '#1a1d23' : '#ffffff'
     body.style.color = theme === 'dark' ? '#f7fafc' : '#212529'
 
+    console.log('🌙 useTheme: Applied inline styles - backgroundColor:', body.style.backgroundColor, 'color:', body.style.color)
+
     // Store preference
     localStorage.setItem('theme-preference', theme)
     localStorage.setItem('theme-is-system', isSystemTheme.value.toString())
     
-    console.log('Theme applied. HTML data-theme:', html.getAttribute('data-theme')) // Debug log
+    console.log('🌙 useTheme: Theme applied. HTML data-theme:', html.getAttribute('data-theme'))
+    console.log('🌙 useTheme: Body data-theme:', body.getAttribute('data-theme'))
+    console.log('🌙 useTheme: HTML classes:', html.className)
+    console.log('🌙 useTheme: Body classes:', body.className)
   }
 
   // Toggle between light and dark

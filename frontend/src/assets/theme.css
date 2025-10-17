@@ -292,3 +292,35 @@ body {
 .preload * {
   transition: none !important;
 }
+
+/* SUPER AGGRESSIVE DARK THEME OVERRIDE - SHOULD DEFINITELY WORK */
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html.dark-theme,
+html.dark-theme body,
+body[data-theme="dark"],
+body.dark-theme {
+  background-color: #1a1d23 !important;
+  background: #1a1d23 !important;
+  color: #f7fafc !important;
+}
+
+#app[data-theme="dark"],
+#app.dark-theme,
+[data-theme="dark"] #app,
+.dark-theme #app {
+  background-color: #1a1d23 !important;
+  background: #1a1d23 !important;
+  color: #f7fafc !important;
+}
+
+/* Debug styling - make dark theme super obvious */
+[data-theme="dark"] {
+  background-color: #1a1d23 !important;
+  color: #f7fafc !important;
+}
+
+.dark-theme {
+  background-color: #1a1d23 !important;
+  color: #f7fafc !important;
+}
