@@ -44,21 +44,37 @@ export function useTheme() {
   // Apply theme to DOM
   const applyTheme = () => {
     const html = document.documentElement
+    const body = document.body
     const theme = currentTheme.value
 
+    console.log('Applying theme:', theme) // Debug log
+    
     // Update data attribute for CSS targeting
     html.setAttribute('data-theme', theme)
+    body.setAttribute('data-theme', theme)
     
     // Update Bootstrap theme classes
     if (theme === 'dark') {
       html.setAttribute('data-bs-theme', 'dark')
+      body.setAttribute('data-bs-theme', 'dark')
+      html.classList.add('dark-theme')
+      body.classList.add('dark-theme')
     } else {
       html.removeAttribute('data-bs-theme')
+      body.removeAttribute('data-bs-theme')
+      html.classList.remove('dark-theme')
+      body.classList.remove('dark-theme')
     }
+
+    // Force a style update
+    body.style.backgroundColor = theme === 'dark' ? '#1a1d23' : '#ffffff'
+    body.style.color = theme === 'dark' ? '#f7fafc' : '#212529'
 
     // Store preference
     localStorage.setItem('theme-preference', theme)
     localStorage.setItem('theme-is-system', isSystemTheme.value.toString())
+    
+    console.log('Theme applied. HTML data-theme:', html.getAttribute('data-theme')) // Debug log
   }
 
   // Toggle between light and dark
