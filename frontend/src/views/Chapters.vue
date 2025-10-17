@@ -1333,6 +1333,14 @@ export default {
       return 'bg-danger'
     },
 
+    getMemberCountBadgeClass(memberCount) {
+      if (memberCount >= 100) return 'badge bg-success'    // Green for large chapters
+      if (memberCount >= 50) return 'badge bg-primary'     // Blue for medium chapters
+      if (memberCount >= 20) return 'badge bg-warning'     // Yellow for small chapters
+      if (memberCount >= 1) return 'badge bg-info'         // Light blue for new chapters
+      return 'badge bg-secondary'                          // Gray for empty chapters
+    },
+
     getYearsSinceFounded(foundedDate) {
       const now = new Date()
       const founded = new Date(foundedDate)
