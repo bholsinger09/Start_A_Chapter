@@ -35,66 +35,47 @@
             </button>
           </div>
         </div>
-        <div class="col-lg-4 col-md-6 mb-3">
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="bi bi-search"></i>
-            </span>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Search chapters, universities, cities..."
-              v-model="searchTerm"
-              @input="performSearch"
-              list="searchSuggestions"
-            >
-            <datalist id="searchSuggestions">
-              <option v-for="suggestion in searchSuggestions" :key="suggestion" :value="suggestion"></option>
-            </datalist>
-            <button 
-              class="btn btn-outline-secondary"
-              @click="showSavedSearches = !showSavedSearches"
-              title="Saved Searches"
-            >
-              <i class="bi bi-bookmark"></i>
-            </button>
-          </div>
+        <div class="col-lg-9 col-md-12 mb-3">
+          <EnhancedSearch
+            :chapters="chapters"
+            :available-states="availableStates"
+            @search="handleEnhancedSearch"
+            @filter-change="handleFilterChange"
+          />
         </div>
-        <div class="col-lg-2 col-md-6 mb-3">
-          <select 
-            class="form-select" 
-            v-model="selectedState"
-            @change="performSearch"
-          >
-            <option value="">All States ({{ availableStates.length }})</option>
-            <option v-for="state in availableStates" :key="state" :value="state">
-              {{ state }} ({{ getStateChapterCount(state) }})
-            </option>
-          </select>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-          <div class="d-flex gap-2">
-            <select 
-              class="form-select" 
-              v-model="sortCriteria"
-              @change="applySorting"
-            >
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="name-desc">Name (Z-A)</option>
-              <option value="members-desc">Most Members</option>
-              <option value="members-asc">Least Members</option>
-              <option value="health-desc">Healthiest</option>
-              <option value="health-asc">Needs Attention</option>
-              <option value="founded-desc">Newest</option>
-              <option value="founded-asc">Oldest</option>
-            </select>
-            <button 
-              class="btn btn-outline-secondary"
-              @click="toggleViewMode"
-              :title="viewMode === 'table' ? 'Switch to Card View' : 'Switch to Table View'"
-            >
-              <i :class="viewMode === 'table' ? 'bi bi-grid-3x3-gap' : 'bi bi-table'"></i>
-            </button>
+      </div>
+
+      <!-- View Controls -->
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-2">
+              <select 
+                class="form-select"
+                style="width: auto;"
+                v-model="sortCriteria"
+                @change="applySorting"
+              >
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="members-desc">Most Members</option>
+                <option value="members-asc">Least Members</option>
+                <option value="health-desc">Healthiest</option>
+                <option value="health-asc">Needs Attention</option>
+                <option value="founded-desc">Newest</option>
+                <option value="founded-asc">Oldest</option>
+              </select>
+              <button 
+                class="btn btn-outline-secondary"
+                @click="toggleViewMode"
+                :title="viewMode === 'table' ? 'Switch to Card View' : 'Switch to Table View'"
+              >
+                <i :class="viewMode === 'table' ? 'bi bi-grid-3x3-gap' : 'bi bi-table'"></i>
+              </button>
+            </div>
+            <div class="text-muted">
+              {{ searchResults.length }} of {{ chapters.length }} chapters
+            </div>
           </div>
         </div>
       </div>
@@ -968,12 +949,14 @@ import { memberService } from '../services/memberService'
 import { useChapterLinks } from '../composables/useChapterLinks'
 import { useTheme } from '../composables/useTheme'
 import ChapterAnalytics from '../components/ChapterAnalytics.vue'
+import EnhancedSearch from '../components/EnhancedSearch.vue'
 import { computed } from 'vue'
 
 export default {
   name: 'Chapters',
   components: {
-    ChapterAnalytics
+    ChapterAnalytics,
+    EnhancedSearch
   },
   setup() {
     // Use the chapter links composable for consistent functionality
@@ -1760,6 +1743,33 @@ export default {
 
     toggleAnalytics() {
       this.showAnalytics = !this.showAnalytics
+    },
+
+    handleEnhancedSearch(searchParams) {
+      console.log('Enhanced search params:', searchParams)
+      
+      // Convert the enhanced search params to our existing search format
+      this.searchTerm = searchParams.query || ''
+      this.selectedState = searchParams.state || ''
+      this.advancedFilters = {
+        university: '',
+        city: searchParams.city || '',
+        active: searchParams.active || ''
+      }
+      
+      // Apply the search using existing logic
+      this.performSearch()
+    },
+
+    handleFilterChange(filters) {
+      console.log('Filter change:', filters)
+      // Update internal filters and trigger search
+      this.advancedFilters = {
+        ...this.advancedFilters,
+        city: filters.city || '',
+        active: filters.active || ''
+      }
+      this.selectedState = filters.state || ''
     }
   },
 
