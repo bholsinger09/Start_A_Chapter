@@ -1311,6 +1311,28 @@ export default {
       return 'Needs Attention'
     },
 
+    getHealthScoreBadgeClass(score) {
+      if (score >= 80) return 'bg-success'      // Green
+      if (score >= 60) return 'bg-primary'      // Blue  
+      if (score >= 40) return 'bg-warning'      // Yellow
+      return 'bg-danger'                        // Red
+    },
+
+    getHealthScoreStatus(score) {
+      if (score >= 80) return 'Excellent'
+      if (score >= 60) return 'Good'
+      if (score >= 40) return 'Fair'
+      return 'Needs Attention'
+    },
+
+    getHealthDotClass(metric, chapter) {
+      const score = this.getPerformanceMetric(chapter, metric)
+      if (score >= 80) return 'bg-success'
+      if (score >= 60) return 'bg-primary'
+      if (score >= 40) return 'bg-warning'
+      return 'bg-danger'
+    },
+
     getYearsSinceFounded(foundedDate) {
       const now = new Date()
       const founded = new Date(foundedDate)
