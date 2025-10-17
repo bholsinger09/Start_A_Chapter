@@ -65,6 +65,11 @@
                 </a></li>
               </ul>
             </li>
+            
+            <!-- Theme Toggle -->
+            <li class="nav-item ms-2">
+              <ThemeToggle />
+            </li>
           </ul>
         </div>
       </div>
@@ -97,8 +102,31 @@
 </template>
 
 <script>
+import ThemeToggle from './components/ThemeToggle.vue'
+import { useTheme } from './composables/useTheme.js'
+import { onMounted } from 'vue'
+
 export default {
   name: 'App',
+  components: {
+    ThemeToggle
+  },
+  setup() {
+    const { initializeTheme } = useTheme()
+    
+    onMounted(() => {
+      // Initialize theme on app mount
+      initializeTheme()
+      
+      // Add preload class to prevent theme transition on initial load
+      document.body.classList.add('preload')
+      setTimeout(() => {
+        document.body.classList.remove('preload')
+      }, 100)
+    })
+    
+    return {}
+  },
   data() {
     return {
       currentUser: null

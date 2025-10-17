@@ -376,6 +376,28 @@
         </div>
       </div>
 
+      <!-- Analytics Dashboard -->
+      <div v-if="showAnalytics && !loading" class="mb-4">
+        <ChapterAnalytics 
+          :chapters="searchResults" 
+          :is-dark-mode="isDarkMode"
+        />
+      </div>
+
+      <!-- Analytics Toggle -->
+      <div class="row mb-3">
+        <div class="col-12">
+          <button 
+            class="btn btn-outline-info btn-sm"
+            @click="toggleAnalytics"
+            :class="{ 'active': showAnalytics }"
+          >
+            <i :class="showAnalytics ? 'bi bi-eye-slash' : 'bi bi-bar-chart'"></i>
+            {{ showAnalytics ? 'Hide Analytics' : 'Show Analytics' }}
+          </button>
+        </div>
+      </div>
+
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-4">
         <div class="spinner-border text-primary" role="status">
@@ -944,18 +966,28 @@
 import { chapterService } from '../services/chapterService'
 import { memberService } from '../services/memberService'
 import { useChapterLinks } from '../composables/useChapterLinks'
+import { useTheme } from '../composables/useTheme'
+import ChapterAnalytics from '../components/ChapterAnalytics.vue'
+import { computed } from 'vue'
 
 export default {
   name: 'Chapters',
+  components: {
+    ChapterAnalytics
+  },
   setup() {
     // Use the chapter links composable for consistent functionality
     const { getCampusLabsUrl, getButtonText, getButtonTooltip, trackLinkClick } = useChapterLinks()
+    
+    // Use theme composable
+    const { currentTheme } = useTheme()
     
     return {
       getCampusLabsUrl,
       getButtonText,
       getButtonTooltip,
-      trackLinkClick
+      trackLinkClick,
+      isDarkModeComputed: computed(() => currentTheme.value === 'dark')
     }
   },
   data() {
@@ -996,6 +1028,8 @@ export default {
       selectedChapters: [],
       showComparisonModal: false,
       savedSearches: [],
+      showAnalytics: false,
+      isDarkMode: false,
       searchSuggestions: [],
       showSavedSearches: false,
       advancedSearchFilters: {
@@ -1722,6 +1756,16 @@ export default {
         foundedDate: '',
         description: ''
       }
+    },
+
+    toggleAnalytics() {
+      this.showAnalytics = !this.showAnalytics
+    }
+  },
+
+  computed: {
+    isDarkMode() {
+      return this.isDarkModeComputed
     }
   }
 }

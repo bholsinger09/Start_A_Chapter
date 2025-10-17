@@ -1,0 +1,257 @@
+/* Custom CSS Variables for Theming */
+:root {
+  /* Light theme colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #e9ecef;
+  --color-bg-accent: #e3f2fd;
+  
+  --color-text-primary: #212529;
+  --color-text-secondary: #6c757d;
+  --color-text-muted: #adb5bd;
+  --color-text-inverse: #ffffff;
+  
+  --color-border: #dee2e6;
+  --color-border-light: #f1f3f4;
+  --color-border-dark: #adb5bd;
+  
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-hover: rgba(0, 0, 0, 0.15);
+  
+  /* Card colors */
+  --color-card-bg: #ffffff;
+  --color-card-border: #dee2e6;
+  --color-card-shadow: rgba(0, 0, 0, 0.05);
+  
+  /* Navigation */
+  --color-nav-bg: var(--bs-primary);
+  --color-nav-text: #ffffff;
+  --color-nav-hover: rgba(255, 255, 255, 0.1);
+  
+  /* Status colors remain the same */
+  --color-success: #198754;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
+  --color-info: #0dcaf0;
+  
+  /* Animation and transitions */
+  --transition-theme: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.15s ease-in-out;
+}
+
+/* Dark theme colors */
+[data-theme="dark"] {
+  --color-bg-primary: #1a1d23;
+  --color-bg-secondary: #2d3748;
+  --color-bg-tertiary: #4a5568;
+  --color-bg-accent: #2a4a6b;
+  
+  --color-text-primary: #f7fafc;
+  --color-text-secondary: #e2e8f0;
+  --color-text-muted: #a0aec0;
+  --color-text-inverse: #1a1d23;
+  
+  --color-border: #4a5568;
+  --color-border-light: #2d3748;
+  --color-border-dark: #718096;
+  
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-hover: rgba(0, 0, 0, 0.4);
+  
+  /* Card colors */
+  --color-card-bg: #2d3748;
+  --color-card-border: #4a5568;
+  --color-card-shadow: rgba(0, 0, 0, 0.2);
+  
+  /* Navigation - slightly darker in dark mode */
+  --color-nav-bg: #1e3a8a;
+  --color-nav-text: #f7fafc;
+  --color-nav-hover: rgba(255, 255, 255, 0.15);
+}
+
+/* Apply theme colors to components */
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: var(--transition-theme);
+}
+
+/* Cards */
+.card {
+  background-color: var(--color-card-bg) !important;
+  border-color: var(--color-card-border) !important;
+  box-shadow: 0 0.125rem 0.25rem var(--color-card-shadow) !important;
+  transition: var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: 0 0.25rem 0.5rem var(--color-shadow-hover) !important;
+}
+
+/* Tables */
+.table {
+  --bs-table-bg: var(--color-card-bg);
+  --bs-table-border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.table-hover > tbody > tr:hover > * {
+  --bs-table-hover-bg: var(--color-bg-secondary);
+}
+
+/* Form controls */
+.form-control,
+.form-select {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  transition: var(--transition-fast);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--color-bg-primary);
+  border-color: var(--bs-primary);
+  color: var(--color-text-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+[data-theme="dark"] .form-control::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+  background-color: var(--color-card-bg);
+  border-color: var(--color-border);
+  box-shadow: 0 0.5rem 1rem var(--color-shadow);
+}
+
+.dropdown-item {
+  color: var(--color-text-primary);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+/* Navigation bar override */
+.navbar-dark {
+  background-color: var(--color-nav-bg) !important;
+}
+
+/* List groups */
+.list-group-item {
+  background-color: var(--color-card-bg);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Badges in dark mode */
+[data-theme="dark"] .badge.bg-light {
+  background-color: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Modal */
+.modal-content {
+  background-color: var(--color-card-bg);
+  border-color: var(--color-border);
+}
+
+.modal-header {
+  border-bottom-color: var(--color-border);
+}
+
+.modal-footer {
+  border-top-color: var(--color-border);
+}
+
+/* Offcanvas */
+.offcanvas {
+  background-color: var(--color-card-bg);
+}
+
+.offcanvas-header {
+  border-bottom-color: var(--color-border);
+}
+
+/* Progress bars */
+.progress {
+  background-color: var(--color-bg-tertiary);
+}
+
+/* Alerts - maintain readability */
+[data-theme="dark"] .alert-light {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Text muted override */
+[data-theme="dark"] .text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+/* Border utilities */
+[data-theme="dark"] .border,
+[data-theme="dark"] .border-top,
+[data-theme="dark"] .border-end,
+[data-theme="dark"] .border-bottom,
+[data-theme="dark"] .border-start {
+  border-color: var(--color-border) !important;
+}
+
+/* Background utilities */
+[data-theme="dark"] .bg-light {
+  background-color: var(--color-bg-secondary) !important;
+}
+
+[data-theme="dark"] .bg-white {
+  background-color: var(--color-card-bg) !important;
+}
+
+/* Theme toggle button styles */
+.theme-toggle {
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.05);
+}
+
+.theme-toggle.dropdown-toggle::after {
+  display: none;
+}
+
+/* Custom scrollbar for dark mode */
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-dark);
+}
+
+/* Smooth transition for all theme changes */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Prevent transition on page load */
+.preload * {
+  transition: none !important;
+}
