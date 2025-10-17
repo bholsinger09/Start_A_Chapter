@@ -67,10 +67,10 @@
               </select>
               <button 
                 class="btn btn-outline-secondary"
-                @click="toggleViewMode"
-                :title="viewMode === 'table' ? 'Switch to Card View' : 'Switch to Table View'"
+                @click="toggleCurrentView"
+                :title="currentView === 'table' ? 'Switch to Card View' : 'Switch to Table View'"
               >
-                <i :class="viewMode === 'table' ? 'bi bi-grid-3x3-gap' : 'bi bi-table'"></i>
+                <i :class="currentView === 'table' ? 'bi bi-grid-3x3-gap' : 'bi bi-table'"></i>
               </button>
             </div>
             <div class="text-muted">
@@ -407,7 +407,7 @@
             </button>
           </div>
           <!-- Table View -->
-          <div v-else-if="viewMode === 'table'" class="table-responsive">
+          <div v-else-if="currentView === 'table'" class="table-responsive">
             <table class="table table-hover mb-0">
               <thead class="table-light sticky-top">
                 <tr>
@@ -1143,25 +1143,42 @@ export default {
   methods: {
     async loadData() {
       try {
+        console.log('🔍 CHAPTERS DEBUG: Starting loadData()')
         this.loading = true
+        console.log('🔍 CHAPTERS DEBUG: Loading set to true')
+        
         const [chaptersData, membersData] = await Promise.all([
           chapterService.getAllChapters(),
           memberService.getAllMembers()
         ])
-        console.log('Loaded chapters:', chaptersData.length)
+        
+        console.log('🔍 CHAPTERS DEBUG: Loaded chapters:', chaptersData)
+        console.log('🔍 CHAPTERS DEBUG: Chapters length:', chaptersData.length)
+        console.log('🔍 CHAPTERS DEBUG: Loaded members:', membersData)
+        
         this.chapters = chaptersData
         this.members = membersData
         this.searchResults = chaptersData
+        
+        console.log('🔍 CHAPTERS DEBUG: Set this.chapters to:', this.chapters)
+        console.log('🔍 CHAPTERS DEBUG: Set this.searchResults to:', this.searchResults)
         
         // Extract unique states and cities for filters
         this.availableStates = [...new Set(chaptersData.map(c => c.state).filter(Boolean))].sort()
         this.availableCities = [...new Set(chaptersData.map(c => c.city).filter(Boolean))].sort()
         
+        console.log('🔍 CHAPTERS DEBUG: Available states:', this.availableStates)
+        
       } catch (error) {
-        console.error('Error loading chapters:', error)
+        console.error('🔍 CHAPTERS DEBUG: Error loading chapters:', error)
       } finally {
         this.loading = false
+        console.log('🔍 CHAPTERS DEBUG: Loading set to false')
       }
+    },
+
+    toggleCurrentView() {
+      this.currentView = this.currentView === 'table' ? 'card' : 'table'
     },
 
     async performSearch() {
