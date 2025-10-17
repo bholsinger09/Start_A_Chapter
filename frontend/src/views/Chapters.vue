@@ -1,127 +1,1260 @@
-<template>
+<template><template><template><template>
+
   <div class="chapters">
-    <div class="container">
+
+    <div class="container">  <div class="chapters">
+
       <!-- Header -->
-      <div class="row mb-4">
+
+      <div class="row mb-4">    <div class="container">  <div class="chapters">  <div class="chapters">
+
         <div class="col">
-          <h1 class="display-4 text-center mb-3">
+
+          <h1 class="display-4 text-center mb-3">      <!-- Header -->
+
             <i class="bi bi-building text-primary me-3"></i>
-            Chapters
+
+            Chapters      <div class="row mb-4">    <div class="container">    <div class="container">
+
           </h1>
-          <p class="lead text-center text-muted">
+
+          <p class="lead text-center text-muted">        <div class="col">
+
             Manage university chapters across the network
-          </p>
-        </div>
-      </div>
 
-      <!-- Enhanced Actions Bar -->
+          </p>          <h1 class="display-4 text-center mb-3">      <!-- Header -->      <!-- Header -->
+
+        </div>
+
+      </div>            <i class="bi bi-building text-primary me-3"></i>
+
+
+
+      <!-- Enhanced Search Component -->            Chapters      <div class="row mb-4">      <div class="row mb-4">
+
       <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-          <div class="d-flex gap-2">
-            <button 
-              class="btn btn-primary flex-fill" 
-              @click="showCreateModal = true"
-            >
-              <i class="bi bi-plus-circle me-2"></i>
-              Add New Chapter
-            </button>
-            <button 
-              class="btn btn-outline-primary" 
-              @click="toggleComparisonMode"
-              :class="{ 'active': comparisonMode }"
-              title="Compare Chapters"
-            >
-              <i class="bi bi-arrow-left-right"></i>
-            </button>
-          </div>
-        </div>
-        <div class="col-lg-9 col-md-12 mb-3">
-          <EnhancedSearch
+
+        <div class="col">          </h1>
+
+          <EnhancedSearch 
+
+            ref="enhancedSearch"          <p class="lead text-center text-muted">        <div class="col">        <div class="col">
+
             :chapters="chapters"
-            :available-states="availableStates"
-            @search="handleEnhancedSearch"
-            @filter-change="handleFilterChange"
-          />
-        </div>
-      </div>
 
-      <!-- View Controls -->
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex gap-2">
-              <select 
-                class="form-select"
-                style="width: auto;"
-                v-model="sortCriteria"
-                @change="applySorting"
-              >
-                <option value="name-asc">Name (A-Z)</option>
-                <option value="name-desc">Name (Z-A)</option>
-                <option value="members-desc">Most Members</option>
-                <option value="members-asc">Least Members</option>
-                <option value="health-desc">Healthiest</option>
-                <option value="health-asc">Needs Attention</option>
-                <option value="founded-desc">Newest</option>
-                <option value="founded-asc">Oldest</option>
-              </select>
-              <button 
-                class="btn btn-outline-secondary"
-                @click="toggleCurrentView"
-                :title="currentView === 'table' ? 'Switch to Card View' : 'Switch to Table View'"
-              >
-                <i :class="currentView === 'table' ? 'bi bi-grid-3x3-gap' : 'bi bi-table'"></i>
-              </button>
-            </div>
-            <div class="text-muted">
-              {{ searchResults.length }} of {{ chapters.length }} chapters
-            </div>
-          </div>
-        </div>
-      </div>
+            :available-states="availableStates"            Manage university chapters across the network
 
-      <!-- Enhanced Advanced Search Card -->
-      <div class="row mb-4" v-if="showAdvancedSearch">
-        <div class="col">
-          <div class="card border-primary">
-            <div class="card-header bg-primary text-white">
-              <div class="d-flex justify-content-between align-items-center">
-                <h6 class="card-title mb-0">
-                  <i class="bi bi-funnel me-2"></i>
-                  Advanced Search & Filters
-                </h6>
-                <button 
-                  class="btn btn-sm btn-outline-light"
-                  @click="saveCurrentSearch"
-                  :disabled="!hasActiveFilters"
+            :available-cities="availableCities"
+
+            @search="handleSearch"          </p>          <h1 class="display-4 text-center mb-3">          <h1 class="display-4 text-center mb-3">
+
+            @advanced-search="handleAdvancedSearch"
+
+          />        </div>
+
+        </div>
+
+      </div>      </div>            <i class="bi bi-building text-primary me-3"></i>            <i class="bi bi-building text-primary me-3"></i>
+
+
+
+      <!-- Analytics Section -->
+
+      <div class="row mb-4">
+
+        <div class="col">      <!-- Enhanced Search Component -->            Chapters            Chapters
+
+          <div class="card bg-light border-0">
+
+            <div class="card-body">      <div class="row mb-4">
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <h5 class="card-title mb-0">        <div class="col">          </h1>          </h1>
+
+                  <i class="bi bi-graph-up text-success me-2"></i>
+
+                  Chapter Analytics          <EnhancedSearch 
+
+                </h5>
+
+                <button             ref="enhancedSearch"          <p class="lead text-center text-muted">          <p class="lead text-center text-muted">
+
+                  class="btn btn-outline-primary btn-sm"
+
+                  @click="showAnalytics = !showAnalytics"            :chapters="chapters"
+
                 >
-                  <i class="bi bi-bookmark-plus me-1"></i>
-                  Save Search
-                </button>
+
+                  <i :class="showAnalytics ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>            :available-states="availableStates"            Manage university chapters across the network            Manage university chapters across the network
+
+                  {{ showAnalytics ? 'Hide' : 'Show' }} Analytics
+
+                </button>            :available-cities="availableCities"
+
               </div>
+
+                          @search="handleSearch"          </p>          </p>
+
+              <div v-if="showAnalytics && !loading" class="mb-4">
+
+                <ChapterAnalytics             @advanced-search="handleAdvancedSearch"
+
+                  :chapters="searchResults" 
+
+                  :members="members"          />        </div>        </div>
+
+                />
+
+              </div>        </div>
+
             </div>
-            <div class="card-body">
-              <!-- Basic Filters Row -->
-              <div class="row mb-3">
-                <div class="col-md-3">
-                  <label class="form-label fw-semibold">University Name</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Search universities..."
-                    v-model="advancedFilters.university"
-                    @input="performSearch"
-                    list="universitySuggestions"
-                  >
-                  <datalist id="universitySuggestions">
-                    <option v-for="uni in uniqueUniversities" :key="uni" :value="uni"></option>
-                  </datalist>
+
+          </div>      </div>      </div>      </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- View Controls & Sorting -->      <!-- Debug Info -->
+
+      <div class="row mb-3">
+
+        <div class="col-12">      <div class="alert alert-info mb-4">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div class="d-flex gap-2">        <h5>Debug Information:</h5>      <!-- Debug Info -->      <!-- Debug Info -->
+
+              <select 
+
+                class="form-select"        <p><strong>Loading:</strong> {{ loading }}</p>
+
+                style="width: auto;"
+
+                v-model="sortBy"        <p><strong>Chapters:</strong> {{ chapters.length }} items</p>      <div class="alert alert-info mb-4">      <div class="alert alert-info mb-4">
+
+                @change="applySorting"
+
+              >        <p><strong>Search Results:</strong> {{ searchResults.length }} items</p>
+
+                <option value="name">Sort by Name</option>
+
+                <option value="university">Sort by University</option>        <p><strong>Current View:</strong> {{ currentView }}</p>        <h5>Debug Information:</h5>        <h5>Debug Information:</h5>
+
+                <option value="state">Sort by State</option>
+
+                <option value="city">Sort by City</option>      </div>
+
+              </select>
+
+              <select         <p><strong>Loading:</strong> {{ loading }}</p>        <p><strong>Loading:</strong> {{ loading }}</p>
+
+                class="form-select"
+
+                style="width: auto;"      <!-- Loading State -->
+
+                v-model="sortOrder"
+
+                @change="applySorting"      <div v-if="loading" class="text-center py-4">        <p><strong>Chapters:</strong> {{ chapters.length }} items</p>        <p><strong>Chapters:</strong> {{ chapters.length }} items</p>
+
+              >
+
+                <option value="asc">A-Z</option>        <div class="spinner-border text-primary" role="status">
+
+                <option value="desc">Z-A</option>
+
+              </select>          <span class="visually-hidden">Loading...</span>        <p><strong>Search Results:</strong> {{ searchResults.length }} items</p>        <p><strong>Search Results:</strong> {{ searchResults.length }} items</p>
+
+              <button 
+
+                class="btn btn-outline-secondary"        </div>
+
+                @click="toggleCurrentView"
+
+                :title="currentView === 'table' ? 'Switch to Card View' : 'Switch to Table View'"        <p class="mt-2">Loading chapters...</p>        <p><strong>Current View:</strong> {{ currentView }}</p>        <p><strong>Current View:</strong> {{ currentView }}</p>
+
+              >
+
+                <i :class="currentView === 'table' ? 'bi bi-grid-3x3-gap' : 'bi bi-table'"></i>      </div>
+
+              </button>
+
+            </div>      </div>      </div>
+
+            <div class="text-muted">
+
+              {{ searchResults.length }} of {{ chapters.length }} chapters      <!-- Chapters Table -->
+
+            </div>
+
+          </div>      <div v-else class="card">
+
+        </div>
+
+      </div>        <div class="card-header bg-light">
+
+
+
+      <!-- Debug Info -->          <h5 class="card-title mb-0">      <!-- Loading State -->      <!-- Loading State -->
+
+      <div class="alert alert-info mb-4">
+
+        <h5>Debug Information:</h5>            <i class="bi bi-table me-2"></i>
+
+        <p><strong>Loading:</strong> {{ loading }}</p>
+
+        <p><strong>Chapters:</strong> {{ chapters.length }} items</p>            Chapters ({{ searchResults.length }})      <div v-if="loading" class="text-center py-4">      <div v-if="loading" class="text-center py-4">
+
+        <p><strong>Search Results:</strong> {{ searchResults.length }} items</p>
+
+        <p><strong>Current View:</strong> {{ currentView }}</p>          </h5>
+
+        <p><strong>Show Analytics:</strong> {{ showAnalytics }}</p>
+
+      </div>        </div>        <div class="spinner-border text-primary" role="status">        <div class="spinner-border text-primary" role="status">
+
+
+
+      <!-- Loading State -->        <div class="card-body p-0">
+
+      <div v-if="loading" class="text-center py-4">
+
+        <div class="spinner-border text-primary" role="status">          <div v-if="searchResults.length === 0" class="text-center py-4 text-muted">          <span class="visually-hidden">Loading...</span>          <span class="visually-hidden">Loading...</span>
+
+          <span class="visually-hidden">Loading...</span>
+
+        </div>            <i class="bi bi-inbox display-4 mb-3"></i>
+
+        <p class="mt-2">Loading chapters...</p>
+
+      </div>            <p>No chapters found</p>        </div>        </div>
+
+
+
+      <!-- Chapters Content -->          </div>
+
+      <div v-else class="card">
+
+        <div class="card-header bg-light">                  <p class="mt-2">Loading chapters...</p>        <p class="mt-2">Loading chapters...</p>
+
+          <h5 class="card-title mb-0">
+
+            <i class="bi bi-table me-2"></i>          <!-- Simple Table View -->
+
+            Chapters ({{ searchResults.length }})
+
+          </h5>          <div v-else class="table-responsive">      </div>      </div>
+
+        </div>
+
+        <div class="card-body p-0">            <table class="table table-hover mb-0">
+
+          <div v-if="searchResults.length === 0" class="text-center py-4 text-muted">
+
+            <i class="bi bi-inbox display-4 mb-3"></i>              <thead class="table-light">
+
+            <p>No chapters found matching your criteria</p>
+
+          </div>                <tr>
+
+          
+
+          <!-- Table View -->                  <th>Chapter Name</th>      <!-- Chapters Table -->      <!-- Chapters Table -->
+
+          <div v-else-if="currentView === 'table'" class="table-responsive">
+
+            <table class="table table-hover mb-0">                  <th>University</th>
+
+              <thead class="table-light">
+
+                <tr>                  <th>Location</th>      <div v-else class="card">      <div v-else class="card">
+
+                  <th>
+
+                    <button                   <th>Actions</th>
+
+                      class="btn btn-sm btn-link text-decoration-none p-0 fw-bold text-dark"
+
+                      @click="sortChapters('name')"                </tr>        <div class="card-header bg-light">        <div class="card-header bg-light">
+
+                    >
+
+                      Chapter Name              </thead>
+
+                      <i 
+
+                        v-if="sortBy === 'name'"               <tbody>          <h5 class="card-title mb-0">          <h5 class="card-title mb-0">
+
+                        :class="`bi ${sortOrder === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'}`"
+
+                      ></i>                <tr v-for="chapter in searchResults" :key="chapter.id">
+
+                    </button>
+
+                  </th>                  <td>            <i class="bi bi-table me-2"></i>            <i class="bi bi-table me-2"></i>
+
+                  <th>
+
+                    <button                     <div class="fw-bold text-primary">{{ chapter.name }}</div>
+
+                      class="btn btn-sm btn-link text-decoration-none p-0 fw-bold text-dark"
+
+                      @click="sortChapters('university')"                    <small class="text-muted">{{ chapter.description || 'No description' }}</small>            Chapters ({{ searchResults.length }})            Chapters ({{ searchResults.length }})
+
+                    >
+
+                      University                  </td>
+
+                      <i 
+
+                        v-if="sortBy === 'university'"                   <td>{{ chapter.university || chapter.universityName }}</td>          </h5>          </h5>
+
+                        :class="`bi ${sortOrder === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'}`"
+
+                      ></i>                  <td>{{ chapter.city }}, {{ chapter.state }}</td>
+
+                    </button>
+
+                  </th>                  <td>        </div>        </div>
+
+                  <th>
+
+                    <button                     <button class="btn btn-sm btn-outline-primary me-1" title="View">
+
+                      class="btn btn-sm btn-link text-decoration-none p-0 fw-bold text-dark"
+
+                      @click="sortChapters('city')"                      <i class="bi bi-eye"></i>        <div class="card-body p-0">        <div class="card-body p-0">
+
+                    >
+
+                      Location                    </button>
+
+                      <i 
+
+                        v-if="sortBy === 'city'"                     <button class="btn btn-sm btn-outline-secondary me-1" title="Edit">          <div v-if="searchResults.length === 0" class="text-center py-4 text-muted">          <div v-if="searchResults.length === 0" class="text-center py-4 text-muted">
+
+                        :class="`bi ${sortOrder === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down'}`"
+
+                      ></i>                      <i class="bi bi-pencil"></i>
+
+                    </button>
+
+                  </th>                    </button>            <i class="bi bi-inbox display-4 mb-3"></i>            <i class="bi bi-inbox display-4 mb-3"></i>
+
+                  <th width="120">Health Score</th>
+
+                  <th width="100">Members</th>                    <button class="btn btn-sm btn-outline-danger" title="Delete">
+
+                  <th class="text-center">Actions</th>
+
+                </tr>                      <i class="bi bi-trash"></i>            <p>No chapters found</p>            <p>No chapters found</p>
+
+              </thead>
+
+              <tbody>                    </button>
+
+                <tr v-for="chapter in searchResults" :key="chapter.id">
+
+                  <td>                  </td>          </div>          </div>
+
+                    <div class="fw-bold text-primary">{{ chapter.name }}</div>
+
+                    <small class="text-muted">{{ chapter.description || 'No description' }}</small>                </tr>
+
+                  </td>
+
+                  <td>{{ chapter.university || chapter.universityName }}</td>              </tbody>                    
+
+                  <td>{{ chapter.city }}, {{ chapter.state }}</td>
+
+                  <td>            </table>
+
+                    <div class="d-flex align-items-center">
+
+                      <div class="progress flex-grow-1 me-2" style="height: 8px;">          </div>          <!-- Simple Table View -->          <!-- Simple Table View -->
+
+                        <div 
+
+                          class="progress-bar"        </div>
+
+                          :class="getHealthScoreClass(chapter.healthScore || 85)"
+
+                          :style="{ width: (chapter.healthScore || 85) + '%' }"      </div>          <div v-else class="table-responsive">          <div v-else class="table-responsive">
+
+                        ></div>
+
+                      </div>
+
+                      <small class="fw-bold">{{ chapter.healthScore || 85 }}%</small>
+
+                    </div>      <!-- Action Buttons -->            <table class="table table-hover mb-0">            <table class="table table-hover mb-0">
+
+                  </td>
+
+                  <td>      <div class="row mt-4">
+
+                    <span class="badge bg-primary rounded-pill">
+
+                      {{ getChapterMemberCount(chapter.id) }}        <div class="col">              <thead class="table-light">              <thead class="table-light">
+
+                    </span>
+
+                  </td>          <button class="btn btn-primary">
+
+                  <td class="text-center">
+
+                    <div class="btn-group btn-group-sm">            <i class="bi bi-plus-circle me-2"></i>                <tr>                <tr>
+
+                      <button 
+
+                        class="btn btn-outline-primary"            Add New Chapter
+
+                        @click="viewChapter(chapter)"
+
+                        title="View Details"          </button>                  <th>Chapter Name</th>                  <th>Chapter Name</th>
+
+                      >
+
+                        <i class="bi bi-eye"></i>          <button class="btn btn-outline-success ms-2" @click="loadData">
+
+                      </button>
+
+                      <button             <i class="bi bi-arrow-clockwise me-2"></i>                  <th>University</th>                  <th>University</th>
+
+                        class="btn btn-outline-secondary"
+
+                        @click="editChapter(chapter)"            Refresh Data
+
+                        title="Edit Chapter"
+
+                      >          </button>                  <th>Location</th>                  <th>Location</th>
+
+                        <i class="bi bi-pencil"></i>
+
+                      </button>        </div>
+
+                      <button 
+
+                        class="btn btn-outline-danger"      </div>                  <th>Actions</th>                  <th>Actions</th>
+
+                        @click="confirmDelete(chapter)"
+
+                        title="Delete Chapter"    </div>
+
+                      >
+
+                        <i class="bi bi-trash"></i>  </div>                </tr>                </tr>
+
+                      </button>
+
+                    </div></template>
+
+                  </td>
+
+                </tr>              </thead>              </thead>
+
+              </tbody>
+
+            </table><script>
+
+          </div>
+
+import { chapterService } from '../services/chapterService'              <tbody>              <tbody>
+
+          <!-- Card View -->
+
+          <div v-else class="row g-3 p-3">import { memberService } from '../services/memberService'
+
+            <div 
+
+              v-for="chapter in searchResults" import EnhancedSearch from '../components/EnhancedSearch.vue'                <tr v-for="chapter in searchResults" :key="chapter.id">                <tr v-for="chapter in searchResults" :key="chapter.id">
+
+              :key="chapter.id"
+
+              class="col-md-6 col-lg-4"
+
+            >
+
+              <div class="card h-100 chapter-card">export default {                  <td>                  <td>
+
+                <div class="card-header bg-primary text-white">
+
+                  <h6 class="card-title mb-0 text-truncate">{{ chapter.name }}</h6>  name: 'Chapters',
+
                 </div>
-                <div class="col-md-3">
-                  <label class="form-label fw-semibold">City</label>
-                  <select 
-                    class="form-select" 
-                    v-model="advancedFilters.city"
+
+                <div class="card-body">  components: {                    <div class="fw-bold text-primary">{{ chapter.name }}</div>                    <div class="fw-bold text-primary">{{ chapter.name }}</div>
+
+                  <div class="mb-3">
+
+                    <small class="text-muted d-block">University</small>    EnhancedSearch
+
+                    <div class="fw-medium">{{ chapter.university || chapter.universityName }}</div>
+
+                  </div>  },                    <small class="text-muted">{{ chapter.description || 'No description' }}</small>                    <small class="text-muted">{{ chapter.description || 'No description' }}</small>
+
+                  
+
+                  <div class="mb-3">  data() {
+
+                    <small class="text-muted d-block">Location</small>
+
+                    <div>    return {                  </td>                  </td>
+
+                      <i class="bi bi-geo-alt text-muted me-1"></i>
+
+                      {{ chapter.city }}, {{ chapter.state }}      loading: false, // Set to false for debugging
+
+                    </div>
+
+                  </div>      chapters: [                  <td>{{ chapter.university || chapter.universityName }}</td>                  <td>{{ chapter.university || chapter.universityName }}</td>
+
+
+
+                  <div class="mb-3">        {
+
+                    <small class="text-muted d-block">Health Score</small>
+
+                    <div class="d-flex align-items-center">          id: 1,                  <td>{{ chapter.city }}, {{ chapter.state }}</td>                  <td>{{ chapter.city }}, {{ chapter.state }}</td>
+
+                      <div class="progress flex-grow-1 me-2" style="height: 8px;">
+
+                        <div           name: "University of California - Berkeley",
+
+                          class="progress-bar"
+
+                          :class="getHealthScoreClass(chapter.healthScore || 85)"          university: "UC Berkeley",                  <td>                  <td>
+
+                          :style="{ width: (chapter.healthScore || 85) + '%' }"
+
+                        ></div>          state: "California",
+
+                      </div>
+
+                      <small class="fw-bold">{{ chapter.healthScore || 85 }}%</small>          city: "Berkeley",                    <button class="btn btn-sm btn-outline-primary me-1" title="View">                    <button class="btn btn-sm btn-outline-primary me-1" title="View">
+
+                    </div>
+
+                  </div>          description: "Leading chapter in Northern California"
+
+
+
+                  <div class="mb-3">        },                      <i class="bi bi-eye"></i>                      <i class="bi bi-eye"></i>
+
+                    <small class="text-muted d-block">Members</small>
+
+                    <span class="badge bg-primary rounded-pill">        {
+
+                      {{ getChapterMemberCount(chapter.id) }}
+
+                    </span>          id: 2,                    </button>                    </button>
+
+                  </div>
+
+          name: "Stanford University",
+
+                  <div v-if="chapter.description" class="mb-3">
+
+                    <small class="text-muted d-block">Description</small>          university: "Stanford University",                     <button class="btn btn-sm btn-outline-secondary me-1" title="Edit">                    <button class="btn btn-sm btn-outline-secondary me-1" title="Edit">
+
+                    <p class="small text-muted mb-0">{{ chapter.description }}</p>
+
+                  </div>          state: "California",
+
+                </div>
+
+              </div>          city: "Stanford",                      <i class="bi bi-pencil"></i>                      <i class="bi bi-pencil"></i>
+
+            </div>
+
+          </div>          description: "Premier Silicon Valley chapter"
+
+        </div>
+
+      </div>        },                    </button>                    </button>
+
+
+
+      <!-- Action Buttons -->        {
+
+      <div class="row mt-4">
+
+        <div class="col">          id: 3,                    <button class="btn btn-sm btn-outline-danger" title="Delete">                    <button class="btn btn-sm btn-outline-danger" title="Delete">
+
+          <button class="btn btn-primary" @click="showCreateModal = true">
+
+            <i class="bi bi-plus-circle me-2"></i>          name: "University of Texas at Austin",
+
+            Add New Chapter
+
+          </button>          university: "UT Austin",                      <i class="bi bi-trash"></i>                      <i class="bi bi-trash"></i>
+
+          <button class="btn btn-outline-success ms-2" @click="loadData">
+
+            <i class="bi bi-arrow-clockwise me-2"></i>          state: "Texas",
+
+            Refresh Data
+
+          </button>          city: "Austin",                    </button>                    </button>
+
+          <button class="btn btn-outline-primary ms-2" @click="exportChapters">
+
+            <i class="bi bi-download me-2"></i>          description: "Largest chapter in Texas"
+
+            Export Data
+
+          </button>        }                  </td>                  </td>
+
+        </div>
+
+      </div>      ],
+
+    </div>
+
+  </div>      searchResults: [],                </tr>                </tr>
+
+</template>
+
+      availableStates: ['California', 'Texas', 'New York', 'Florida'],
+
+<script>
+
+import { chapterService } from '../services/chapterService'      availableCities: ['Berkeley', 'Stanford', 'Austin', 'Boston', 'Miami'],              </tbody>              </tbody>
+
+import { memberService } from '../services/memberService'
+
+import EnhancedSearch from '../components/EnhancedSearch.vue'      currentView: 'table'
+
+import ChapterAnalytics from '../components/ChapterAnalytics.vue'
+
+    }            </table>            </table>
+
+export default {
+
+  name: 'Chapters',  },
+
+  components: {
+
+    EnhancedSearch,  async mounted() {          </div>          </div>
+
+    ChapterAnalytics
+
+  },    console.log('🔍 CHAPTERS DEBUG: Component mounted with EnhancedSearch')
+
+  data() {
+
+    return {    this.searchResults = [...this.chapters]        </div>        </div>
+
+      loading: false,
+
+      chapters: [    // Uncomment to test real data loading
+
+        {
+
+          id: 1,    // await this.loadData()      </div>      </div>
+
+          name: "University of California - Berkeley",
+
+          university: "UC Berkeley",  },
+
+          state: "California",
+
+          city: "Berkeley",  methods: {
+
+          description: "Leading chapter in Northern California",
+
+          healthScore: 92    async loadData() {
+
+        },
+
+        {      try {      <!-- Action Buttons -->      <!-- Action Buttons -->
+
+          id: 2,
+
+          name: "Stanford University",        console.log('🔍 CHAPTERS DEBUG: Starting loadData()')
+
+          university: "Stanford University", 
+
+          state: "California",        this.loading = true      <div class="row mt-4">      <div class="row mt-4">
+
+          city: "Stanford",
+
+          description: "Premier Silicon Valley chapter",        
+
+          healthScore: 88
+
+        },        const [chaptersData, membersData] = await Promise.all([        <div class="col">        <div class="col">
+
+        {
+
+          id: 3,          chapterService.getAllChapters(),
+
+          name: "University of Texas at Austin",
+
+          university: "UT Austin",          memberService.getAllMembers()          <button class="btn btn-primary">          <button class="btn btn-primary">
+
+          state: "Texas",
+
+          city: "Austin",        ])
+
+          description: "Largest chapter in Texas",
+
+          healthScore: 76                    <i class="bi bi-plus-circle me-2"></i>            <i class="bi bi-plus-circle me-2"></i>
+
+        },
+
+        {        console.log('🔍 CHAPTERS DEBUG: Loaded chapters:', chaptersData)
+
+          id: 4,
+
+          name: "Harvard University",                    Add New Chapter            Add New Chapter
+
+          university: "Harvard University",
+
+          state: "Massachusetts",         this.chapters = chaptersData
+
+          city: "Cambridge",
+
+          description: "Prestigious East Coast chapter",        this.searchResults = chaptersData          </button>          </button>
+
+          healthScore: 95
+
+        },        
+
+        {
+
+          id: 5,        // Extract unique states and cities for filters          <button class="btn btn-outline-success ms-2" @click="loadData">          <button class="btn btn-outline-success ms-2" @click="loadData">
+
+          name: "University of Miami",
+
+          university: "University of Miami",        this.availableStates = [...new Set(chaptersData.map(chapter => chapter.state))].filter(Boolean).sort()
+
+          state: "Florida",
+
+          city: "Miami",         this.availableCities = [...new Set(chaptersData.map(chapter => chapter.city))].filter(Boolean).sort()            <i class="bi bi-arrow-clockwise me-2"></i>            <i class="bi bi-arrow-clockwise me-2"></i>
+
+          description: "Dynamic Southern chapter",
+
+          healthScore: 82        
+
+        }
+
+      ],        console.log('🔍 CHAPTERS DEBUG: Updated searchResults:', this.searchResults)            Refresh Data            Refresh Data
+
+      members: [
+
+        { id: 1, chapterId: 1, name: "John Doe" },        
+
+        { id: 2, chapterId: 1, name: "Jane Smith" },
+
+        { id: 3, chapterId: 2, name: "Bob Johnson" },      } catch (error) {          </button>          </button>
+
+        { id: 4, chapterId: 3, name: "Alice Brown" },
+
+        { id: 5, chapterId: 3, name: "Charlie Wilson" },        console.error('🔍 CHAPTERS DEBUG: Error loading chapters:', error)
+
+        { id: 6, chapterId: 3, name: "Diana Davis" }
+
+      ],      } finally {        </div>        </div>
+
+      searchResults: [],
+
+      availableStates: ['California', 'Texas', 'Massachusetts', 'Florida'],        this.loading = false
+
+      availableCities: ['Berkeley', 'Stanford', 'Austin', 'Cambridge', 'Miami'],
+
+      currentView: 'table',        console.log('🔍 CHAPTERS DEBUG: Loading complete')      </div>      </div>
+
+      sortBy: 'name',
+
+      sortOrder: 'asc',      }
+
+      showAnalytics: false,
+
+      showCreateModal: false    },    </div>    </div>
+
+    }
+
+  },
+
+  async mounted() {
+
+    console.log('🔍 CHAPTERS DEBUG: Enhanced component mounted')    handleSearch(searchData) {  </div>  </div>
+
+    this.searchResults = [...this.chapters]
+
+    this.applySorting()      console.log('🔍 SEARCH DEBUG: Received search:', searchData)
+
+    // Uncomment to test real data loading
+
+    // await this.loadData()      // Filter chapters based on search criteria</template></template>
+
+  },
+
+  methods: {      this.searchResults = this.chapters.filter(chapter => {
+
+    async loadData() {
+
+      try {        const matchesQuery = !searchData.query || 
+
+        console.log('🔍 CHAPTERS DEBUG: Starting loadData()')
+
+        this.loading = true          chapter.name.toLowerCase().includes(searchData.query.toLowerCase()) ||
+
+        
+
+        const [chaptersData, membersData] = await Promise.all([          chapter.university.toLowerCase().includes(searchData.query.toLowerCase())<script>      <!-- Enhanced Actions Bar -->
+
+          chapterService.getAllChapters(),
+
+          memberService.getAllMembers()        
+
+        ])
+
+                const matchesState = !searchData.state || chapter.state === searchData.stateimport { chapterService } from '../services/chapterService'      <div class="row mb-4">
+
+        console.log('🔍 CHAPTERS DEBUG: Loaded chapters:', chaptersData)
+
+                
+
+        this.chapters = chaptersData
+
+        this.members = membersData        return matchesQuery && matchesStateimport { memberService } from '../services/memberService'        <div class="col-lg-3 col-md-6 mb-3">
+
+        this.searchResults = chaptersData
+
+              })
+
+        // Extract unique states and cities for filters
+
+        this.availableStates = [...new Set(chaptersData.map(chapter => chapter.state))].filter(Boolean).sort()      console.log('🔍 SEARCH DEBUG: Filtered results:', this.searchResults.length)          <div class="d-flex gap-2">
+
+        this.availableCities = [...new Set(chaptersData.map(chapter => chapter.city))].filter(Boolean).sort()
+
+            },
+
+        this.applySorting()
+
+        export default {            <button 
+
+      } catch (error) {
+
+        console.error('🔍 CHAPTERS DEBUG: Error loading chapters:', error)    handleAdvancedSearch(filters) {
+
+      } finally {
+
+        this.loading = false      console.log('🔍 ADVANCED SEARCH DEBUG: Received filters:', filters)  name: 'Chapters',              class="btn btn-primary flex-fill" 
+
+      }
+
+    },      // Apply advanced filters
+
+
+
+    handleSearch(searchData) {      this.searchResults = this.chapters.filter(chapter => {  data() {              @click="showCreateModal = true"
+
+      console.log('🔍 SEARCH DEBUG: Received search:', searchData)
+
+      this.searchResults = this.chapters.filter(chapter => {        const matchesUniversity = !filters.university || 
+
+        const matchesQuery = !searchData.query || 
+
+          chapter.name.toLowerCase().includes(searchData.query.toLowerCase()) ||          chapter.university.toLowerCase().includes(filters.university.toLowerCase())    return {            >
+
+          chapter.university.toLowerCase().includes(searchData.query.toLowerCase())
+
+                
+
+        const matchesState = !searchData.state || chapter.state === searchData.state
+
+                const matchesCity = !filters.city || chapter.city === filters.city      loading: false, // Set to false for debugging              <i class="bi bi-plus-circle me-2"></i>
+
+        return matchesQuery && matchesState
+
+      })        
+
+      this.applySorting()
+
+    },        return matchesUniversity && matchesCity      chapters: [              Add New Chapter
+
+
+
+    handleAdvancedSearch(filters) {      })
+
+      console.log('🔍 ADVANCED SEARCH DEBUG: Received filters:', filters)
+
+      this.searchResults = this.chapters.filter(chapter => {      console.log('🔍 ADVANCED SEARCH DEBUG: Filtered results:', this.searchResults.length)        {            </button>
+
+        const matchesUniversity = !filters.university || 
+
+          chapter.university.toLowerCase().includes(filters.university.toLowerCase())    }
+
+        
+
+        const matchesCity = !filters.city || chapter.city === filters.city  }          id: 1,            <button 
+
+        
+
+        return matchesUniversity && matchesCity}
+
+      })
+
+      this.applySorting()</script>          name: "University of California - Berkeley",              class="btn btn-outline-primary" 
+
+    },
+
+
+
+    sortChapters(field) {
+
+      if (this.sortBy === field) {<style scoped>          university: "UC Berkeley",              @click="toggleComparisonMode"
+
+        this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc'
+
+      } else {.chapters {
+
+        this.sortBy = field
+
+        this.sortOrder = 'asc'  min-height: 100vh;          state: "California",              :class="{ 'active': comparisonMode }"
+
+      }
+
+      this.applySorting()  padding: 20px 0;
+
+    },
+
+}          city: "Berkeley",              title="Compare Chapters"
+
+    applySorting() {
+
+      this.searchResults.sort((a, b) => {
+
+        let valueA = a[this.sortBy] || ''
+
+        let valueB = b[this.sortBy] || ''.card {          description: "Leading chapter in Northern California"            >
+
+
+
+        if (typeof valueA === 'string') valueA = valueA.toLowerCase()  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        if (typeof valueB === 'string') valueB = valueB.toLowerCase()
+
+}        },              <i class="bi bi-arrow-left-right"></i>
+
+        if (this.sortOrder === 'asc') {
+
+          return valueA < valueB ? -1 : valueA > valueB ? 1 : 0
+
+        } else {
+
+          return valueA > valueB ? -1 : valueA < valueB ? 1 : 0.table th {        {            </button>
+
+        }
+
+      })  border-top: none;
+
+    },
+
+  font-weight: 600;          id: 2,          </div>
+
+    toggleCurrentView() {
+
+      this.currentView = this.currentView === 'table' ? 'card' : 'table'}
+
+    },
+
+          name: "Stanford University",        </div>
+
+    getHealthScoreClass(score) {
+
+      if (score >= 80) return 'bg-success'.btn-group .btn {
+
+      if (score >= 60) return 'bg-warning'
+
+      return 'bg-danger'  border-radius: 0.25rem;          university: "Stanford University",         <div class="col-lg-9 col-md-12 mb-3">
+
+    },
+
+}
+
+    getChapterMemberCount(chapterId) {
+
+      return this.members.filter(member => member.chapterId === chapterId).length          state: "California",          <EnhancedSearch
+
+    },
+
+.alert-info {
+
+    exportChapters() {
+
+      const headers = ['Name', 'University', 'City', 'State', 'Health Score', 'Members', 'Description']  background-color: #e3f2fd;          city: "Stanford",            :chapters="chapters"
+
+      let csvContent = headers.join(',') + '\n'
+
+  border-color: #2196f3;
+
+      this.searchResults.forEach(chapter => {
+
+        const row = [  color: #1976d2;          description: "Premier Silicon Valley chapter"            :available-states="availableStates"
+
+          `"${chapter.name || ''}"`,
+
+          `"${chapter.university || chapter.universityName || ''}"`,}
+
+          `"${chapter.city || ''}"`,
+
+          `"${chapter.state || ''}"`,</style>        }            @search="handleEnhancedSearch"
+
+          `"${chapter.healthScore || 85}"`,
+
+          `"${this.getChapterMemberCount(chapter.id)}"`,      ],            @filter-change="handleFilterChange"
+
+          `"${chapter.description || ''}"`
+
+        ]      searchResults: [          />
+
+        csvContent += row.join(',') + '\n'
+
+      })        {        </div>
+
+
+
+      const blob = new Blob([csvContent], { type: 'text/csv' })          id: 1,      </div>
+
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement('a')          name: "University of California - Berkeley",
+
+      link.href = url
+
+      link.download = `chapters-export-${new Date().toISOString().split('T')[0]}.csv`          university: "UC Berkeley",      <!-- View Controls -->
+
+      document.body.appendChild(link)
+
+      link.click()          state: "California",      <div class="row mb-3">
+
+      document.body.removeChild(link)
+
+      window.URL.revokeObjectURL(url)          city: "Berkeley",        <div class="col-12">
+
+    },
+
+          description: "Leading chapter in Northern California"          <div class="d-flex justify-content-between align-items-center">
+
+    // Placeholder methods for CRUD operations
+
+    viewChapter(chapter) {        },            <div class="d-flex gap-2">
+
+      console.log('View chapter:', chapter.name)
+
+      // this.$router.push(`/chapters/${chapter.id}`)        {              <select 
+
+    },
+
+          id: 2,                class="form-select"
+
+    editChapter(chapter) {
+
+      console.log('Edit chapter:', chapter.name)          name: "Stanford University",                style="width: auto;"
+
+      // Implementation coming next
+
+    },          university: "Stanford University",                v-model="sortCriteria"
+
+
+
+    confirmDelete(chapter) {          state: "California",                 @change="applySorting"
+
+      console.log('Delete chapter:', chapter.name)
+
+      // Implementation coming next          city: "Stanford",              >
+
+    }
+
+  }          description: "Premier Silicon Valley chapter"                <option value="name-asc">Name (A-Z)</option>
+
+}
+
+</script>        }                <option value="name-desc">Name (Z-A)</option>
+
+
+
+<style scoped>      ],                <option value="members-desc">Most Members</option>
+
+.chapters {
+
+  min-height: 100vh;      currentView: 'table'                <option value="members-asc">Least Members</option>
+
+  padding: 20px 0;
+
+}    }                <option value="health-desc">Healthiest</option>
+
+
+
+.card {  },                <option value="health-asc">Needs Attention</option>
+
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  border: none;  async mounted() {                <option value="founded-desc">Newest</option>
+
+  border-radius: 10px;
+
+}    console.log('🔍 CHAPTERS DEBUG: Simplified component mounted()')                <option value="founded-asc">Oldest</option>
+
+
+
+.table th {    console.log('🔍 CHAPTERS DEBUG: searchResults:', this.searchResults)              </select>
+
+  border-top: none;
+
+  font-weight: 600;    // Uncomment to test real data loading              <button 
+
+}
+
+    // await this.loadData()                class="btn btn-outline-secondary"
+
+.btn-group .btn {
+
+  border-radius: 0.25rem;  },                @click="toggleCurrentView"
+
+}
+
+  methods: {                :title="currentView === 'table' ? 'Switch to Card View' : 'Switch to Table View'"
+
+.alert-info {
+
+  background-color: #e3f2fd;    async loadData() {              >
+
+  border-color: #2196f3;
+
+  color: #1976d2;      try {                <i :class="currentView === 'table' ? 'bi bi-grid-3x3-gap' : 'bi bi-table'"></i>
+
+}
+
+        console.log('🔍 CHAPTERS DEBUG: Starting loadData()')              </button>
+
+.chapter-card {
+
+  transition: all 0.3s ease;        this.loading = true            </div>
+
+  border: none;
+
+  border-radius: 12px;                    <div class="text-muted">
+
+  overflow: hidden;
+
+}        const [chaptersData, membersData] = await Promise.all([              {{ searchResults.length }} of {{ chapters.length }} chapters
+
+
+
+.chapter-card:hover {          chapterService.getAllChapters(),            </div>
+
+  transform: translateY(-5px);
+
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);          memberService.getAllMembers()          </div>
+
+}
+
+        ])        </div>
+
+.progress {
+
+  background-color: rgba(0,0,0,0.1);              </div>
+
+}
+
+        console.log('🔍 CHAPTERS DEBUG: Loaded chapters:', chaptersData)
+
+.table-hover tbody tr:hover {
+
+  background-color: rgba(102, 126, 234, 0.05);              <!-- Enhanced Advanced Search Card -->
+
+}
+
+</style>        this.chapters = chaptersData      <div class="row mb-4" v-if="showAdvancedSearch">
+
+        this.searchResults = chaptersData        <div class="col">
+
+                  <div class="card border-primary">
+
+        console.log('🔍 CHAPTERS DEBUG: Updated searchResults:', this.searchResults)            <div class="card-header bg-primary text-white">
+
+                      <div class="d-flex justify-content-between align-items-center">
+
+      } catch (error) {                <h6 class="card-title mb-0">
+
+        console.error('🔍 CHAPTERS DEBUG: Error loading chapters:', error)                  <i class="bi bi-funnel me-2"></i>
+
+      } finally {                  Advanced Search & Filters
+
+        this.loading = false                </h6>
+
+        console.log('🔍 CHAPTERS DEBUG: Loading complete')                <button 
+
+      }                  class="btn btn-sm btn-outline-light"
+
+    }                  @click="saveCurrentSearch"
+
+  }                  :disabled="!hasActiveFilters"
+
+}                >
+
+</script>                  <i class="bi bi-bookmark-plus me-1"></i>
+
+                  Save Search
+
+<style scoped>                </button>
+
+.chapters {              </div>
+
+  min-height: 100vh;            </div>
+
+  padding: 20px 0;            <div class="card-body">
+
+}              <!-- Basic Filters Row -->
+
+              <div class="row mb-3">
+
+.card {                <div class="col-md-3">
+
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);                  <label class="form-label fw-semibold">University Name</label>
+
+}                  <input
+
+                    type="text"
+
+.table th {                    class="form-control"
+
+  border-top: none;                    placeholder="Search universities..."
+
+  font-weight: 600;                    v-model="advancedFilters.university"
+
+}                    @input="performSearch"
+
+                    list="universitySuggestions"
+
+.btn-group .btn {                  >
+
+  border-radius: 0.25rem;                  <datalist id="universitySuggestions">
+
+}                    <option v-for="uni in uniqueUniversities" :key="uni" :value="uni"></option>
+
+                  </datalist>
+
+.alert-info {                </div>
+
+  background-color: #e3f2fd;                <div class="col-md-3">
+
+  border-color: #2196f3;                  <label class="form-label fw-semibold">City</label>
+
+  color: #1976d2;                  <select 
+
+}                    class="form-select" 
+
+</style>                    v-model="advancedFilters.city"
                     @change="performSearch"
                   >
                     <option value="">All Cities</option>
@@ -946,18 +2079,85 @@
 <script>
 import { chapterService } from '../services/chapterService'
 import { memberService } from '../services/memberService'
-import { useChapterLinks } from '../composables/useChapterLinks'
-import { useTheme } from '../composables/useTheme'
-import ChapterAnalytics from '../components/ChapterAnalytics.vue'
-import EnhancedSearch from '../components/EnhancedSearch.vue'
-import { computed } from 'vue'
 
 export default {
   name: 'Chapters',
-  components: {
-    ChapterAnalytics,
-    EnhancedSearch
+  data() {
+    return {
+      loading: false, // Set to false for debugging
+      chapters: [
+        {
+          id: 1,
+          name: "University of California - Berkeley",
+          university: "UC Berkeley",
+          state: "California",
+          city: "Berkeley",
+          description: "Leading chapter in Northern California"
+        },
+        {
+          id: 2,
+          name: "Stanford University",
+          university: "Stanford University", 
+          state: "California",
+          city: "Stanford",
+          description: "Premier Silicon Valley chapter"
+        }
+      ],
+      searchResults: [
+        {
+          id: 1,
+          name: "University of California - Berkeley",
+          university: "UC Berkeley",
+          state: "California",
+          city: "Berkeley",
+          description: "Leading chapter in Northern California"
+        },
+        {
+          id: 2,
+          name: "Stanford University",
+          university: "Stanford University",
+          state: "California", 
+          city: "Stanford",
+          description: "Premier Silicon Valley chapter"
+        }
+      ],
+      currentView: 'table'
+    }
   },
+  async mounted() {
+    console.log('🔍 CHAPTERS DEBUG: Simplified component mounted()')
+    console.log('🔍 CHAPTERS DEBUG: searchResults:', this.searchResults)
+    // Uncomment to test real data loading
+    // await this.loadData()
+  },
+  methods: {
+    async loadData() {
+      try {
+        console.log('🔍 CHAPTERS DEBUG: Starting loadData()')
+        this.loading = true
+        
+        const [chaptersData, membersData] = await Promise.all([
+          chapterService.getAllChapters(),
+          memberService.getAllMembers()
+        ])
+        
+        console.log('🔍 CHAPTERS DEBUG: Loaded chapters:', chaptersData)
+        
+        this.chapters = chaptersData
+        this.searchResults = chaptersData
+        
+        console.log('🔍 CHAPTERS DEBUG: Updated searchResults:', this.searchResults)
+        
+      } catch (error) {
+        console.error('🔍 CHAPTERS DEBUG: Error loading chapters:', error)
+      } finally {
+        this.loading = false
+        console.log('🔍 CHAPTERS DEBUG: Loading complete')
+      }
+    }
+  }
+}
+</script>
   setup() {
     // Use the chapter links composable for consistent functionality
     const { getCampusLabsUrl, getButtonText, getButtonTooltip, trackLinkClick } = useChapterLinks()
