@@ -176,3 +176,5 @@ export const memberService = {
     }
   }
 }
+
+export default memberService

@@ -144,3 +144,5 @@ export const chapterService = {
     }
   }
 }
+
+export default chapterService

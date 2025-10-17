@@ -350,6 +350,8 @@
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
+import chapterService from '../services/chapterService.js'
+import memberService from '../services/memberService.js'
 
 export default {
   name: 'Chapters',
@@ -404,48 +406,29 @@ export default {
         loading.value = true
         error.value = null
         
-        console.log('Loading chapters...')
+        console.log('Loading chapters from chapter service...')
+        const response = await chapterService.getAllChapters()
+        console.log('Chapters response:', response)
         
-        // Try to load from backend first, then fall back to comprehensive mock data
-        try {
-          const response = await fetch('/api/chapters')
-          if (response.ok) {
-            const data = await response.json()
-            console.log('Loaded chapters from backend:', data)
-            chapters.value = data
-          } else {
-            throw new Error('Backend not available')
-          }
-        } catch (backendError) {
-          console.log('Backend not available, using comprehensive mock data')
+        if (response && Array.isArray(response)) {
+          chapters.value = response
           
-          // Comprehensive mock data with many chapters for testing filters
-          chapters.value = [
-            { id: 1, name: 'Alpha Chapter', university: 'University of California', city: 'Los Angeles', state: 'CA', status: 'Active', memberCount: 45, healthScore: 85 },
-            { id: 2, name: 'Beta Chapter', university: 'University of Texas', city: 'Austin', state: 'TX', status: 'Active', memberCount: 38, healthScore: 92 },
-            { id: 3, name: 'Gamma Chapter', university: 'New York University', city: 'New York', state: 'NY', status: 'Active', memberCount: 52, healthScore: 78 },
-            { id: 4, name: 'Delta Chapter', university: 'Florida State University', city: 'Tallahassee', state: 'FL', status: 'Active', memberCount: 29, healthScore: 88 },
-            { id: 5, name: 'Epsilon Chapter', university: 'University of Washington', city: 'Seattle', state: 'WA', status: 'Active', memberCount: 41, healthScore: 91 },
-            { id: 6, name: 'Zeta Chapter', university: 'Georgia Tech', city: 'Atlanta', state: 'GA', status: 'Active', memberCount: 33, healthScore: 82 },
-            { id: 7, name: 'Eta Chapter', university: 'University of Illinois', city: 'Chicago', state: 'IL', status: 'Active', memberCount: 47, healthScore: 89 },
-            { id: 8, name: 'Theta Chapter', university: 'University of Michigan', city: 'Ann Arbor', state: 'MI', status: 'Active', memberCount: 39, healthScore: 87 },
-            { id: 9, name: 'Iota Chapter', university: 'Penn State', city: 'State College', state: 'PA', status: 'Active', memberCount: 44, healthScore: 83 },
-            { id: 10, name: 'Kappa Chapter', university: 'Arizona State University', city: 'Phoenix', state: 'AZ', status: 'Active', memberCount: 36, healthScore: 90 },
-            { id: 11, name: 'Lambda Chapter', university: 'University of Colorado', city: 'Boulder', state: 'CO', status: 'Inactive', memberCount: 22, healthScore: 65 },
-            { id: 12, name: 'Mu Chapter', university: 'University of Oregon', city: 'Portland', state: 'OR', status: 'Active', memberCount: 31, healthScore: 86 },
-            { id: 13, name: 'Nu Chapter', university: 'University of Virginia', city: 'Richmond', state: 'VA', status: 'Active', memberCount: 42, healthScore: 84 },
-            { id: 14, name: 'Xi Chapter', university: 'University of North Carolina', city: 'Charlotte', state: 'NC', status: 'Active', memberCount: 48, healthScore: 91 },
-            { id: 15, name: 'Omicron Chapter', university: 'University of Tennessee', city: 'Nashville', state: 'TN', status: 'Active', memberCount: 35, healthScore: 88 },
-            { id: 16, name: 'Pi Chapter', university: 'University of Alabama', city: 'Birmingham', state: 'AL', status: 'Suspended', memberCount: 18, healthScore: 45 },
-            { id: 17, name: 'Rho Chapter', university: 'University of Kentucky', city: 'Louisville', state: 'KY', status: 'Active', memberCount: 40, healthScore: 89 },
-            { id: 18, name: 'Sigma Chapter', university: 'University of South Carolina', city: 'Columbia', state: 'SC', status: 'Active', memberCount: 37, healthScore: 85 },
-            { id: 19, name: 'Tau Chapter', university: 'University of Mississippi', city: 'Jackson', state: 'MS', status: 'Active', memberCount: 28, healthScore: 81 },
-            { id: 20, name: 'Upsilon Chapter', university: 'University of Arkansas', city: 'Little Rock', state: 'AR', status: 'Inactive', memberCount: 24, healthScore: 68 }
-          ]
+          // Load member counts for each chapter
+          for (const chapter of chapters.value) {
+            try {
+              const members = await memberService.getMembersByChapter(chapter.id)
+              chapter.memberCount = Array.isArray(members) ? members.length : 0
+            } catch (err) {
+              console.warn(`Failed to load members for chapter ${chapter.id}:`, err)
+              chapter.memberCount = chapter.memberCount || 0
+            }
+          }
+          
+          filteredChapters.value = [...chapters.value]
+          console.log(`Loaded ${chapters.value.length} chapters`)
+        } else {
+          throw new Error('Invalid response format')
         }
-        
-        filteredChapters.value = [...chapters.value]
-        console.log(`Loaded ${chapters.value.length} chapters`)
         
       } catch (err) {
         console.error('Error loading chapters:', err)
