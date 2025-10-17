@@ -975,11 +975,29 @@ export default {
   },
   data() {
     return {
-      loading: true,
+      loading: false, // Temporarily set to false for debugging
       saving: false,
-      chapters: [],
+      chapters: [
+        {
+          id: 1,
+          name: "Test Chapter",
+          university: "Test University",
+          state: "California",
+          city: "Test City",
+          description: "Test description"
+        }
+      ],
       members: [],
-      searchResults: [],
+      searchResults: [
+        {
+          id: 1,
+          name: "Test Chapter",
+          university: "Test University",
+          state: "California",
+          city: "Test City",
+          description: "Test description"
+        }
+      ],
       availableStates: [],
       availableCities: [],
       searchTerm: '',
@@ -1127,6 +1145,7 @@ export default {
     }
   },
   async mounted() {
+    console.log('🔍 CHAPTERS DEBUG: Component mounted()')
     // Check if there are route query parameters
     if (this.$route.query.state) {
       this.selectedState = this.$route.query.state
@@ -1138,7 +1157,9 @@ export default {
       this.savedSearches = JSON.parse(saved)
     }
     
+    console.log('🔍 CHAPTERS DEBUG: About to call loadData()')
     await this.loadData()
+    console.log('🔍 CHAPTERS DEBUG: loadData() completed')
   },
   methods: {
     async loadData() {

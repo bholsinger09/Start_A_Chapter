@@ -72,12 +72,14 @@ const mockChapters = [
 export const chapterService = {
   // Get all chapters
   async getAllChapters() {
+    console.log('🔍 SERVICE DEBUG: getAllChapters() called')
     try {
       const response = await api.get('/chapters')
       return response.data
     } catch (error) {
       console.warn('Backend not available, using mock data:', error.message)
       // Return mock data when backend is not available
+      console.log('🔍 SERVICE DEBUG: Returning mock chapters:', mockChapters.length, 'items')
       return mockChapters
     }
   },
