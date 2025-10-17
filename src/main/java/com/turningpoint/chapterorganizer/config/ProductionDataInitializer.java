@@ -36,13 +36,14 @@ public class ProductionDataInitializer implements CommandLineRunner {
             long count = chapterRepository.count();
             System.out.println("Current chapter count: " + count);
             
-            // Only initialize if no chapters exist
-            if (count == 0) {
-                System.out.println("No chapters found, initializing basic data...");
-                initializeBasicData();
-            } else {
-                System.out.println("Chapters already exist, skipping initialization");
+            // Force reinitialization to ensure consistent data
+            if (count > 0) {
+                System.out.println("Deleting existing chapters to ensure consistent data...");
+                chapterRepository.deleteAll();
             }
+            
+            System.out.println("Initializing comprehensive chapter data...");
+            initializeBasicData();
             
             // Test the problematic search functionality
             System.out.println("Testing search functionality...");
@@ -114,6 +115,10 @@ public class ProductionDataInitializer implements CommandLineRunner {
         florida.setDescription("Turning Point chapter at University of Florida");
         florida.setActive(true);
 
+        Chapter idaho = new Chapter("University of Idaho Turning Point", "University of Idaho", "Idaho", "Moscow");
+        idaho.setDescription("Turning Point chapter at University of Idaho");
+        idaho.setActive(true);
+
         // Save chapters
         stanford = chapterRepository.save(stanford);
         berkeley = chapterRepository.save(berkeley);
@@ -121,6 +126,7 @@ public class ProductionDataInitializer implements CommandLineRunner {
         mit = chapterRepository.save(mit);
         nyu = chapterRepository.save(nyu);
         florida = chapterRepository.save(florida);
+        idaho = chapterRepository.save(idaho);
 
         // Create sample members for each chapter
         Member member1 = new Member();
