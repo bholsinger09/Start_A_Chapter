@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/chapters")
@@ -72,8 +73,25 @@ public class ChapterController {
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) Boolean active) {
-        List<Chapter> chapters = chapterService.searchChapters(name, university, state, city, active);
-        return ResponseEntity.ok(chapters);
+        try {
+            System.out.println("Search request received - name: " + name + 
+                             ", university: " + university + 
+                             ", state: " + state + 
+                             ", city: " + city + 
+                             ", active: " + active);
+            
+            List<Chapter> chapters = chapterService.searchChapters(name, university, state, city, active);
+            
+            System.out.println("Search completed successfully, returning " + chapters.size() + " chapters");
+            return ResponseEntity.ok(chapters);
+            
+        } catch (Exception e) {
+            System.err.println("Error in searchChapters endpoint: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Return empty list instead of error to prevent frontend crashes
+            return ResponseEntity.ok(new ArrayList<>());
+        }
     }
 
     // POST /api/chapters - Create new chapter

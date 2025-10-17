@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -102,13 +103,57 @@ public class ChapterService {
     @Transactional(readOnly = true)
     public List<Chapter> searchChapters(String name, String universityName, String state,
             String city, Boolean active) {
-        // Convert empty strings to null so the query treats them as "not specified"
-        name = (name != null && name.trim().isEmpty()) ? null : name;
-        universityName = (universityName != null && universityName.trim().isEmpty()) ? null : universityName;
-        state = (state != null && state.trim().isEmpty()) ? null : state;
-        city = (city != null && city.trim().isEmpty()) ? null : city;
-        
-        return chapterRepository.findChaptersByCriteria(name, universityName, state, city, active);
+        try {
+            // Convert empty strings to null so the query treats them as "not specified"
+            name = (name != null && name.trim().isEmpty()) ? null : name;
+            universityName = (universityName != null && universityName.trim().isEmpty()) ? null : universityName;
+            state = (state != null && state.trim().isEmpty()) ? null : state;
+            city = (city != null && city.trim().isEmpty()) ? null : city;
+            
+            // First try the complex query
+            return chapterRepository.findChaptersByCriteria(name, universityName, state, city, active);
+            
+        } catch (Exception e) {
+            // If the complex query fails, fall back to simple filtering
+            System.err.println("Complex search query failed, using fallback method: " + e.getMessage());
+            return searchChaptersFallback(name, universityName, state, city, active);
+        }
+    }
+    
+    /**
+     * Fallback search method using basic repository operations and Java filtering
+     */
+    private List<Chapter> searchChaptersFallback(String name, String universityName, String state,
+            String city, Boolean active) {
+        try {
+            // Start with all chapters or active chapters
+            List<Chapter> chapters;
+            if (active != null && active) {
+                chapters = chapterRepository.findByActiveTrue();
+            } else if (active != null && !active) {
+                chapters = chapterRepository.findByActiveFalse();
+            } else {
+                chapters = chapterRepository.findAll();
+            }
+            
+            // Apply filters using Java streams
+            return chapters.stream()
+                .filter(chapter -> name == null || 
+                    chapter.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(chapter -> universityName == null || 
+                    chapter.getUniversityName().toLowerCase().contains(universityName.toLowerCase()))
+                .filter(chapter -> state == null || 
+                    chapter.getState().equalsIgnoreCase(state))
+                .filter(chapter -> city == null || 
+                    chapter.getCity().equalsIgnoreCase(city))
+                .toList();
+                
+        } catch (Exception e) {
+            System.err.println("Fallback search also failed: " + e.getMessage());
+            e.printStackTrace();
+            // Return empty list as last resort
+            return new ArrayList<>();
+        }
     }
 
     /**
