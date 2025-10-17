@@ -1158,6 +1158,10 @@ export default {
         if (this.advancedFilters.city) searchParams.city = this.advancedFilters.city
         if (this.advancedFilters.active !== '') searchParams.active = this.advancedFilters.active
         
+        console.log('Search parameters:', searchParams)
+        console.log('Available chapters:', this.chapters.length)
+        console.log('Chapters by state:', this.chapters.map(c => ({ name: c.name, state: c.state })))
+        
         // If no search parameters, show all chapters
         if (Object.keys(searchParams).length === 0) {
           this.searchResults = this.chapters
@@ -1165,17 +1169,23 @@ export default {
         }
         
         // Perform backend search
+        console.log('Calling backend search with params:', searchParams)
         this.searchResults = await chapterService.searchChapters(searchParams)
+        console.log('Backend search returned:', this.searchResults.length, 'chapters')
+        console.log('Search results:', this.searchResults.map(c => ({ name: c.name, state: c.state })))
         
       } catch (error) {
         console.error('Error searching chapters:', error)
+        console.log('Backend search failed, falling back to local search')
         // Fallback to local filtering if backend search fails
         this.performLocalSearch()
       }
     },
 
     performLocalSearch() {
+      console.log('Performing local search...')
       let results = this.chapters
+      console.log('Starting with', results.length, 'chapters')
       
       if (this.searchTerm) {
         const term = this.searchTerm.toLowerCase()
@@ -1183,10 +1193,14 @@ export default {
           chapter.name.toLowerCase().includes(term) ||
           chapter.universityName.toLowerCase().includes(term)
         )
+        console.log('After search term filter:', results.length, 'chapters')
       }
       
       if (this.selectedState) {
+        console.log('Filtering by state:', this.selectedState)
+        console.log('Available states in chapters:', [...new Set(results.map(c => c.state))])
         results = results.filter(chapter => chapter.state === this.selectedState)
+        console.log('After state filter:', results.length, 'chapters')
       }
       
       if (this.advancedFilters.university) {
