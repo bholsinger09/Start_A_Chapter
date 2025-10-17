@@ -29,9 +29,62 @@ public class ProductionDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Only initialize if no chapters exist
-        if (chapterRepository.count() == 0) {
-            initializeBasicData();
+        try {
+            System.out.println("=== Production Data Initializer Starting ===");
+            
+            // Check current chapter count
+            long count = chapterRepository.count();
+            System.out.println("Current chapter count: " + count);
+            
+            // Only initialize if no chapters exist
+            if (count == 0) {
+                System.out.println("No chapters found, initializing basic data...");
+                initializeBasicData();
+            } else {
+                System.out.println("Chapters already exist, skipping initialization");
+            }
+            
+            // Test the problematic search functionality
+            System.out.println("Testing search functionality...");
+            testSearchFunctionality();
+            
+            System.out.println("=== Production Data Initializer Complete ===");
+            
+        } catch (Exception e) {
+            System.err.println("ERROR in Production Data Initializer: " + e.getMessage());
+            e.printStackTrace();
+            // Don't re-throw - let the app continue to start even if this fails
+        }
+    }
+    
+    private void testSearchFunctionality() {
+        try {
+            // Test basic repository operations
+            System.out.println("Testing basic findAll...");
+            var allChapters = chapterRepository.findAll();
+            System.out.println("✅ findAll successful: " + allChapters.size() + " chapters");
+            
+            // Test the problematic search query with null parameters
+            System.out.println("Testing findChaptersByCriteria with all null params...");
+            var nullSearchResults = chapterRepository.findChaptersByCriteria(null, null, null, null, null);
+            System.out.println("✅ Null search successful: " + nullSearchResults.size() + " results");
+            
+            // Test search with active=true
+            System.out.println("Testing findChaptersByCriteria with active=true...");
+            var activeSearchResults = chapterRepository.findChaptersByCriteria(null, null, null, null, true);
+            System.out.println("✅ Active search successful: " + activeSearchResults.size() + " results");
+            
+            // Test search with state parameter
+            if (!allChapters.isEmpty()) {
+                String testState = allChapters.get(0).getState();
+                System.out.println("Testing findChaptersByCriteria with state=" + testState + "...");
+                var stateSearchResults = chapterRepository.findChaptersByCriteria(null, null, testState, null, true);
+                System.out.println("✅ State search successful: " + stateSearchResults.size() + " results");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("❌ Search functionality test failed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
