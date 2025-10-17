@@ -1174,6 +1174,16 @@ export default {
         console.log('Backend search returned:', this.searchResults.length, 'chapters')
         console.log('Search results:', this.searchResults.map(c => ({ name: c.name, state: c.state })))
         
+        // If backend returns empty but we know chapters exist for this state, use fallback
+        if (this.searchResults.length === 0 && this.selectedState) {
+          const expectedCount = this.getStateChapterCount(this.selectedState)
+          if (expectedCount > 0) {
+            console.log(`Backend returned 0 results but ${expectedCount} chapters exist for ${this.selectedState}, using fallback`)
+            this.performLocalSearch()
+            return
+          }
+        }
+        
       } catch (error) {
         console.error('Error searching chapters:', error)
         console.log('Backend search failed, falling back to local search')
@@ -1218,6 +1228,7 @@ export default {
         results = results.filter(chapter => chapter.active === this.advancedFilters.active)
       }
       
+      console.log('Local search completed, setting results:', results.length, 'chapters')
       this.searchResults = results
     },
 
