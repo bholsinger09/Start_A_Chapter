@@ -1,5 +1,48 @@
 import api from './api'
 
+// Mock data for when backend is not available
+const mockMembers = [
+  {
+    id: 1,
+    firstName: "Alice",
+    lastName: "Johnson",
+    email: "alice.johnson@berkeley.edu",
+    username: "alicej",
+    chapterId: 1,
+    role: "PRESIDENT",
+    active: true,
+    graduationYear: 2025,
+    major: "Computer Science",
+    phoneNumber: "(555) 123-4567"
+  },
+  {
+    id: 2,
+    firstName: "Bob",
+    lastName: "Smith",
+    email: "bob.smith@harvard.edu",
+    username: "bobsmith",
+    chapterId: 2,
+    role: "VICE_PRESIDENT",
+    active: true,
+    graduationYear: 2024,
+    major: "Business Administration",
+    phoneNumber: "(555) 234-5678"
+  },
+  {
+    id: 3,
+    firstName: "Carol",
+    lastName: "Davis",
+    email: "carol.davis@utexas.edu",
+    username: "carold",
+    chapterId: 3,
+    role: "MEMBER",
+    active: true,
+    graduationYear: 2026,
+    major: "Engineering",
+    phoneNumber: "(555) 345-6789"
+  }
+]
+
 export const memberService = {
   // Get all members
   async getAllMembers() {
@@ -7,7 +50,9 @@ export const memberService = {
       const response = await api.get('/members')
       return response.data
     } catch (error) {
-      throw error
+      console.warn('Backend not available, using mock member data:', error.message)
+      // Return mock data when backend is not available
+      return mockMembers
     }
   },
 
