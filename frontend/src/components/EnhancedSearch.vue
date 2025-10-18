@@ -1,5 +1,8 @@
 <template>
-  <div class="advanced-search-component">
+  <div class="advanced-search-component" 
+       tabindex="0" 
+       @keydown="containerKeydown"
+       ref="searchContainer">
     <!-- Enhanced Search Input with Suggestions -->
     <div class="search-input-container position-relative">
       <div class="input-group">
@@ -41,7 +44,7 @@
       
       <!-- Search Suggestions Dropdown -->
       <div 
-        v-if="showSuggestions && (filteredSuggestions.length > 0 || recentSearches.length > 0)"
+        v-if="showSuggestions && (filteredSuggestions.length > 0 || recentSearches.length > 0 || true)"
         class="search-suggestions dropdown-menu show position-absolute w-100 mt-1"
         style="max-height: 300px; overflow-y: auto; z-index: 1050;"
         @mousedown.prevent
@@ -90,6 +93,14 @@
               <i class="bi bi-x"></i>
             </button>
           </button>
+        </div>
+        
+        <!-- Debug message when no suggestions -->
+        <div v-if="filteredSuggestions.length === 0 && recentSearches.length === 0">
+          <div class="dropdown-item-text text-muted">
+            <i class="bi bi-info-circle me-2"></i>
+            Suggestions dropdown is visible - Press Escape to close
+          </div>
         </div>
       </div>
     </div>
@@ -316,6 +327,7 @@ export default {
     const showAdvancedFilters = ref(false)
     const selectedSuggestionIndex = ref(-1)
     const searchInput = ref(null)
+    const searchContainer = ref(null)
     const isSearching = ref(false)
     
     // Filters
@@ -657,6 +669,17 @@ export default {
       }
     }
 
+    const containerKeydown = (event) => {
+      console.log('Container keydown:', event.key, 'showSuggestions:', showSuggestions.value)
+      if (event.key === 'Escape') {
+        console.log('CONTAINER: Escape key detected!')
+        event.preventDefault()
+        event.stopPropagation()
+        showSuggestions.value = false
+        selectedSuggestionIndex.value = -1
+      }
+    }
+
     const selectSuggestion = (suggestion) => {
       searchQuery.value = suggestion.text
       showSuggestions.value = false
@@ -865,7 +888,9 @@ export default {
       showSuggestions,
       showAdvancedFilters,
       selectedSuggestionIndex,
+      // Refs
       searchInput,
+      searchContainer,
       isSearching,
       filters,
       recentSearches,
@@ -881,6 +906,7 @@ export default {
       handleSearchInput,
       handleKeydown,
       handleKeyup,
+      containerKeydown,
       selectSuggestion,
       selectRecentSearch,
       hideSuggestionsDelayed,
