@@ -52,12 +52,8 @@ public class SecurityConfig {
         if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
             configuration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins.split(",")));
         } else {
-            // Default origins for development and production
-            configuration.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:3000", 
-                "http://localhost:8080",
-                "https://chapter-organizer-frontend.onrender.com"
-            ));
+            // Default origins for development and production - allow all for debugging
+            configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         }
         
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
