@@ -16,7 +16,7 @@ class SearchService {
       if (pagination.page) params.append('page', pagination.page)
       if (pagination.size) params.append('size', pagination.size)
 
-      const response = await api.get(`/api/search/global?${params.toString()}`)
+      const response = await api.get(`/search/global?${params.toString()}`)
       return response.data
     } catch (error) {
       console.error('Error performing global search:', error)
@@ -31,7 +31,7 @@ class SearchService {
       if (memberId) params.append('memberId', memberId)
       if (limit) params.append('limit', limit)
 
-      const response = await api.get(`/api/search/recommendations?${params.toString()}`)
+      const response = await api.get(`/search/recommendations?${params.toString()}`)
       return response.data
     } catch (error) {
       console.error('Error getting recommendations:', error)
@@ -45,7 +45,7 @@ class SearchService {
       const params = new URLSearchParams()
       if (limit) params.append('limit', limit)
 
-      const response = await api.get(`/api/search/similar/${chapterId}?${params.toString()}`)
+      const response = await api.get(`/search/similar/${chapterId}?${params.toString()}`)
       return response.data
     } catch (error) {
       console.error('Error getting similar chapters:', error)
@@ -56,7 +56,7 @@ class SearchService {
   // Get search suggestions for auto-complete
   async getSuggestions(partial) {
     try {
-      const response = await api.get(`/api/search/suggestions?partial=${encodeURIComponent(partial)}`)
+      const response = await api.get(`/search/suggestions?partial=${encodeURIComponent(partial)}`)
       return response.data
     } catch (error) {
       console.error('Error getting search suggestions:', error)
@@ -67,7 +67,7 @@ class SearchService {
   // Get trending chapters
   async getTrendingChapters(limit = 10) {
     try {
-      const response = await api.get(`/api/search/trending?limit=${limit}`)
+      const response = await api.get(`/search/trending?limit=${limit}`)
       return response.data
     } catch (error) {
       console.error('Error getting trending chapters:', error)
@@ -86,7 +86,7 @@ class SearchService {
         }
       })
 
-      const response = await api.get(`/api/search/faceted?${params.toString()}`)
+      const response = await api.get(`/search/faceted?${params.toString()}`)
       return response.data
     } catch (error) {
       console.error('Error performing faceted search:', error)
@@ -104,7 +104,7 @@ class SearchService {
         limit: limit.toString()
       })
 
-      const response = await api.get(`/api/search/geographic?${params.toString()}`)
+      const response = await api.get(`/search/geographic?${params.toString()}`)
       return response.data
     } catch (error) {
       console.error('Error performing geographic search:', error)
