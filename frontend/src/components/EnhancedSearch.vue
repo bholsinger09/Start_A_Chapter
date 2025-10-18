@@ -362,10 +362,18 @@ export default {
       setupDebouncedFunctions()
       loadRecommendations()
       loadTrendingChapters()
+      
+      // Add direct window event listener as backup
+      console.log('Adding direct window escape listener')
+      window.addEventListener('keydown', windowEscapeHandler, true) // Use capture phase
+      window.addEventListener('keyup', windowEscapeHandler, true)
     })
 
     onUnmounted(() => {
       removeKeyboardShortcuts()
+      console.log('Removing direct window escape listener')
+      window.removeEventListener('keydown', windowEscapeHandler, true)
+      window.removeEventListener('keyup', windowEscapeHandler, true)
     })
 
     const setupDebouncedFunctions = () => {
@@ -619,10 +627,16 @@ export default {
     }
 
     const handleKeydown = (event) => {
+      // Log ALL keys when suggestions are visible
+      if (showSuggestions.value) {
+        console.log('INPUT handleKeydown:', event.key, 'code:', event.code)
+      }
+      
       // Handle Escape key regardless of suggestions state
       if (event.key === 'Escape') {
-        console.log('Escape key pressed in handleKeydown')
+        console.log('INPUT: Escape key pressed in handleKeydown')
         event.preventDefault()
+        event.stopPropagation()
         showSuggestions.value = false
         selectedSuggestionIndex.value = -1
         return
@@ -634,6 +648,7 @@ export default {
       
       switch (event.key) {
         case 'ArrowDown':
+          console.log('Arrow down pressed')
           event.preventDefault()
           selectedSuggestionIndex.value = Math.min(
             selectedSuggestionIndex.value + 1, 
@@ -641,10 +656,12 @@ export default {
           )
           break
         case 'ArrowUp':
+          console.log('Arrow up pressed')
           event.preventDefault()
           selectedSuggestionIndex.value = Math.max(selectedSuggestionIndex.value - 1, -1)
           break
         case 'Enter':
+          console.log('Enter pressed')
           event.preventDefault()
           if (selectedSuggestionIndex.value >= 0) {
             if (selectedSuggestionIndex.value < filteredSuggestions.value.length) {
@@ -675,6 +692,22 @@ export default {
         console.log('CONTAINER: Escape key detected!')
         event.preventDefault()
         event.stopPropagation()
+        showSuggestions.value = false
+        selectedSuggestionIndex.value = -1
+      }
+    }
+
+    const windowEscapeHandler = (event) => {
+      // Log ALL keydown events when suggestions are visible for debugging
+      if (showSuggestions.value) {
+        console.log('WINDOW EVENT:', event.type, event.key, 'code:', event.code, 'target:', event.target.tagName)
+      }
+      
+      if (event.key === 'Escape' && showSuggestions.value) {
+        console.log('WINDOW: Escape captured! Closing suggestions.')
+        event.preventDefault()
+        event.stopPropagation()
+        event.stopImmediatePropagation()
         showSuggestions.value = false
         selectedSuggestionIndex.value = -1
       }
