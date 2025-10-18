@@ -86,6 +86,11 @@ public class SearchService {
     public List<RecommendationDto> getPersonalizedRecommendations(Long memberId, int limit) {
         List<RecommendationDto> recommendations = new ArrayList<>();
         
+        // Handle null member ID - return general recommendations
+        if (memberId == null) {
+            return getGeneralRecommendations(limit);
+        }
+        
         // Get member info (if exists)
         Optional<Member> memberOpt = memberRepository.findById(memberId);
         if (!memberOpt.isPresent()) {
