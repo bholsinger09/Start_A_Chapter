@@ -281,7 +281,7 @@
 
 <script>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import searchService from '@/services/searchService'
+import searchService from '../services/searchService'
 
 export default {
   name: 'EnhancedSearch',
