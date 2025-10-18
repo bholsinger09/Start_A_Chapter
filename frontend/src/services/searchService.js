@@ -1,5 +1,6 @@
 import api from './api'
 
+// Search service for chapter discovery and recommendations
 class SearchService {
   // Global search with intelligent filtering
   async globalSearch(query, filters = {}, pagination = {}) {
