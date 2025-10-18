@@ -62,6 +62,19 @@ public class SearchController {
     }
 
     /**
+     * Get general recommendations for anonymous users or when no member ID available
+     * Returns trending and high-rated chapters
+     */
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<RecommendationDto>> getGeneralRecommendations(
+            @RequestParam(defaultValue = "10") int limit) {
+        
+        // Use null memberId to get general recommendations
+        List<RecommendationDto> recommendations = searchService.getPersonalizedRecommendations(null, limit);
+        return ResponseEntity.ok(recommendations);
+    }
+
+    /**
      * Find chapters similar to a given chapter
      * Based on location, size, activity patterns, and focus areas
      */
