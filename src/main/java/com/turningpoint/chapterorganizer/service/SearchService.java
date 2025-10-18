@@ -38,8 +38,17 @@ public class SearchService {
         
         long startTime = System.currentTimeMillis();
         
+        // Debug logging
+        System.out.println("DEBUG: Search parameters - query: '" + query + "', states: " + states + ", statuses: " + statuses);
+        
         // Get all chapters and apply filtering
         List<Chapter> allChapters = chapterRepository.findAll();
+        System.out.println("DEBUG: Total chapters found: " + allChapters.size());
+        
+        // Debug: Print all existing states
+        Set<String> existingStates = allChapters.stream().map(Chapter::getState).collect(Collectors.toSet());
+        System.out.println("DEBUG: Existing states in database: " + existingStates);
+        
         List<Chapter> filteredChapters = allChapters.stream()
                 .filter(chapter -> matchesQuery(chapter, query))
                 .filter(chapter -> states == null || states.isEmpty() || states.contains(chapter.getState()))
