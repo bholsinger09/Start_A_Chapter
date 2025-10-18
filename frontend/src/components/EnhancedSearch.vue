@@ -281,6 +281,7 @@
 
 <script>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import searchService from '@/services/searchService'
 
 export default {
   name: 'EnhancedSearch',
@@ -294,7 +295,7 @@ export default {
       default: () => []
     }
   },
-  emits: ['search', 'filter-change'],
+  emits: ['search', 'filter-change', 'search-results'],
   setup(props, { emit }) {
     // Reactive data
     const searchQuery = ref('')
@@ -302,6 +303,7 @@ export default {
     const showAdvancedFilters = ref(false)
     const selectedSuggestionIndex = ref(-1)
     const searchInput = ref(null)
+    const isSearching = ref(false)
     
     // Filters
     const filters = ref({
@@ -317,16 +319,34 @@ export default {
     // Recent searches and saved searches
     const recentSearches = ref([])
     const savedSearches = ref([])
+    
+    // Advanced search features
+    const smartSuggestions = ref([])
+    const recommendations = ref([])
+    const trendingChapters = ref([])
+    const searchResults = ref(null)
+
+    // Debounced functions
+    const debouncedSearch = ref(null)
+    const debouncedSuggestions = ref(null)
 
     // Load saved data on mount
     onMounted(() => {
       loadStoredData()
       setupKeyboardShortcuts()
+      setupDebouncedFunctions()
+      loadRecommendations()
+      loadTrendingChapters()
     })
 
     onUnmounted(() => {
       removeKeyboardShortcuts()
     })
+
+    const setupDebouncedFunctions = () => {
+      debouncedSearch.value = searchService.debounce(performBackendSearch, 500)
+      debouncedSuggestions.value = searchService.debounce(fetchSmartSuggestions, 300)
+    }
 
     const loadStoredData = () => {
       const recent = localStorage.getItem('recentSearches')
@@ -340,19 +360,114 @@ export default {
       }
     }
 
-    // Generate search suggestions
+    // Fetch smart suggestions from backend
+    const fetchSmartSuggestions = async () => {
+      if (searchQuery.value.length < 2) {
+        smartSuggestions.value = []
+        return
+      }
+
+      try {
+        const suggestions = await searchService.getSuggestions(searchQuery.value)
+        smartSuggestions.value = suggestions.map(text => ({
+          type: 'smart',
+          text,
+          value: text
+        }))
+      } catch (error) {
+        console.error('Error fetching smart suggestions:', error)
+        smartSuggestions.value = []
+      }
+    }
+
+    // Load personalized recommendations
+    const loadRecommendations = async () => {
+      try {
+        // TODO: Get actual member ID from auth context
+        recommendations.value = await searchService.getRecommendations(null, 3)
+      } catch (error) {
+        console.error('Error loading recommendations:', error)
+      }
+    }
+
+    // Load trending chapters
+    const loadTrendingChapters = async () => {
+      try {
+        trendingChapters.value = await searchService.getTrendingChapters(5)
+      } catch (error) {
+        console.error('Error loading trending chapters:', error)
+      }
+    }
+
+    // Perform backend search using our new search service
+    const performBackendSearch = async () => {
+      if (!searchQuery.value.trim() && !hasActiveFilters.value) {
+        searchResults.value = null
+        emit('search-results', null)
+        return
+      }
+
+      isSearching.value = true
+      try {
+        // Convert our filters to the backend format
+        const backendFilters = {
+          states: filters.value.state ? [filters.value.state] : [],
+          statuses: filters.value.active ? [filters.value.active === 'true' ? 'Active' : 'Inactive'] : [],
+          minMembers: filters.value.memberCountMin > 0 ? filters.value.memberCountMin : null,
+          maxMembers: null,
+          minHealthScore: filters.value.healthScoreMin > 0 ? filters.value.healthScoreMin : null,
+          maxHealthScore: filters.value.healthScoreMax < 100 ? filters.value.healthScoreMax : null
+        }
+
+        const results = await searchService.globalSearch(
+          searchQuery.value.trim(),
+          backendFilters,
+          { page: 0, size: 20 }
+        )
+        
+        searchResults.value = results
+        emit('search-results', results)
+        emit('search', {
+          query: searchQuery.value,
+          ...filters.value,
+          results: results
+        })
+      } catch (error) {
+        console.error('Error performing backend search:', error)
+        // Fallback to local search for backward compatibility
+        performLocalSearch()
+      } finally {
+        isSearching.value = false
+      }
+    }
+
+    // Fallback local search (existing implementation)
+    const performLocalSearch = () => {
+      const searchParams = {
+        query: searchQuery.value,
+        ...filters.value
+      }
+      
+      if (searchQuery.value) {
+        addToRecentSearches(searchQuery.value)
+      }
+      
+      emit('search', searchParams)
+    }
+
+    // Generate search suggestions (combining local and smart suggestions)
     const filteredSuggestions = computed(() => {
       if (!searchQuery.value || searchQuery.value.length < 2) {
-        return []
+        return smartSuggestions.value
       }
 
       const query = searchQuery.value.toLowerCase()
-      const suggestions = []
+      const localSuggestions = []
 
       // Chapter name suggestions
       props.chapters.forEach(chapter => {
         if (chapter.name.toLowerCase().includes(query)) {
-          suggestions.push({
+          localSuggestions.push({
             type: 'chapter',
             text: chapter.name,
             value: chapter.name
@@ -364,7 +479,7 @@ export default {
       const universities = [...new Set(props.chapters.map(c => c.universityName))]
       universities.forEach(uni => {
         if (uni && uni.toLowerCase().includes(query)) {
-          suggestions.push({
+          localSuggestions.push({
             type: 'university',
             text: uni,
             value: uni
@@ -375,7 +490,7 @@ export default {
       // State suggestions
       props.availableStates.forEach(state => {
         if (state.toLowerCase().includes(query)) {
-          suggestions.push({
+          localSuggestions.push({
             type: 'state',
             text: state,
             value: state
@@ -387,7 +502,7 @@ export default {
       const cities = [...new Set(props.chapters.map(c => c.city))]
       cities.forEach(city => {
         if (city && city.toLowerCase().includes(query)) {
-          suggestions.push({
+          localSuggestions.push({
             type: 'city',
             text: city,
             value: city
@@ -395,7 +510,15 @@ export default {
         }
       })
 
-      return suggestions.slice(0, 12) // Limit to prevent overwhelming UI
+      // Combine smart suggestions with local suggestions
+      const combined = [...smartSuggestions.value, ...localSuggestions]
+      
+      // Remove duplicates and limit
+      const unique = combined.filter((item, index, self) => 
+        index === self.findIndex(t => t.text === item.text)
+      )
+      
+      return unique.slice(0, 12)
     })
 
     const getSuggestionIcon = (type) => {
@@ -403,7 +526,8 @@ export default {
         chapter: 'bi bi-building',
         university: 'bi bi-mortarboard',
         state: 'bi bi-geo-alt',
-        city: 'bi bi-geo'
+        city: 'bi bi-geo',
+        smart: 'bi bi-lightbulb'
       }
       return icons[type] || 'bi bi-search'
     }
@@ -457,7 +581,16 @@ export default {
     // Methods
     const handleSearchInput = () => {
       selectedSuggestionIndex.value = -1
-      performSearch()
+      
+      // Trigger smart suggestions
+      if (debouncedSuggestions.value) {
+        debouncedSuggestions.value()
+      }
+      
+      // Trigger search
+      if (debouncedSearch.value) {
+        debouncedSearch.value()
+      }
     }
 
     const handleKeydown = (event) => {
@@ -499,13 +632,13 @@ export default {
       searchQuery.value = suggestion.text
       showSuggestions.value = false
       addToRecentSearches(suggestion.text)
-      performSearch()
+      performBackendSearch()
     }
 
     const selectRecentSearch = (recent) => {
       searchQuery.value = recent.query
       showSuggestions.value = false
-      performSearch()
+      performBackendSearch()
     }
 
     const hideSuggestionsDelayed = () => {
@@ -516,24 +649,11 @@ export default {
 
     const clearSearch = () => {
       searchQuery.value = ''
-      performSearch()
-    }
-
-    const performSearch = () => {
-      const searchParams = {
-        query: searchQuery.value,
-        ...filters.value
-      }
-      
-      if (searchQuery.value) {
-        addToRecentSearches(searchQuery.value)
-      }
-      
-      emit('search', searchParams)
+      performBackendSearch()
     }
 
     const applyFilters = () => {
-      performSearch()
+      performBackendSearch()
       emit('filter-change', filters.value)
     }
 
@@ -548,7 +668,7 @@ export default {
         active: '',
         foundedAfter: ''
       }
-      performSearch()
+      performBackendSearch()
     }
 
     const removeFilter = (filterKey) => {
@@ -576,7 +696,7 @@ export default {
           filters.value.foundedAfter = ''
           break
       }
-      performSearch()
+      performBackendSearch()
     }
 
     const addToRecentSearches = (query) => {
@@ -606,7 +726,7 @@ export default {
       localStorage.setItem('recentSearches', JSON.stringify(recentSearches.value))
     }
 
-    const saveCurrentSearch = () => {
+    const saveCurrentSearch = async () => {
       if (!hasActiveFilters.value) {
         alert('No active filters to save!')
         return
@@ -614,23 +734,37 @@ export default {
       
       const name = prompt('Enter a name for this search:')
       if (name) {
-        const search = {
-          name,
-          query: searchQuery.value,
-          filters: { ...filters.value },
-          timestamp: Date.now(),
-          description: activeFiltersList.value.map(f => f.label).join(', ')
+        try {
+          const searchParams = {
+            query: searchQuery.value,
+            filters: filters.value
+          }
+          
+          // Save to backend (when implemented)
+          await searchService.saveSearch(null, name, searchParams)
+          
+          // Also save locally for immediate use
+          const search = {
+            name,
+            query: searchQuery.value,
+            filters: { ...filters.value },
+            timestamp: Date.now(),
+            description: activeFiltersList.value.map(f => f.label).join(', ')
+          }
+          
+          savedSearches.value.push(search)
+          localStorage.setItem('savedSearches', JSON.stringify(savedSearches.value))
+        } catch (error) {
+          console.error('Error saving search:', error)
+          alert('Failed to save search. Please try again.')
         }
-        
-        savedSearches.value.push(search)
-        localStorage.setItem('savedSearches', JSON.stringify(savedSearches.value))
       }
     }
 
     const loadSavedSearch = (search) => {
       searchQuery.value = search.query
       filters.value = { ...search.filters }
-      performSearch()
+      performBackendSearch()
     }
 
     const removeSavedSearch = (index) => {
@@ -658,7 +792,9 @@ export default {
     // Watch for filter changes
     watch(filters, () => {
       if (hasActiveFilters.value) {
-        performSearch()
+        if (debouncedSearch.value) {
+          debouncedSearch.value()
+        }
       }
     }, { deep: true })
 
@@ -668,9 +804,14 @@ export default {
       showAdvancedFilters,
       selectedSuggestionIndex,
       searchInput,
+      isSearching,
       filters,
       recentSearches,
       savedSearches,
+      smartSuggestions,
+      recommendations,
+      trendingChapters,
+      searchResults,
       filteredSuggestions,
       hasActiveFilters,
       activeFiltersList,
@@ -687,7 +828,10 @@ export default {
       removeRecentSearch,
       saveCurrentSearch,
       loadSavedSearch,
-      removeSavedSearch
+      removeSavedSearch,
+      performBackendSearch,
+      loadRecommendations,
+      loadTrendingChapters
     }
   }
 }

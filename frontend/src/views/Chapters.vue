@@ -14,39 +14,14 @@
         </div>
       </div>
 
-      <!-- Search and Filter Controls -->
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="bi bi-search"></i>
-            </span>
-            <input 
-              v-model="searchQuery" 
-              type="text" 
-              class="form-control" 
-              placeholder="Search chapters by name, university, or city..."
-              @input="applyFilters"
-            />
-          </div>
-        </div>
-        <div class="col-md-3">
-          <select v-model="selectedState" @change="applyFilters" class="form-select">
-            <option value="">All States</option>
-            <option v-for="state in availableStates" :key="state" :value="state">
-              {{ state }}
-            </option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <select v-model="selectedStatus" @change="applyFilters" class="form-select">
-            <option value="">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-            <option value="Suspended">Suspended</option>
-          </select>
-        </div>
-      </div>
+      <!-- Enhanced Search and Filter Controls -->
+      <EnhancedSearch
+        :chapters="allChapters"
+        :available-states="availableStates"
+        @search="handleSearch"
+        @search-results="handleSearchResults"
+        @filter-change="handleFilterChange"
+      />
 
       <!-- Stats Row -->
       <div class="row mb-3">
@@ -352,12 +327,17 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import chapterService from '../services/chapterService.js'
 import memberService from '../services/memberService.js'
+import EnhancedSearch from '../components/EnhancedSearch.vue'
 
 export default {
   name: 'Chapters',
+  components: {
+    EnhancedSearch
+  },
   setup() {
     // Reactive data
     const chapters = ref([])
+    const allChapters = ref([]) // Store all chapters for search component
     const filteredChapters = ref([])
     const loading = ref(true)
     const error = ref(null)
@@ -365,6 +345,7 @@ export default {
     const selectedState = ref('')
     const selectedStatus = ref('')
     const currentView = ref('table')
+    const searchResults = ref(null) // Store backend search results
     
     // Pagination
     const currentPage = ref(1)
@@ -412,6 +393,7 @@ export default {
         
         if (response && Array.isArray(response)) {
           chapters.value = response
+          allChapters.value = [...response] // Store original chapters for search component
           
           // Load member counts for each chapter
           for (const chapter of chapters.value) {
@@ -424,6 +406,8 @@ export default {
             }
           }
           
+          // Update allChapters with member counts too
+          allChapters.value = [...chapters.value]
           filteredChapters.value = [...chapters.value]
           console.log(`Loaded ${chapters.value.length} chapters`)
         } else {
@@ -575,6 +559,44 @@ export default {
       // TODO: Implement delete confirmation
     }
 
+    // Enhanced search handlers
+    const handleSearch = (searchParams) => {
+      console.log('Search triggered:', searchParams)
+      
+      // If we have backend search results, use them
+      if (searchResults.value && searchResults.value.chapters) {
+        filteredChapters.value = searchResults.value.chapters
+        currentPage.value = 1
+        return
+      }
+      
+      // Fallback to local search
+      searchQuery.value = searchParams.query || ''
+      selectedState.value = searchParams.state || ''
+      selectedStatus.value = searchParams.active === 'true' ? 'Active' : 
+                              searchParams.active === 'false' ? 'Inactive' : ''
+      applyFilters()
+    }
+
+    const handleSearchResults = (results) => {
+      console.log('Search results received:', results)
+      searchResults.value = results
+      
+      if (results && results.chapters) {
+        filteredChapters.value = results.chapters
+        currentPage.value = 1
+      } else {
+        // Reset to show all chapters if no results
+        filteredChapters.value = [...chapters.value]
+      }
+    }
+
+    const handleFilterChange = (filters) => {
+      console.log('Filters changed:', filters)
+      // The enhanced search component will handle the filtering
+      // This is just for monitoring filter changes
+    }
+
     // Watchers
     watch([sortField, sortDirection], () => {
       applyFilters()
@@ -588,6 +610,7 @@ export default {
     return {
       // Data
       chapters,
+      allChapters,
       filteredChapters,
       loading,
       error,
@@ -599,6 +622,7 @@ export default {
       itemsPerPage,
       sortField,
       sortDirection,
+      searchResults,
 
       // Computed
       availableStates,
@@ -618,7 +642,10 @@ export default {
       exportToCSV,
       viewChapter,
       editChapter,
-      deleteChapter
+      deleteChapter,
+      handleSearch,
+      handleSearchResults,
+      handleFilterChange
     }
   }
 }
