@@ -29,7 +29,7 @@ public class SearchController {
      */
     @GetMapping("/global")
     public ResponseEntity<SearchResultsDto> globalSearch(
-            @RequestParam String query,
+            @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false) List<String> states,
             @RequestParam(required = false) List<String> statuses,
             @RequestParam(required = false) Integer minMembers,
