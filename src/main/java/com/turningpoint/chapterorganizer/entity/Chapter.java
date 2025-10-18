@@ -152,6 +152,10 @@ public class Chapter {
         this.members = members;
     }
 
+    public int getMemberCount() {
+        return members != null ? members.size() : 0;
+    }
+
     public List<Event> getEvents() {
         return events;
     }

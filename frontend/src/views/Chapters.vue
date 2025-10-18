@@ -395,18 +395,10 @@ export default {
           chapters.value = response
           allChapters.value = [...response] // Store original chapters for search component
           
-          // Load member counts for each chapter
-          for (const chapter of chapters.value) {
-            try {
-              const members = await memberService.getMembersByChapter(chapter.id)
-              chapter.memberCount = Array.isArray(members) ? members.length : 0
-            } catch (err) {
-              console.warn(`Failed to load members for chapter ${chapter.id}:`, err)
-              chapter.memberCount = chapter.memberCount || 0
-            }
-          }
+          // Member counts are now included in the chapter data from backend
+          console.log(`Loaded ${chapters.value.length} chapters`)
           
-          // Update allChapters with member counts too
+          // Update allChapters with the same data
           allChapters.value = [...chapters.value]
           filteredChapters.value = [...chapters.value]
           console.log(`Loaded ${chapters.value.length} chapters`)

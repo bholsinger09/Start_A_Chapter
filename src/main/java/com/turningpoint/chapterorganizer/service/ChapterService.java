@@ -78,7 +78,7 @@ public class ChapterService {
      */
     @Transactional(readOnly = true)
     public List<Chapter> getAllActiveChapters() {
-        return chapterRepository.findByActiveTrue();
+        return chapterRepository.findByActiveTrueWithMembers();
     }
 
     /**
