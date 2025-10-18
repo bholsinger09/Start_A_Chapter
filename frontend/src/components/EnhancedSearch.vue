@@ -14,6 +14,7 @@
           v-model="searchQuery"
           @input="handleSearchInput"
           @keydown="handleKeydown"
+          @keyup="handleKeyup"
           @focus="showSuggestions = true"
           @blur="hideSuggestionsDelayed"
           autocomplete="off"
@@ -26,6 +27,15 @@
           title="Clear search"
         >
           <i class="bi bi-x-lg"></i>
+        </button>
+        <!-- Debug button - remove after testing -->
+        <button 
+          class="btn btn-outline-info"
+          type="button"
+          @click="showSuggestions = !showSuggestions"
+          title="Toggle suggestions (debug)"
+        >
+          {{ showSuggestions ? 'Hide' : 'Show' }}
         </button>
       </div>
       
@@ -599,10 +609,10 @@ export default {
     const handleKeydown = (event) => {
       // Handle Escape key regardless of suggestions state
       if (event.key === 'Escape') {
+        console.log('Escape key pressed in handleKeydown')
         event.preventDefault()
         showSuggestions.value = false
         selectedSuggestionIndex.value = -1
-        searchInput.value?.blur()
         return
       }
 
@@ -633,6 +643,17 @@ export default {
             }
           }
           break
+      }
+    }
+
+    const handleKeyup = (event) => {
+      // Additional Escape key handler on keyup as backup
+      if (event.key === 'Escape') {
+        console.log('Escape key pressed in handleKeyup')
+        event.preventDefault()
+        event.stopPropagation()
+        showSuggestions.value = false
+        selectedSuggestionIndex.value = -1
       }
     }
 
@@ -817,14 +838,15 @@ export default {
         searchInput.value?.focus()
       }
       
-      // Escape to close suggestions (global handler)
-      if (event.key === 'Escape' && showSuggestions.value) {
-        event.preventDefault()
-        showSuggestions.value = false
-        selectedSuggestionIndex.value = -1
-        // Don't blur if the search input has focus, just close suggestions
-        if (document.activeElement !== searchInput.value) {
-          searchInput.value?.blur()
+      // Escape to close suggestions (global handler with debug)
+      if (event.key === 'Escape') {
+        console.log('Global Escape detected, showSuggestions:', showSuggestions.value)
+        if (showSuggestions.value) {
+          event.preventDefault()
+          event.stopPropagation()
+          showSuggestions.value = false
+          selectedSuggestionIndex.value = -1
+          console.log('Global Escape closed suggestions')
         }
       }
     }
@@ -858,6 +880,7 @@ export default {
       getSuggestionIcon,
       handleSearchInput,
       handleKeydown,
+      handleKeyup,
       selectSuggestion,
       selectRecentSearch,
       hideSuggestionsDelayed,
