@@ -34,6 +34,7 @@
         v-if="showSuggestions && (filteredSuggestions.length > 0 || recentSearches.length > 0)"
         class="search-suggestions dropdown-menu show position-absolute w-100 mt-1"
         style="max-height: 300px; overflow-y: auto; z-index: 1050;"
+        @mousedown.prevent
       >
         <!-- Quick Suggestions -->
         <div v-if="filteredSuggestions.length > 0">
@@ -46,7 +47,8 @@
             :key="`suggestion-${index}`"
             class="dropdown-item d-flex align-items-center"
             :class="{ 'active': selectedSuggestionIndex === index }"
-            @mousedown.prevent="selectSuggestion(suggestion)"
+            @click.stop="selectSuggestion(suggestion)"
+            @mousedown.prevent
           >
             <i :class="getSuggestionIcon(suggestion.type)" class="me-2"></i>
             <span class="flex-grow-1">{{ suggestion.text }}</span>
@@ -65,7 +67,8 @@
             v-for="(recent, index) in recentSearches.slice(0, 5)"
             :key="`recent-${index}`"
             class="dropdown-item d-flex align-items-center"
-            @mousedown.prevent="selectRecentSearch(recent)"
+            @click.stop="selectRecentSearch(recent)"
+            @mousedown.prevent
           >
             <i class="bi bi-clock me-2"></i>
             <span class="flex-grow-1">{{ recent.query }}</span>
@@ -594,6 +597,15 @@ export default {
     }
 
     const handleKeydown = (event) => {
+      // Handle Escape key regardless of suggestions state
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        showSuggestions.value = false
+        selectedSuggestionIndex.value = -1
+        searchInput.value?.blur()
+        return
+      }
+
       if (!showSuggestions.value) return
 
       const suggestionsLength = filteredSuggestions.value.length + recentSearches.value.length
@@ -621,30 +633,47 @@ export default {
             }
           }
           break
-        case 'Escape':
-          showSuggestions.value = false
-          searchInput.value?.blur()
-          break
       }
     }
 
     const selectSuggestion = (suggestion) => {
       searchQuery.value = suggestion.text
       showSuggestions.value = false
+      selectedSuggestionIndex.value = -1
       addToRecentSearches(suggestion.text)
       performBackendSearch()
+      // Keep focus on search input for better UX
+      nextTick(() => {
+        if (searchInput.value) {
+          searchInput.value.focus()
+        }
+      })
     }
 
     const selectRecentSearch = (recent) => {
       searchQuery.value = recent.query
       showSuggestions.value = false
+      selectedSuggestionIndex.value = -1
       performBackendSearch()
+      // Keep focus on search input for better UX
+      nextTick(() => {
+        if (searchInput.value) {
+          searchInput.value.focus()
+        }
+      })
     }
 
     const hideSuggestionsDelayed = () => {
+      // Use a shorter delay and ensure we don't interfere with selection
       setTimeout(() => {
         showSuggestions.value = false
-      }, 150)
+        selectedSuggestionIndex.value = -1
+      }, 100)
+    }
+
+    const hideSuggestionsImmediately = () => {
+      showSuggestions.value = false
+      selectedSuggestionIndex.value = -1
     }
 
     const clearSearch = () => {
@@ -787,6 +816,17 @@ export default {
         event.preventDefault()
         searchInput.value?.focus()
       }
+      
+      // Escape to close suggestions (global handler)
+      if (event.key === 'Escape' && showSuggestions.value) {
+        event.preventDefault()
+        showSuggestions.value = false
+        selectedSuggestionIndex.value = -1
+        // Don't blur if the search input has focus, just close suggestions
+        if (document.activeElement !== searchInput.value) {
+          searchInput.value?.blur()
+        }
+      }
     }
 
     // Watch for filter changes
@@ -821,6 +861,7 @@ export default {
       selectSuggestion,
       selectRecentSearch,
       hideSuggestionsDelayed,
+      hideSuggestionsImmediately,
       clearSearch,
       applyFilters,
       clearAllFilters,
