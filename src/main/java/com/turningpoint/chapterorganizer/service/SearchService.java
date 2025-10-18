@@ -43,7 +43,13 @@ public class SearchService {
         
         List<Chapter> filteredChapters = allChapters.stream()
                 .filter(chapter -> matchesQuery(chapter, query))
-                .filter(chapter -> states == null || states.isEmpty() || states.contains(chapter.getState()))
+                .filter(chapter -> {
+                    boolean stateMatch = states == null || states.isEmpty() || states.contains(chapter.getState());
+                    if (states != null && !states.isEmpty()) {
+                        System.out.println("DEBUG: Chapter '" + chapter.getName() + "' state: '" + chapter.getState() + "' vs filter states: " + states + " = " + stateMatch);
+                    }
+                    return stateMatch;
+                })
                 .filter(chapter -> statuses == null || statuses.isEmpty() || 
                         (statuses.contains("Active") && Boolean.TRUE.equals(chapter.getActive())) ||
                         (statuses.contains("Inactive") && Boolean.FALSE.equals(chapter.getActive())))
