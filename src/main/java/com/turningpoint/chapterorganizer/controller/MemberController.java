@@ -1,5 +1,6 @@
 package com.turningpoint.chapterorganizer.controller;
 
+import com.turningpoint.chapterorganizer.dto.CreateMemberRequest;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.service.MemberService;
@@ -111,9 +112,9 @@ public class MemberController {
 
     // POST /api/members - Create new member
     @PostMapping
-    public ResponseEntity<Member> createMember(@Valid @RequestBody Member member) {
+    public ResponseEntity<Member> createMember(@Valid @RequestBody CreateMemberRequest request) {
         try {
-            Member createdMember = memberService.createMember(member);
+            Member createdMember = memberService.createMember(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdMember);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();

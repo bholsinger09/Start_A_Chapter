@@ -1,5 +1,6 @@
 package com.turningpoint.chapterorganizer.service;
 
+import com.turningpoint.chapterorganizer.dto.CreateMemberRequest;
 import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.MemberRole;
@@ -52,6 +53,35 @@ public class MemberService {
         if (member.getRole() == null) {
             member.setRole(MemberRole.MEMBER);
         }
+
+        return memberRepository.save(member);
+    }
+
+    /**
+     * Create a new member from CreateMemberRequest
+     */
+    public Member createMember(CreateMemberRequest request) {
+        // Check if email already exists
+        if (memberRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Member with this email already exists");
+        }
+
+        // Get the chapter
+        Optional<Chapter> chapter = chapterService.getChapterById(request.getChapterId());
+        if (chapter.isEmpty()) {
+            throw new IllegalArgumentException("Chapter not found with id: " + request.getChapterId());
+        }
+
+        // Create new member
+        Member member = new Member();
+        member.setFirstName(request.getFirstName());
+        member.setLastName(request.getLastName());
+        member.setEmail(request.getEmail());
+        member.setUsername(request.getUsername());
+        member.setPhoneNumber(request.getPhoneNumber());
+        member.setRole(request.getRole() != null ? request.getRole() : MemberRole.MEMBER);
+        member.setChapter(chapter.get());
+        member.setActive(true);
 
         return memberRepository.save(member);
     }
