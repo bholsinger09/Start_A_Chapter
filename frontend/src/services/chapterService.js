@@ -77,15 +77,30 @@ export const chapterService = {
       const response = await api.get('/chapters')
       console.log('🔍 SERVICE DEBUG: API response:', response)
       
+      let data = response.data
+      
+      // Check if the response data is a JSON string that needs parsing
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data)
+          console.log('🔍 SERVICE DEBUG: Parsed JSON string data:', data)
+        } catch (parseError) {
+          console.error('🔍 SERVICE DEBUG: Failed to parse JSON string:', parseError)
+          console.warn('🔍 SERVICE DEBUG: Using mock data due to parse error')
+          return mockChapters
+        }
+      }
+      
       // Ensure we return an array
-      if (response.data && Array.isArray(response.data)) {
-        console.log('🔍 SERVICE DEBUG: Returning API data:', response.data.length, 'chapters')
-        return response.data
+      if (data && Array.isArray(data)) {
+        console.log('🔍 SERVICE DEBUG: Returning API data:', data.length, 'chapters')
+        return data
       } else if (Array.isArray(response)) {
         console.log('🔍 SERVICE DEBUG: Returning direct response:', response.length, 'chapters')
         return response
       } else {
         console.warn('🔍 SERVICE DEBUG: Unexpected API response format, using mock data')
+        console.warn('🔍 SERVICE DEBUG: Expected array, got:', typeof data, data)
         return mockChapters
       }
     } catch (error) {
