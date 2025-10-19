@@ -1,5 +1,6 @@
 package com.turningpoint.chapterorganizer.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -47,6 +48,7 @@ public abstract class Institution {
     private String description;
 
     @OneToMany(mappedBy = "institution", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore  // Prevent circular reference during JSON serialization
     private List<Chapter> chapters = new ArrayList<>();
 
     @CreationTimestamp

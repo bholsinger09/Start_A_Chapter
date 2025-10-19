@@ -188,22 +188,45 @@ public class ChapterController {
     @PostMapping("/with-institution")
     public ResponseEntity<Chapter> createChapterWithInstitution(@Valid @RequestBody CreateChapterRequest request) {
         try {
+            System.out.println("DEBUG: createChapterWithInstitution called");
+            System.out.println("DEBUG: Request object: " + request);
+            System.out.println("DEBUG: Request name: " + (request != null ? request.getName() : "null"));
+            System.out.println("DEBUG: Request description: " + (request != null ? request.getDescription() : "null"));
+            System.out.println("DEBUG: Request institutionId: " + (request != null ? request.getInstitutionId() : "null"));
+            System.out.println("DEBUG: Request newInstitution: " + (request != null ? request.getNewInstitution() : "null"));
+            
+            if (request == null) {
+                System.err.println("ERROR: Request is null");
+                return ResponseEntity.badRequest().build();
+            }
+            
+            System.out.println("DEBUG: Request validation hasValidInstitution: " + request.hasValidInstitution());
+            
             if (!request.hasValidInstitution()) {
+                System.err.println("ERROR: Invalid institution - both institutionId and newInstitution are null");
                 return ResponseEntity.badRequest().build();
             }
 
             Institution institution;
             
             if (request.getInstitutionId() != null) {
+                System.out.println("DEBUG: Using existing institution ID: " + request.getInstitutionId());
                 // Use existing institution
                 Optional<Institution> existingInstitution = institutionService.getInstitutionById(request.getInstitutionId());
                 if (existingInstitution.isEmpty()) {
+                    System.err.println("ERROR: Institution not found with ID: " + request.getInstitutionId());
                     return ResponseEntity.badRequest().build();
                 }
                 institution = existingInstitution.get();
             } else {
+                System.out.println("DEBUG: Creating new institution: " + request.getNewInstitution());
                 // Create new institution
                 CreateInstitutionRequest newInstRequest = request.getNewInstitution();
+                if (newInstRequest == null) {
+                    System.err.println("ERROR: newInstitution is null");
+                    return ResponseEntity.badRequest().build();
+                }
+                
                 if (newInstRequest.isUniversity()) {
                     University university = new University();
                     university.setName(newInstRequest.getName());
@@ -237,14 +260,20 @@ public class ChapterController {
             }
 
             // Create the chapter
+            System.out.println("DEBUG: Creating chapter with name: " + request.getName());
             Chapter chapter = new Chapter(request.getName(), institution);
             chapter.setDescription(request.getDescription());
             Chapter createdChapter = chapterService.createChapter(chapter);
+            System.out.println("DEBUG: Chapter created successfully with ID: " + createdChapter.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(createdChapter);
             
         } catch (IllegalArgumentException e) {
+            System.err.println("ERROR: IllegalArgumentException in createChapterWithInstitution: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
+            System.err.println("ERROR: Exception in createChapterWithInstitution: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
