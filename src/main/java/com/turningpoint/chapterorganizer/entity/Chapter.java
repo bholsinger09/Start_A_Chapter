@@ -1,6 +1,8 @@
 package com.turningpoint.chapterorganizer.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +30,7 @@ public class Chapter {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "institution_id", nullable = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "chapters"})
     private Institution institution;
 
     // Legacy fields for backward compatibility - will be deprecated
