@@ -195,14 +195,27 @@
               <label class="form-label fw-semibold">
                 Min Members: {{ filters.memberCountMin }}
               </label>
-              <input
-                v-model.number="filters.memberCountMin"
-                type="range"
-                class="form-range"
-                min="0"
-                max="500"
-                step="10"
-              >
+              <div class="d-flex align-items-center gap-2">
+                <input
+                  v-model.number="filters.memberCountMin"
+                  type="range"
+                  class="form-range flex-grow-1"
+                  min="0"
+                  max="500"
+                  step="1"
+                  @input="updateFilterResults"
+                >
+                <input
+                  v-model.number="filters.memberCountMin"
+                  type="number"
+                  class="form-control"
+                  style="width: 70px;"
+                  min="0"
+                  max="500"
+                  step="1"
+                  @input="updateFilterResults"
+                >
+              </div>
             </div>
           </div>
 
