@@ -27,7 +27,7 @@ public class Chapter {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "institution_id", nullable = false)
+    @JoinColumn(name = "institution_id", nullable = true)
     private Institution institution;
 
     // Legacy fields for backward compatibility - will be deprecated
