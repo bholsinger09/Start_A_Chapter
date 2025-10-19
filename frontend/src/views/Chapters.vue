@@ -1035,8 +1035,6 @@ export default {
         alert('Chapter created successfully!')
         
       } catch (error) {
-        console.error('Error creating chapter:', error)
-        
         // Handle specific error messages
         let errorMessage = 'Error creating chapter. Please try again.'
         
@@ -1051,14 +1049,21 @@ export default {
           } else {
             errorMessage = 'Invalid request. Please check all required fields are filled correctly.'
           }
+          // Log as info since this is a user validation error, not a system error
+          console.info('Chapter creation validation error:', error.response.data?.error || 'Bad request')
         } else if (error.response && error.response.status === 500) {
           if (error.response.data && error.response.data.error) {
             errorMessage = error.response.data.error
           } else {
             errorMessage = 'Server error occurred. Please try again later.'
           }
+          console.error('Server error creating chapter:', error)
         } else if (error.code === 'NETWORK_ERROR' || !error.response) {
           errorMessage = 'Network error. Please check your connection and try again.'
+          console.error('Network error creating chapter:', error)
+        } else {
+          // Unexpected error
+          console.error('Unexpected error creating chapter:', error)
         }
         
         alert(errorMessage)

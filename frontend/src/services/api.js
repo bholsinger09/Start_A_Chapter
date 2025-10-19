@@ -28,7 +28,13 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
-    console.error('API Error:', error.response?.data || error.message)
+    // Log client errors (400-499) as info since they're often user validation errors
+    // Log server errors (500+) as errors since they indicate system problems
+    if (error.response?.status >= 400 && error.response?.status < 500) {
+      console.info('API Client Error:', error.response?.data || error.message)
+    } else {
+      console.error('API Error:', error.response?.data || error.message)
+    }
     return Promise.reject(error)
   }
 )
