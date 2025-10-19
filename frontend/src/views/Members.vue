@@ -456,15 +456,23 @@ export default {
       try {
         this.saving = true
         
-        const memberData = {
-          ...this.memberForm,
-          chapter: this.memberForm.chapterId ? { id: this.memberForm.chapterId } : null
-        }
-        delete memberData.chapterId
-        
         if (this.showEditModal) {
+          // For updates, use the original format with chapter object
+          const memberData = {
+            ...this.memberForm,
+            chapter: this.memberForm.chapterId ? { id: this.memberForm.chapterId } : null
+          }
+          delete memberData.chapterId
           await memberService.updateMember(this.memberForm.id, memberData)
         } else {
+          // For creates, use the CreateMemberRequest format with chapterId
+          const memberData = {
+            firstName: this.memberForm.firstName,
+            lastName: this.memberForm.lastName,
+            email: this.memberForm.email,
+            chapterId: this.memberForm.chapterId,
+            role: this.memberForm.role
+          }
           await memberService.createMember(memberData)
         }
         
