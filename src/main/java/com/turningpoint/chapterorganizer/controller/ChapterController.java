@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
@@ -186,7 +188,7 @@ public class ChapterController {
 
     // POST /api/chapters/with-institution - Create new chapter with institution
     @PostMapping("/with-institution")
-    public ResponseEntity<Chapter> createChapterWithInstitution(@Valid @RequestBody CreateChapterRequest request) {
+    public ResponseEntity<?> createChapterWithInstitution(@Valid @RequestBody CreateChapterRequest request) {
         try {
             System.out.println("DEBUG: createChapterWithInstitution called");
             System.out.println("DEBUG: Request object: " + request);
@@ -270,11 +272,13 @@ public class ChapterController {
         } catch (IllegalArgumentException e) {
             System.err.println("ERROR: IllegalArgumentException in createChapterWithInstitution: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+            // Return the error message in the response body so frontend can display it
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             System.err.println("ERROR: Exception in createChapterWithInstitution: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Internal server error occurred"));
         }
     }
 

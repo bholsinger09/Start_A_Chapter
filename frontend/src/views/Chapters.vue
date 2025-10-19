@@ -1036,7 +1036,32 @@ export default {
         
       } catch (error) {
         console.error('Error creating chapter:', error)
-        alert('Error creating chapter. Please try again.')
+        
+        // Handle specific error messages
+        let errorMessage = 'Error creating chapter. Please try again.'
+        
+        if (error.response && error.response.status === 400) {
+          // Check for error message in response body
+          if (error.response.data && error.response.data.error) {
+            if (error.response.data.error.includes('Institution with this name already exists')) {
+              errorMessage = 'An institution with this name already exists. Please choose a different name or select an existing institution.'
+            } else {
+              errorMessage = error.response.data.error
+            }
+          } else {
+            errorMessage = 'Invalid request. Please check all required fields are filled correctly.'
+          }
+        } else if (error.response && error.response.status === 500) {
+          if (error.response.data && error.response.data.error) {
+            errorMessage = error.response.data.error
+          } else {
+            errorMessage = 'Server error occurred. Please try again later.'
+          }
+        } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+          errorMessage = 'Network error. Please check your connection and try again.'
+        }
+        
+        alert(errorMessage)
       } finally {
         saving.value = false
       }
