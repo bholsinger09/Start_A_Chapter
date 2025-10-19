@@ -314,11 +314,306 @@
         <i class="bi bi-building display-1 text-muted"></i>
         <h3 class="text-muted mt-3">No chapters found</h3>
         <p class="text-muted">Try adjusting your search criteria or add a new chapter.</p>
-        <button class="btn btn-primary">
+        <button @click="openAddModal" class="btn btn-primary">
           <i class="bi bi-plus-circle me-2"></i>
           Add Chapter
         </button>
       </div>
+
+      <!-- Add Chapter Modal -->
+      <div 
+        class="modal fade" 
+        :class="{ show: showAddModal }" 
+        :style="{ display: showAddModal ? 'block' : 'none' }"
+        tabindex="-1"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                <i class="bi bi-plus-circle me-2"></i>
+                Add New Chapter
+              </h5>
+              <button 
+                type="button" 
+                class="btn-close" 
+                @click="closeModal"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form @submit.prevent="saveChapter">
+                <!-- Chapter Information -->
+                <div class="row">
+                  <div class="col-12 mb-3">
+                    <h6 class="text-primary mb-3">Chapter Information</h6>
+                  </div>
+                  <div class="col-12 mb-3">
+                    <label for="chapterName" class="form-label">Chapter Name *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="chapterName"
+                      v-model="chapterForm.name"
+                      required
+                      placeholder="e.g., Turning Point USA - University of Texas"
+                    >
+                  </div>
+                  <div class="col-12 mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea
+                      class="form-control"
+                      id="description"
+                      v-model="chapterForm.description"
+                      rows="3"
+                      placeholder="Brief description of the chapter..."
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Institution Selection -->
+                <div class="row">
+                  <div class="col-12 mb-3">
+                    <h6 class="text-primary mb-3">Institution Association</h6>
+                  </div>
+                  <div class="col-12 mb-3">
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="institutionOption"
+                        id="existingInstitution"
+                        value="existing"
+                        v-model="institutionOption"
+                      >
+                      <label class="form-check-label" for="existingInstitution">
+                        Select Existing Institution
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="institutionOption"
+                        id="newInstitution"
+                        value="new"
+                        v-model="institutionOption"
+                      >
+                      <label class="form-check-label" for="newInstitution">
+                        Add New Institution
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Existing Institution Selection -->
+                <div v-if="institutionOption === 'existing'" class="row mb-3">
+                  <div class="col-12">
+                    <label for="existingInstitutionSelect" class="form-label">Choose Institution *</label>
+                    <select
+                      class="form-select"
+                      id="existingInstitutionSelect"
+                      v-model="chapterForm.institutionId"
+                      required
+                    >
+                      <option value="">Select an institution...</option>
+                      <option v-for="institution in institutions" :key="institution.id" :value="institution.id">
+                        {{ institution.name }} - {{ institution.city }}, {{ institution.state }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- New Institution Form -->
+                <div v-if="institutionOption === 'new'" class="row">
+                  <div class="col-12 mb-3">
+                    <label class="form-label">Institution Type *</label>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="institutionType"
+                        id="university"
+                        value="UNIVERSITY"
+                        v-model="newInstitution.institutionType"
+                      >
+                      <label class="form-check-label" for="university">
+                        University
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="institutionType"
+                        id="church"
+                        value="CHURCH"
+                        v-model="newInstitution.institutionType"
+                      >
+                      <label class="form-check-label" for="church">
+                        Church
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <!-- Basic Institution Info -->
+                  <div class="col-md-6 mb-3">
+                    <label for="institutionName" class="form-label">{{ newInstitution.institutionType === 'UNIVERSITY' ? 'University' : 'Church' }} Name *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="institutionName"
+                      v-model="newInstitution.name"
+                      required
+                      :placeholder="newInstitution.institutionType === 'UNIVERSITY' ? 'e.g., University of Texas at Austin' : 'e.g., First Baptist Church'"
+                    >
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="institutionCity" class="form-label">City *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="institutionCity"
+                      v-model="newInstitution.city"
+                      required
+                      placeholder="e.g., Austin"
+                    >
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="institutionState" class="form-label">State *</label>
+                    <select
+                      class="form-select"
+                      id="institutionState"
+                      v-model="newInstitution.state"
+                      required
+                    >
+                      <option value="">Select State</option>
+                      <option v-for="state in usStates" :key="state" :value="state">{{ state }}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="institutionZipCode" class="form-label">ZIP Code</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="institutionZipCode"
+                      v-model="newInstitution.zipCode"
+                      placeholder="e.g., 78712"
+                    >
+                  </div>
+                  <div class="col-12 mb-3">
+                    <label for="institutionAddress" class="form-label">Address</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="institutionAddress"
+                      v-model="newInstitution.address"
+                      placeholder="e.g., 110 Inner Campus Drive"
+                    >
+                  </div>
+
+                  <!-- University-specific fields -->
+                  <template v-if="newInstitution.institutionType === 'UNIVERSITY'">
+                    <div class="col-md-6 mb-3">
+                      <label for="universityType" class="form-label">University Type</label>
+                      <select class="form-select" id="universityType" v-model="newInstitution.universityType">
+                        <option value="">Select Type</option>
+                        <option value="Public">Public</option>
+                        <option value="Private">Private</option>
+                        <option value="Community College">Community College</option>
+                        <option value="Technical">Technical</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="studentPopulation" class="form-label">Student Population</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="studentPopulation"
+                        v-model="newInstitution.studentPopulation"
+                        placeholder="e.g., 40000"
+                      >
+                    </div>
+                  </template>
+
+                  <!-- Church-specific fields -->
+                  <template v-if="newInstitution.institutionType === 'CHURCH'">
+                    <div class="col-md-6 mb-3">
+                      <label for="denomination" class="form-label">Denomination</label>
+                      <select class="form-select" id="denomination" v-model="newInstitution.denomination">
+                        <option value="">Select Denomination</option>
+                        <option value="Baptist">Baptist</option>
+                        <option value="Methodist">Methodist</option>
+                        <option value="Presbyterian">Presbyterian</option>
+                        <option value="Catholic">Catholic</option>
+                        <option value="Lutheran">Lutheran</option>
+                        <option value="Episcopal">Episcopal</option>
+                        <option value="Pentecostal">Pentecostal</option>
+                        <option value="Non-denominational">Non-denominational</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="pastorName" class="form-label">Pastor Name</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="pastorName"
+                        v-model="newInstitution.pastorName"
+                        placeholder="e.g., Pastor John Smith"
+                      >
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="membershipSize" class="form-label">Membership Size</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="membershipSize"
+                        v-model="newInstitution.membershipSize"
+                        placeholder="e.g., 500"
+                      >
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="website" class="form-label">Website</label>
+                      <input
+                        type="url"
+                        class="form-control"
+                        id="website"
+                        v-model="newInstitution.website"
+                        placeholder="e.g., https://church.org"
+                      >
+                    </div>
+                  </template>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                @click="closeModal"
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-primary" 
+                @click="saveChapter"
+                :disabled="saving"
+              >
+                <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
+                {{ saving ? 'Creating...' : 'Create Chapter' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal backdrop -->
+      <div 
+        v-if="showAddModal" 
+        class="modal-backdrop fade show"
+        @click="closeModal"
+      ></div>
     </div>
   </div>
 </template>
@@ -354,6 +649,50 @@ export default {
     // Sorting
     const sortField = ref('name')
     const sortDirection = ref('asc')
+
+    // Modal and form data
+    const showAddModal = ref(false)
+    const saving = ref(false)
+    const institutions = ref([])
+    const institutionOption = ref('existing')
+    
+    const chapterForm = ref({
+      name: '',
+      description: '',
+      institutionId: null
+    })
+    
+    const newInstitution = ref({
+      institutionType: 'UNIVERSITY',
+      name: '',
+      state: '',
+      city: '',
+      zipCode: '',
+      address: '',
+      description: '',
+      // University fields
+      universityType: '',
+      accreditation: '',
+      studentPopulation: null,
+      universityFoundedYear: null,
+      // Church fields
+      denomination: '',
+      pastorName: '',
+      membershipSize: null,
+      churchFoundedYear: null,
+      website: ''
+    })
+    
+    // US States for dropdown
+    const usStates = ref([
+      'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+      'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+      'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+      'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+      'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+      'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+      'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+    ])
 
     // Computed properties
     const availableStates = computed(() => {
@@ -589,6 +928,95 @@ export default {
       // This is just for monitoring filter changes
     }
 
+    // Modal methods
+    const loadInstitutions = async () => {
+      try {
+        const response = await chapterService.getAllInstitutions()
+        institutions.value = response || []
+      } catch (error) {
+        console.error('Error loading institutions:', error)
+        institutions.value = []
+      }
+    }
+
+    const openAddModal = () => {
+      // Reset form
+      chapterForm.value = {
+        name: '',
+        description: '',
+        institutionId: null
+      }
+      
+      newInstitution.value = {
+        institutionType: 'UNIVERSITY',
+        name: '',
+        state: '',
+        city: '',
+        zipCode: '',
+        address: '',
+        description: '',
+        universityType: '',
+        accreditation: '',
+        studentPopulation: null,
+        universityFoundedYear: null,
+        denomination: '',
+        pastorName: '',
+        membershipSize: null,
+        churchFoundedYear: null,
+        website: ''
+      }
+      
+      institutionOption.value = 'existing'
+      showAddModal.value = true
+      
+      // Load institutions for selection
+      loadInstitutions()
+    }
+
+    const closeModal = () => {
+      showAddModal.value = false
+      saving.value = false
+    }
+
+    const saveChapter = async () => {
+      try {
+        saving.value = true
+        
+        const requestData = {
+          name: chapterForm.value.name,
+          description: chapterForm.value.description
+        }
+
+        if (institutionOption.value === 'existing') {
+          if (!chapterForm.value.institutionId) {
+            alert('Please select an institution')
+            return
+          }
+          requestData.institutionId = chapterForm.value.institutionId
+        } else {
+          if (!newInstitution.value.name || !newInstitution.value.state || !newInstitution.value.city) {
+            alert('Please fill in all required institution fields')
+            return
+          }
+          requestData.newInstitution = { ...newInstitution.value }
+        }
+
+        const createdChapter = await chapterService.createChapterWithInstitution(requestData)
+        
+        // Reload chapters to include the new one
+        await loadChapters()
+        
+        closeModal()
+        alert('Chapter created successfully!')
+        
+      } catch (error) {
+        console.error('Error creating chapter:', error)
+        alert('Error creating chapter. Please try again.')
+      } finally {
+        saving.value = false
+      }
+    }
+
     // Watchers
     watch([sortField, sortDirection], () => {
       applyFilters()
@@ -637,7 +1065,19 @@ export default {
       deleteChapter,
       handleSearch,
       handleSearchResults,
-      handleFilterChange
+      handleFilterChange,
+      
+      // Modal methods and data
+      showAddModal,
+      saving,
+      institutions,
+      institutionOption,
+      chapterForm,
+      newInstitution,
+      usStates,
+      openAddModal,
+      closeModal,
+      saveChapter
     }
   }
 }

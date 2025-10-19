@@ -142,6 +142,58 @@ export const chapterService = {
     } catch (error) {
       throw error
     }
+  },
+
+  // Create chapter with institution
+  async createChapterWithInstitution(chapterData) {
+    try {
+      const response = await api.post('/chapters/with-institution', chapterData)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Get all institutions
+  async getAllInstitutions() {
+    try {
+      const response = await api.get('/chapters/institutions')
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Get all universities
+  async getAllUniversities() {
+    try {
+      const response = await api.get('/chapters/institutions/universities')
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Get all churches
+  async getAllChurches() {
+    try {
+      const response = await api.get('/chapters/institutions/churches')
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Search institutions
+  async searchInstitutions(query) {
+    try {
+      const response = await api.get('/chapters/institutions/search', { 
+        params: { query }
+      })
+      return response.data
+    } catch (error) {
+      throw error
+    }
   }
 }
 

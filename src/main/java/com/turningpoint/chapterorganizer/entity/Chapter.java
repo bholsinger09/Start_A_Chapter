@@ -26,19 +26,18 @@ public class Chapter {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @NotBlank(message = "University name is required")
-    @Size(min = 2, max = 150, message = "University name must be between 2 and 150 characters")
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "institution_id", nullable = false)
+    private Institution institution;
+
+    // Legacy fields for backward compatibility - will be deprecated
+    @Column(name = "university_name")
     private String universityName;
 
-    @NotBlank(message = "State is required")
-    @Size(min = 2, max = 50, message = "State must be between 2 and 50 characters")
-    @Column(nullable = false)
+    @Column(name = "state")
     private String state;
 
-    @NotBlank(message = "City is required")
-    @Size(min = 2, max = 100, message = "City must be between 2 and 100 characters")
-    @Column(nullable = false)
+    @Column(name = "city")
     private String city;
 
     @Size(max = 500, message = "Description cannot exceed 500 characters")
@@ -79,6 +78,17 @@ public class Chapter {
         this.city = city;
     }
 
+    public Chapter(String name, Institution institution) {
+        this.name = name;
+        this.institution = institution;
+        // Set legacy fields for backward compatibility
+        if (institution != null) {
+            this.universityName = institution.getName();
+            this.state = institution.getState();
+            this.city = institution.getCity();
+        }
+    }
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -94,6 +104,20 @@ public class Chapter {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Institution getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
+        // Update legacy fields for backward compatibility
+        if (institution != null) {
+            this.universityName = institution.getName();
+            this.state = institution.getState();
+            this.city = institution.getCity();
+        }
     }
 
     public String getUniversityName() {

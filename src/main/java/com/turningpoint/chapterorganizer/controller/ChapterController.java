@@ -1,7 +1,13 @@
 package com.turningpoint.chapterorganizer.controller;
 
+import com.turningpoint.chapterorganizer.dto.CreateChapterRequest;
+import com.turningpoint.chapterorganizer.dto.CreateInstitutionRequest;
 import com.turningpoint.chapterorganizer.entity.Chapter;
+import com.turningpoint.chapterorganizer.entity.Institution;
+import com.turningpoint.chapterorganizer.entity.University;
+import com.turningpoint.chapterorganizer.entity.Church;
 import com.turningpoint.chapterorganizer.service.ChapterService;
+import com.turningpoint.chapterorganizer.service.InstitutionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,10 +28,12 @@ import java.util.ArrayList;
 public class ChapterController {
 
     private final ChapterService chapterService;
+    private final InstitutionService institutionService;
 
     @Autowired
-    public ChapterController(ChapterService chapterService) {
+    public ChapterController(ChapterService chapterService, InstitutionService institutionService) {
         this.chapterService = chapterService;
+        this.institutionService = institutionService;
     }
 
     // GET /api/chapters - Get all chapters
@@ -166,6 +174,99 @@ public class ChapterController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    // POST /api/chapters/with-institution - Create new chapter with institution
+    @PostMapping("/with-institution")
+    public ResponseEntity<Chapter> createChapterWithInstitution(@Valid @RequestBody CreateChapterRequest request) {
+        try {
+            if (!request.hasValidInstitution()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            Institution institution;
+            
+            if (request.getInstitutionId() != null) {
+                // Use existing institution
+                Optional<Institution> existingInstitution = institutionService.getInstitutionById(request.getInstitutionId());
+                if (existingInstitution.isEmpty()) {
+                    return ResponseEntity.badRequest().build();
+                }
+                institution = existingInstitution.get();
+            } else {
+                // Create new institution
+                CreateInstitutionRequest newInstRequest = request.getNewInstitution();
+                if (newInstRequest.isUniversity()) {
+                    University university = new University();
+                    university.setName(newInstRequest.getName());
+                    university.setState(newInstRequest.getState());
+                    university.setCity(newInstRequest.getCity());
+                    university.setZipCode(newInstRequest.getZipCode());
+                    university.setAddress(newInstRequest.getAddress());
+                    university.setDescription(newInstRequest.getDescription());
+                    university.setUniversityType(newInstRequest.getUniversityType());
+                    university.setAccreditation(newInstRequest.getAccreditation());
+                    university.setStudentPopulation(newInstRequest.getStudentPopulation());
+                    university.setFoundedYear(newInstRequest.getUniversityFoundedYear());
+                    institution = institutionService.createUniversity(university);
+                } else if (newInstRequest.isChurch()) {
+                    Church church = new Church();
+                    church.setName(newInstRequest.getName());
+                    church.setState(newInstRequest.getState());
+                    church.setCity(newInstRequest.getCity());
+                    church.setZipCode(newInstRequest.getZipCode());
+                    church.setAddress(newInstRequest.getAddress());
+                    church.setDescription(newInstRequest.getDescription());
+                    church.setDenomination(newInstRequest.getDenomination());
+                    church.setPastorName(newInstRequest.getPastorName());
+                    church.setMembershipSize(newInstRequest.getMembershipSize());
+                    church.setFoundedYear(newInstRequest.getChurchFoundedYear());
+                    church.setWebsite(newInstRequest.getWebsite());
+                    institution = institutionService.createChurch(church);
+                } else {
+                    return ResponseEntity.badRequest().build();
+                }
+            }
+
+            // Create the chapter
+            Chapter chapter = new Chapter(request.getName(), institution);
+            chapter.setDescription(request.getDescription());
+            Chapter createdChapter = chapterService.createChapter(chapter);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdChapter);
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // GET /api/chapters/institutions - Get all institutions
+    @GetMapping("/institutions")
+    public ResponseEntity<List<Institution>> getAllInstitutions() {
+        List<Institution> institutions = institutionService.getAllInstitutions();
+        return ResponseEntity.ok(institutions);
+    }
+
+    // GET /api/chapters/institutions/universities - Get all universities
+    @GetMapping("/institutions/universities")
+    public ResponseEntity<List<University>> getAllUniversities() {
+        List<University> universities = institutionService.getAllUniversities();
+        return ResponseEntity.ok(universities);
+    }
+
+    // GET /api/chapters/institutions/churches - Get all churches
+    @GetMapping("/institutions/churches")
+    public ResponseEntity<List<Church>> getAllChurches() {
+        List<Church> churches = institutionService.getAllChurches();
+        return ResponseEntity.ok(churches);
+    }
+
+    // GET /api/chapters/institutions/search - Search institutions
+    @GetMapping("/institutions/search")
+    public ResponseEntity<List<Institution>> searchInstitutions(@RequestParam String query) {
+        List<Institution> institutions = institutionService.searchInstitutions(query);
+        return ResponseEntity.ok(institutions);
     }
 
     // Inner DTO class for chapter statistics
