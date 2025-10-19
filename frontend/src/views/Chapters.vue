@@ -28,6 +28,13 @@
         <div class="col-md-6">
           <div class="d-flex align-items-center">
             <button 
+              @click="openAddModal" 
+              class="btn btn-primary me-3"
+            >
+              <i class="bi bi-plus-circle me-2"></i>
+              Add Chapter
+            </button>
+            <button 
               @click="toggleView" 
               class="btn btn-outline-secondary me-3"
             >
