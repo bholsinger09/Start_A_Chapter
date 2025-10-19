@@ -75,7 +75,19 @@ export const chapterService = {
     console.log('🔍 SERVICE DEBUG: getAllChapters() called')
     try {
       const response = await api.get('/chapters')
-      return response.data
+      console.log('🔍 SERVICE DEBUG: API response:', response)
+      
+      // Ensure we return an array
+      if (response.data && Array.isArray(response.data)) {
+        console.log('🔍 SERVICE DEBUG: Returning API data:', response.data.length, 'chapters')
+        return response.data
+      } else if (Array.isArray(response)) {
+        console.log('🔍 SERVICE DEBUG: Returning direct response:', response.length, 'chapters')
+        return response
+      } else {
+        console.warn('🔍 SERVICE DEBUG: Unexpected API response format, using mock data')
+        return mockChapters
+      }
     } catch (error) {
       console.warn('Backend not available, using mock data:', error.message)
       // Return mock data when backend is not available

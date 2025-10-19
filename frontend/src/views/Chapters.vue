@@ -737,24 +737,42 @@ export default {
         const response = await chapterService.getAllChapters()
         console.log('Chapters response:', response)
         
-        if (response && Array.isArray(response)) {
-          chapters.value = response
-          allChapters.value = [...response] // Store original chapters for search component
-          
-          // Member counts are now included in the chapter data from backend
-          console.log(`Loaded ${chapters.value.length} chapters`)
-          
-          // Update allChapters with the same data
-          allChapters.value = [...chapters.value]
-          filteredChapters.value = [...chapters.value]
-          console.log(`Loaded ${chapters.value.length} chapters`)
-        } else {
-          throw new Error('Invalid response format')
+        // Handle different response formats
+        let chaptersData = response
+        
+        // If response is wrapped in a data property
+        if (response && response.data && Array.isArray(response.data)) {
+          chaptersData = response.data
         }
+        // If response is directly an array
+        else if (Array.isArray(response)) {
+          chaptersData = response
+        }
+        // If no valid chapters data found
+        else {
+          console.warn('Unexpected response format:', response)
+          chaptersData = []
+        }
+        
+        chapters.value = chaptersData
+        allChapters.value = [...chaptersData] // Store original chapters for search component
+        
+        // Member counts are now included in the chapter data from backend
+        console.log(`Loaded ${chapters.value.length} chapters`)
+        
+        // Update allChapters with the same data
+        allChapters.value = [...chapters.value]
+        filteredChapters.value = [...chapters.value]
+        console.log(`Successfully loaded ${chapters.value.length} chapters`)
         
       } catch (err) {
         console.error('Error loading chapters:', err)
         error.value = 'Failed to load chapters. Please try again.'
+        
+        // Set empty arrays as fallback
+        chapters.value = []
+        allChapters.value = []
+        filteredChapters.value = []
       } finally {
         loading.value = false
       }
