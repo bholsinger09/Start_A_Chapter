@@ -78,7 +78,13 @@ public class ChapterService {
      */
     @Transactional(readOnly = true)
     public List<Chapter> getAllActiveChapters() {
-        return chapterRepository.findByActiveTrueWithMembers();
+        try {
+            return chapterRepository.findByActiveTrueWithMembers();
+        } catch (Exception e) {
+            // Fallback to simple query if JOIN FETCH fails during migration
+            System.out.println("DEBUG: findByActiveTrueWithMembers failed, using fallback: " + e.getMessage());
+            return chapterRepository.findByActiveTrue();
+        }
     }
 
     /**

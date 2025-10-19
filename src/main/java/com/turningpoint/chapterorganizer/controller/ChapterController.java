@@ -39,8 +39,16 @@ public class ChapterController {
     // GET /api/chapters - Get all chapters
     @GetMapping
     public ResponseEntity<List<Chapter>> getAllChapters() {
-        List<Chapter> chapters = chapterService.getAllActiveChapters();
-        return ResponseEntity.ok(chapters);
+        try {
+            System.out.println("DEBUG: ChapterController.getAllChapters() called");
+            List<Chapter> chapters = chapterService.getAllActiveChapters();
+            System.out.println("DEBUG: Retrieved " + chapters.size() + " chapters");
+            return ResponseEntity.ok(chapters);
+        } catch (Exception e) {
+            System.err.println("ERROR in getAllChapters: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 
     // GET /api/chapters/paginated - Get paginated chapters with sorting
