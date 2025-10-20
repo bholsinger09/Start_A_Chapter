@@ -9,7 +9,7 @@
         <span class="input-group-text">
           <i class="bi bi-search"></i>
         </span>
-        <input
+                <input
           ref="searchInput"
           type="text"
           class="form-control"
@@ -18,8 +18,8 @@
           @input="handleSearchInput"
           @keydown="handleKeydown"
           @keyup="handleKeyup"
-          @focus="showSuggestions = true"
-          @blur="hideSuggestionsDelayed"
+          @focus="showSuggestions = true; console.log('🎯 INPUT FOCUSED - suggestions should show, showSuggestions will be:', true)"
+          @blur="console.log('😴 INPUT BLURRED - hiding suggestions in 100ms'); hideSuggestionsDelayed"
           autocomplete="off"
         >
         <button 
@@ -40,6 +40,25 @@
         >
           {{ showSuggestions ? 'Hide' : 'Show' }}
         </button>
+        <!-- Test ESC function directly -->
+        <button 
+          class="btn btn-outline-warning"
+          type="button"
+          @click="closeSuggestions"
+          title="Test close function"
+        >
+          Test Close
+        </button>
+      </div>
+      
+      <!-- Debug info visible on page -->
+      <div class="alert alert-info mt-2">
+        <small>
+          <strong>Debug Info:</strong> 
+          showSuggestions: {{ showSuggestions }} | 
+          selectedIndex: {{ selectedSuggestionIndex }} |
+          searchQuery: "{{ searchQuery }}"
+        </small>
       </div>
       
       <!-- Search Suggestions Dropdown -->
@@ -370,23 +389,19 @@ export default {
 
     // Load saved data on mount
     onMounted(() => {
+      console.log('🚀 EnhancedSearch component MOUNTED successfully')
       loadStoredData()
       setupKeyboardShortcuts()
       setupDebouncedFunctions()
       loadRecommendations()
       loadTrendingChapters()
       
-      // Add direct window event listener as backup
-      console.log('Adding direct window escape listener')
-      window.addEventListener('keydown', windowEscapeHandler, true) // Use capture phase
-      window.addEventListener('keyup', windowEscapeHandler, true)
+      console.log('✅ Enhanced Search component setup complete - ESC key handling initialized')
     })
 
     onUnmounted(() => {
       removeKeyboardShortcuts()
-      console.log('Removing direct window escape listener')
-      window.removeEventListener('keydown', windowEscapeHandler, true)
-      window.removeEventListener('keyup', windowEscapeHandler, true)
+      console.log('Enhanced Search component unmounted')
     })
 
     const setupDebouncedFunctions = () => {
@@ -640,18 +655,20 @@ export default {
     }
 
     const handleKeydown = (event) => {
+      // BASIC logging for ALL keydown events to verify event handling works
+      console.log('🔥 KEYDOWN EVENT FIRED:', event.key, 'showSuggestions:', showSuggestions.value)
+      
       // Log ALL keys when suggestions are visible
       if (showSuggestions.value) {
         console.log('INPUT handleKeydown:', event.key, 'code:', event.code)
       }
       
-      // Handle Escape key regardless of suggestions state
+      // Handle Escape key - this is the primary handler
       if (event.key === 'Escape') {
-        console.log('INPUT: Escape key pressed in handleKeydown')
+        console.log('🚨 ESCAPE KEY DETECTED in handleKeydown!')
         event.preventDefault()
         event.stopPropagation()
-        showSuggestions.value = false
-        selectedSuggestionIndex.value = -1
+        closeSuggestions()
         return
       }
 
@@ -688,48 +705,35 @@ export default {
       }
     }
 
+    // Create a centralized function to close suggestions
+    const closeSuggestions = () => {
+      console.log('🎯 CLOSING SUGGESTIONS - showSuggestions was:', showSuggestions.value)
+      showSuggestions.value = false
+      selectedSuggestionIndex.value = -1
+      console.log('🎯 CLOSED SUGGESTIONS - showSuggestions now:', showSuggestions.value)
+    }
+
     const handleKeyup = (event) => {
-      // Additional Escape key handler on keyup as backup
-      if (event.key === 'Escape') {
-        console.log('Escape key pressed in handleKeyup')
-        event.preventDefault()
-        event.stopPropagation()
-        showSuggestions.value = false
-        selectedSuggestionIndex.value = -1
-      }
+      // Remove redundant escape handling - handled in keydown
+      // This handler can be used for other keyup-specific logic if needed
     }
 
     const containerKeydown = (event) => {
       console.log('Container keydown:', event.key, 'showSuggestions:', showSuggestions.value)
-      if (event.key === 'Escape') {
-        console.log('CONTAINER: Escape key detected!')
+      // Container escape handler as backup - only if not handled by input
+      if (event.key === 'Escape' && showSuggestions.value) {
+        console.log('CONTAINER: Escape key detected as backup!')
         event.preventDefault()
         event.stopPropagation()
-        showSuggestions.value = false
-        selectedSuggestionIndex.value = -1
+        closeSuggestions()
       }
     }
 
-    const windowEscapeHandler = (event) => {
-      // Log ALL keydown events when suggestions are visible for debugging
-      if (showSuggestions.value) {
-        console.log('WINDOW EVENT:', event.type, event.key, 'code:', event.code, 'target:', event.target.tagName)
-      }
-      
-      if (event.key === 'Escape' && showSuggestions.value) {
-        console.log('WINDOW: Escape captured! Closing suggestions.')
-        event.preventDefault()
-        event.stopPropagation()
-        event.stopImmediatePropagation()
-        showSuggestions.value = false
-        selectedSuggestionIndex.value = -1
-      }
-    }
+    // Remove the windowEscapeHandler - it's redundant and potentially problematic
 
     const selectSuggestion = (suggestion) => {
       searchQuery.value = suggestion.text
-      showSuggestions.value = false
-      selectedSuggestionIndex.value = -1
+      closeSuggestions()
       addToRecentSearches(suggestion.text)
       performBackendSearch()
       // Keep focus on search input for better UX
@@ -742,8 +746,7 @@ export default {
 
     const selectRecentSearch = (recent) => {
       searchQuery.value = recent.query
-      showSuggestions.value = false
-      selectedSuggestionIndex.value = -1
+      closeSuggestions()
       performBackendSearch()
       // Keep focus on search input for better UX
       nextTick(() => {
@@ -755,15 +758,15 @@ export default {
 
     const hideSuggestionsDelayed = () => {
       // Use a shorter delay and ensure we don't interfere with selection
+      console.log('⏰ HIDING SUGGESTIONS IN 100ms...')
       setTimeout(() => {
-        showSuggestions.value = false
-        selectedSuggestionIndex.value = -1
+        console.log('💤 TIMEOUT EXECUTED - calling closeSuggestions()')
+        closeSuggestions()
       }, 100)
     }
 
     const hideSuggestionsImmediately = () => {
-      showSuggestions.value = false
-      selectedSuggestionIndex.value = -1
+      closeSuggestions()
     }
 
     const clearSearch = () => {
@@ -907,16 +910,17 @@ export default {
         searchInput.value?.focus()
       }
       
-      // Escape to close suggestions (global handler with debug)
-      if (event.key === 'Escape') {
-        console.log('Global Escape detected, showSuggestions:', showSuggestions.value)
-        if (showSuggestions.value) {
-          event.preventDefault()
-          event.stopPropagation()
-          showSuggestions.value = false
-          selectedSuggestionIndex.value = -1
-          console.log('Global Escape closed suggestions')
-        }
+      // Global Escape handler as final backup - only if suggestions are visible
+      // and not handled by component handlers
+      if (event.key === 'Escape' && showSuggestions.value) {
+        console.log('Global Escape detected as final backup, showSuggestions:', showSuggestions.value)
+        // Don't prevent default here to allow event bubbling first
+        setTimeout(() => {
+          if (showSuggestions.value) {
+            console.log('Global Escape executing closure after timeout')
+            closeSuggestions()
+          }
+        }, 0)
       }
     }
 
@@ -953,6 +957,7 @@ export default {
       handleKeydown,
       handleKeyup,
       containerKeydown,
+      closeSuggestions,
       selectSuggestion,
       selectRecentSearch,
       hideSuggestionsDelayed,
