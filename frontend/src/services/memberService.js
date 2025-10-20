@@ -126,24 +126,25 @@ export const memberService = {
     }
   },
 
-    // Update member (using flexible endpoint)
+  // Update member (using flexible endpoint)
   async updateMember(id, member) {
+    // Create a clean update request without any problematic fields
+    const updateRequest = {
+      firstName: member.firstName,
+      lastName: member.lastName,
+      email: member.email,
+      phoneNumber: member.phoneNumber || null,
+      major: member.major || null,
+      graduationYear: member.graduationYear || null,
+      role: member.role,
+      active: member.active !== undefined ? member.active : true,
+      // Send chapter ID instead of full chapter object
+      chapterId: member.chapter ? member.chapter.id : null
+    }
+    
+    console.log('🔍 Updating member with flexible request:', updateRequest)
+    
     try {
-      // Create a clean update request without any problematic fields
-      const updateRequest = {
-        firstName: member.firstName,
-        lastName: member.lastName,
-        email: member.email,
-        phoneNumber: member.phoneNumber || null,
-        major: member.major || null,
-        graduationYear: member.graduationYear || null,
-        role: member.role,
-        active: member.active !== undefined ? member.active : true,
-        // Send chapter ID instead of full chapter object
-        chapterId: member.chapter ? member.chapter.id : null
-      }
-      
-      console.log('🔍 Updating member with flexible request:', updateRequest)
       const response = await api.put(`/members/${id}/flexible`, updateRequest)
       return response.data
     } catch (error) {

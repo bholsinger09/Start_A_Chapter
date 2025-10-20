@@ -114,7 +114,7 @@ class MemberServiceTest {
     void getMembersByChapter_ShouldReturnActiveMembers() {
         // Given
         List<Member> members = Arrays.asList(testMember);
-        when(memberRepository.findByChapterIdAndActiveTrue(1L)).thenReturn(members);
+        when(memberRepository.findByChapter_IdAndActiveTrue(1L)).thenReturn(members);
 
         // When
         List<Member> result = memberService.getMembersByChapter(1L);
@@ -155,7 +155,7 @@ class MemberServiceTest {
         // Given
         testMember.setRole(MemberRole.PRESIDENT);
         List<Member> presidents = Arrays.asList(testMember);
-        when(memberRepository.findByChapterIdAndRoleAndActiveTrue(1L, MemberRole.PRESIDENT)).thenReturn(presidents);
+        when(memberRepository.findByChapter_IdAndRoleAndActiveTrue(1L, MemberRole.PRESIDENT)).thenReturn(presidents);
 
         // When
         List<Member> result = memberService.getMembersByRole(1L, MemberRole.PRESIDENT);

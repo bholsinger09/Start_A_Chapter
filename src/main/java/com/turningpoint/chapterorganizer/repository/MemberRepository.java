@@ -20,19 +20,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByUsername(String username);
 
     // Find members by chapter ID
-    List<Member> findByChapterId(Long chapterId);
+    List<Member> findByChapter_Id(Long chapterId);
 
     // Find active members by chapter ID
-    List<Member> findByChapterIdAndActiveTrue(Long chapterId);
+    List<Member> findByChapter_IdAndActiveTrue(Long chapterId);
 
     // Find members by role
     List<Member> findByRole(MemberRole role);
 
     // Find members by chapter ID and role
-    List<Member> findByChapterIdAndRole(Long chapterId, MemberRole role);
+    List<Member> findByChapter_IdAndRole(Long chapterId, MemberRole role);
 
     // Find active members by chapter ID and role
-    List<Member> findByChapterIdAndRoleAndActiveTrue(Long chapterId, MemberRole role);
+    List<Member> findByChapter_IdAndRoleAndActiveTrue(Long chapterId, MemberRole role);
 
     // Find members by first and last name (case-insensitive)
     List<Member> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(

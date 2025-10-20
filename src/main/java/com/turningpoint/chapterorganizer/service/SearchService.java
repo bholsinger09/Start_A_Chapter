@@ -324,7 +324,7 @@ public class SearchService {
     }
 
     private int getMemberCount(Chapter chapter) {
-        return memberRepository.findByChapterId(chapter.getId()).size();
+        return memberRepository.findByChapter_Id(chapter.getId()).size();
     }
 
     private int getHealthScore(Chapter chapter) {

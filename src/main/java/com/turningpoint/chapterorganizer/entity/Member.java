@@ -213,6 +213,11 @@ public class Member {
         return firstName + " " + lastName;
     }
 
+    // Helper method to get chapter ID for JSON serialization
+    public Long getChapterId() {
+        return chapter != null ? chapter.getId() : null;
+    }
+
     // equals and hashCode based on email (business key)
     @Override
     public boolean equals(Object o) {

@@ -457,12 +457,14 @@ export default {
         this.saving = true
         
         if (this.showEditModal) {
-          // For updates, use the original format with chapter object
+          // For updates, use the new format with chapterId
           const memberData = {
             ...this.memberForm,
-            chapter: this.memberForm.chapterId ? { id: this.memberForm.chapterId } : null
+            // Keep chapterId instead of creating chapter object
+            chapterId: this.memberForm.chapterId
           }
-          delete memberData.chapterId
+          // Remove any chapter object if it exists
+          delete memberData.chapter
           await memberService.updateMember(this.memberForm.id, memberData)
         } else {
           // For creates, use the CreateMemberRequest format with chapterId
