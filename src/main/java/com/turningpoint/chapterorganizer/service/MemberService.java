@@ -175,7 +175,51 @@ public class MemberService {
     }
 
     /**
-     * Update member information
+     * Update member information using DTO
+     */
+    public Member updateMember(Long id, com.turningpoint.chapterorganizer.dto.MemberUpdateRequest updateRequest) {
+        Member existingMember = memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
+
+        // Check if email is changing and if new email already exists
+        if (!existingMember.getEmail().equals(updateRequest.getEmail())) {
+            if (memberRepository.existsByEmailAndIdNot(updateRequest.getEmail(), id)) {
+                throw new IllegalArgumentException("Member with this email already exists");
+            }
+        }
+
+        // Update basic fields
+        existingMember.setFirstName(updateRequest.getFirstName());
+        existingMember.setLastName(updateRequest.getLastName());
+        existingMember.setEmail(updateRequest.getEmail());
+        existingMember.setPhoneNumber(updateRequest.getPhoneNumber());
+        existingMember.setMajor(updateRequest.getMajor());
+        existingMember.setGraduationYear(updateRequest.getGraduationYear());
+
+        if (updateRequest.getRole() != null) {
+            existingMember.setRole(updateRequest.getRole());
+        }
+
+        if (updateRequest.getActive() != null) {
+            existingMember.setActive(updateRequest.getActive());
+        }
+
+        // Handle chapter assignment
+        if (updateRequest.getChapterId() != null) {
+            Optional<Chapter> chapterOpt = chapterService.getChapterById(updateRequest.getChapterId());
+            if (chapterOpt.isPresent()) {
+                existingMember.setChapter(chapterOpt.get());
+                System.out.println("✅ Updated member " + id + " to chapter: " + chapterOpt.get().getName());
+            } else {
+                System.err.println("⚠️ Chapter not found with ID: " + updateRequest.getChapterId());
+            }
+        }
+
+        return memberRepository.save(existingMember);
+    }
+
+    /**
+     * Update member information (legacy method)
      */
     public Member updateMember(Long id, Member updatedMember) {
         Member existingMember = memberRepository.findById(id)

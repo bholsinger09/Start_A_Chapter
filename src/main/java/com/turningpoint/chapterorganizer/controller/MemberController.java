@@ -1,6 +1,7 @@
 package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.dto.CreateMemberRequest;
+import com.turningpoint.chapterorganizer.dto.MemberUpdateRequest;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.service.MemberService;
@@ -124,12 +125,18 @@ public class MemberController {
     // PUT /api/members/{id} - Update existing member
     @PutMapping("/{id}")
     public ResponseEntity<Member> updateMember(@PathVariable Long id, 
-                                             @Valid @RequestBody Member memberDetails) {
+                                             @Valid @RequestBody MemberUpdateRequest updateRequest) {
         try {
-            Member updatedMember = memberService.updateMember(id, memberDetails);
+            System.out.println("🔍 Updating member " + id + " with chapter ID: " + updateRequest.getChapterId());
+            Member updatedMember = memberService.updateMember(id, updateRequest);
             return ResponseEntity.ok(updatedMember);
         } catch (IllegalArgumentException e) {
+            System.err.println("❌ Error updating member: " + e.getMessage());
             return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error updating member: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
