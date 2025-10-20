@@ -285,8 +285,21 @@ public class ChapterController {
     // GET /api/chapters/institutions - Get all institutions
     @GetMapping("/institutions")
     public ResponseEntity<List<Institution>> getAllInstitutions() {
-        List<Institution> institutions = institutionService.getAllInstitutions();
-        return ResponseEntity.ok(institutions);
+        try {
+            System.out.println("🔍 GET /api/chapters/institutions called");
+            long startTime = System.currentTimeMillis();
+            
+            List<Institution> institutions = institutionService.getAllInstitutions();
+            
+            long endTime = System.currentTimeMillis();
+            System.out.println("🔍 Found " + institutions.size() + " institutions in " + (endTime - startTime) + "ms");
+            
+            return ResponseEntity.ok(institutions);
+        } catch (Exception e) {
+            System.err.println("❌ Error getting institutions: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // GET /api/chapters/institutions/universities - Get all universities

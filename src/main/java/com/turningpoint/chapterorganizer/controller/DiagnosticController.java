@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,5 +60,40 @@ public class DiagnosticController {
         }
         
         return config;
+    }
+
+    /**
+     * Check database table counts
+     */
+    @GetMapping("/tables")
+    public Map<String, Object> getTableInfo() {
+        Map<String, Object> tables = new HashMap<>();
+        
+        try {
+            Connection connection = dataSource.getConnection();
+            
+            // Check each table count
+            String[] tableNames = {"chapters", "institutions", "universities", "churches", "members", "events"};
+            
+            for (String tableName : tableNames) {
+                try {
+                    PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) FROM " + tableName);
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        tables.put(tableName + "_count", rs.getLong(1));
+                    }
+                    rs.close();
+                    stmt.close();
+                } catch (Exception e) {
+                    tables.put(tableName + "_error", e.getMessage());
+                }
+            }
+            
+            connection.close();
+        } catch (Exception e) {
+            tables.put("connection_error", e.getMessage());
+        }
+        
+        return tables;
     }
 }

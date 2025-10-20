@@ -26,7 +26,22 @@ public class InstitutionService {
 
     // Institution methods
     public List<Institution> getAllInstitutions() {
-        return institutionRepository.findAll();
+        try {
+            List<Institution> institutions = institutionRepository.findAll();
+            
+            // If institutions table is empty, create some default ones
+            if (institutions.isEmpty()) {
+                System.out.println("⚠️ Institutions table is empty, creating default institutions...");
+                createDefaultInstitutions();
+                institutions = institutionRepository.findAll();
+            }
+            
+            return institutions;
+        } catch (Exception e) {
+            System.err.println("❌ Error getting institutions: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public Optional<Institution> getInstitutionById(Long id) {
@@ -148,5 +163,42 @@ public class InstitutionService {
 
     public List<String> getAllDenominations() {
         return churchRepository.findDistinctDenominations();
+    }
+
+    private void createDefaultInstitutions() {
+        try {
+            System.out.println("Creating default institutions...");
+            
+            // Create some common universities
+            String[][] universities = {
+                {"University of California, Berkeley", "California", "Berkeley"},
+                {"Harvard University", "Massachusetts", "Cambridge"},
+                {"Stanford University", "California", "Stanford"},
+                {"University of Texas at Austin", "Texas", "Austin"},
+                {"University of Florida", "Florida", "Gainesville"},
+                {"Arizona State University", "Arizona", "Tempe"},
+                {"Boise State University", "Idaho", "Boise"},
+                {"University of Washington", "Washington", "Seattle"},
+                {"UCLA", "California", "Los Angeles"},
+                {"MIT", "Massachusetts", "Cambridge"}
+            };
+            
+            for (String[] uni : universities) {
+                if (!institutionRepository.existsByNameIgnoreCase(uni[0])) {
+                    University university = new University();
+                    university.setName(uni[0]);
+                    university.setState(uni[1]);
+                    university.setCity(uni[2]);
+                    university.setFoundedYear(1950); // Default founding year
+                    university.setDescription("Major university offering diverse academic programs");
+                    universityRepository.save(university);
+                }
+            }
+            
+            System.out.println("✅ Default institutions created successfully");
+        } catch (Exception e) {
+            System.err.println("❌ Error creating default institutions: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
