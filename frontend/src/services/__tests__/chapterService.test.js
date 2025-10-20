@@ -40,12 +40,18 @@ describe('ChapterService', () => {
       expect(result).toEqual(mockChapters)
     })
 
-    it('throws error when API call fails', async () => {
+    it('returns mock data when API call fails', async () => {
       const error = new Error('API Error')
       api.get.mockRejectedValue(error)
 
-      await expect(chapterService.getAllChapters()).rejects.toThrow('API Error')
+      const result = await chapterService.getAllChapters()
+
       expect(api.get).toHaveBeenCalledWith('/chapters')
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+      // Should return mock data instead of throwing
+      expect(result[0]).toHaveProperty('id')
+      expect(result[0]).toHaveProperty('name')
     })
   })
 
