@@ -41,3 +41,7 @@ spring-boot-*.log
 # Test outputs
 test-output/
 coverage/
+
+# QA Environment
+qa-data/
+database-exports/
