@@ -110,11 +110,11 @@
                   <td>{{ member.email }}</td>
                   <td>
                     <router-link 
-                      v-if="member.chapter"
-                      :to="`/chapters/${member.chapter.id}`"
+                      v-if="member.chapterId"
+                      :to="`/chapters/${member.chapterId}`"
                       class="text-decoration-none"
                     >
-                      {{ member.chapter.name }}
+                      {{ member.chapterName || 'Unknown Chapter' }}
                     </router-link>
                     <span v-else class="text-muted">No Chapter</span>
                   </td>
@@ -370,14 +370,14 @@ export default {
           member.firstName.toLowerCase().includes(term) ||
           member.lastName.toLowerCase().includes(term) ||
           member.email.toLowerCase().includes(term) ||
-          (member.chapter && member.chapter.name.toLowerCase().includes(term))
+          (member.chapterName && member.chapterName.toLowerCase().includes(term))
         )
       }
 
       // Filter by chapter
       if (this.selectedChapter) {
         filtered = filtered.filter(member => 
-          member.chapter && member.chapter.id === parseInt(this.selectedChapter)
+          member.chapterId === parseInt(this.selectedChapter)
         )
       }
 
@@ -441,7 +441,7 @@ export default {
         lastName: member.lastName,
         email: member.email,
         phoneNumber: member.phoneNumber || '',
-        chapterId: member.chapter ? member.chapter.id : '',
+        chapterId: member.chapterId || '',
         role: member.role,
         joinDate: member.joinDate,
         active: member.active

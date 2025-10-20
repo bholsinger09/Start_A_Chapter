@@ -348,7 +348,7 @@ export default {
         
         this.chapter = chapter
         this.chapterMembers = allMembers.filter(member => 
-          member.chapter && member.chapter.id === chapterId
+          member.chapterId === chapterId
         )
         this.chapterEvents = allEvents.filter(event => 
           event.chapter && event.chapter.id === chapterId
