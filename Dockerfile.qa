@@ -1,5 +1,5 @@
 # QA Environment Dockerfile
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 
 # Set working directory
 WORKDIR /app
@@ -29,4 +29,4 @@ EXPOSE 8080
 
 # Set QA profile and run
 ENV SPRING_PROFILES_ACTIVE=qa
-CMD ["java", "-jar", "target/campus-chapter-organizer-1.0.0.jar"]
+CMD ["java", "-jar", "target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar"]

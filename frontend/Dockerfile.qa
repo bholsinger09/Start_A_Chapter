@@ -12,9 +12,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build for development with QA settings
-RUN npm run build
-
-# Serve the application
+# Expose port
 EXPOSE 3000
-CMD ["npm", "run", "serve"]
+
+# Start development server (bind to all interfaces)
+CMD ["npm", "run", "serve", "--", "--host", "0.0.0.0", "--port", "3000"]
