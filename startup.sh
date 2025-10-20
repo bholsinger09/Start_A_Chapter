@@ -58,12 +58,18 @@ fi
 
 export SPRING_DATASOURCE_URL
 
+# Set production database settings to preserve data
+export SPRING_JPA_HIBERNATE_DDL_AUTO="${SPRING_JPA_HIBERNATE_DDL_AUTO:-validate}"
+export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE:-production}"
+
 echo "Final configuration:"
 echo "  Database URL: $SPRING_DATASOURCE_URL"
 echo "  Username: $SPRING_DATASOURCE_USERNAME"
 echo "  Host: $DB_HOST"
 echo "  Port: $DB_PORT"
 echo "  Database: $DB_NAME"
+echo "  DDL Auto: $SPRING_JPA_HIBERNATE_DDL_AUTO"
+echo "  Profile: $SPRING_PROFILES_ACTIVE"
 
 # Validate URL format
 if [[ "$SPRING_DATASOURCE_URL" =~ jdbc:postgresql://.*:.*/.* ]]; then
