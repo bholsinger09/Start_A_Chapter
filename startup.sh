@@ -59,17 +59,28 @@ fi
 export SPRING_DATASOURCE_URL
 
 # Set production database settings to preserve data
+# CRITICAL: These settings prevent database from being wiped on deployment
 export SPRING_JPA_HIBERNATE_DDL_AUTO="${SPRING_JPA_HIBERNATE_DDL_AUTO:-validate}"
 export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE:-production}"
 
-echo "Final configuration:"
+echo "==================== DATABASE PROTECTION CONFIGURATION ===================="
+echo "CRITICAL SETTINGS FOR DATA PERSISTENCE:"
+echo "  DDL Auto Setting: $SPRING_JPA_HIBERNATE_DDL_AUTO"
+echo "  Spring Profile: $SPRING_PROFILES_ACTIVE"
+echo ""
+echo "Database Connection Details:"
 echo "  Database URL: $SPRING_DATASOURCE_URL"
 echo "  Username: $SPRING_DATASOURCE_USERNAME"
 echo "  Host: $DB_HOST"
 echo "  Port: $DB_PORT"
 echo "  Database: $DB_NAME"
-echo "  DDL Auto: $SPRING_JPA_HIBERNATE_DDL_AUTO"
-echo "  Profile: $SPRING_PROFILES_ACTIVE"
+echo ""
+if [ "$SPRING_JPA_HIBERNATE_DDL_AUTO" = "validate" ]; then
+    echo "✅ DATA PROTECTION: ON - Database will be preserved"
+else
+    echo "⚠️  WARNING: DDL_AUTO='$SPRING_JPA_HIBERNATE_DDL_AUTO' may wipe data!"
+fi
+echo "========================================================================"
 
 # Validate URL format
 if [[ "$SPRING_DATASOURCE_URL" =~ jdbc:postgresql://.*:.*/.* ]]; then
