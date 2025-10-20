@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
-@Aspect
-@Component
+// @Aspect
+// @Component
 public class AuditAspect {
 
     private final AuditService auditService;

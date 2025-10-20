@@ -219,6 +219,49 @@ public class MemberService {
     }
 
     /**
+     * Update member information using individual parameters (flexible)
+     */
+    public Member updateMember(Long id, String firstName, String lastName, String email, String phone, Long chapterId, MemberRole role) {
+        Member existingMember = memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
+
+        // Check if email is changing and if new email already exists
+        if (email != null && !existingMember.getEmail().equals(email)) {
+            if (memberRepository.existsByEmailAndIdNot(email, id)) {
+                throw new IllegalArgumentException("Member with this email already exists");
+            }
+            existingMember.setEmail(email);
+        }
+
+        // Update basic fields if provided
+        if (firstName != null) {
+            existingMember.setFirstName(firstName);
+        }
+        if (lastName != null) {
+            existingMember.setLastName(lastName);
+        }
+        if (phone != null) {
+            existingMember.setPhoneNumber(phone);
+        }
+        if (role != null) {
+            existingMember.setRole(role);
+        }
+
+        // Handle chapter assignment
+        if (chapterId != null) {
+            Optional<Chapter> chapterOpt = chapterService.getChapterById(chapterId);
+            if (chapterOpt.isPresent()) {
+                existingMember.setChapter(chapterOpt.get());
+                System.out.println("✅ Updated member " + id + " to chapter: " + chapterOpt.get().getName());
+            } else {
+                System.err.println("⚠️ Chapter not found with ID: " + chapterId);
+            }
+        }
+
+        return memberRepository.save(existingMember);
+    }
+
+    /**
      * Update member information (legacy method)
      */
     public Member updateMember(Long id, Member updatedMember) {

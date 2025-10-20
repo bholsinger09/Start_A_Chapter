@@ -6,9 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * DTO for member update requests to avoid JSON serialization issues
  */
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignore any unknown fields from frontend
 public class MemberUpdateRequest {
 
     @NotBlank(message = "First name is required")

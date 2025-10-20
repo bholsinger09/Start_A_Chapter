@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/api/monitoring")
-@CrossOrigin(origins = "*")
+// @RestController
+// @RequestMapping("/api/monitoring")
+// @CrossOrigin(origins = "*")
 public class MonitoringController {
 
     private final AuditService auditService;

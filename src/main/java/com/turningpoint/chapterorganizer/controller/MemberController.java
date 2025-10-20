@@ -4,6 +4,7 @@ import com.turningpoint.chapterorganizer.dto.CreateMemberRequest;
 import com.turningpoint.chapterorganizer.dto.MemberUpdateRequest;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.MemberRole;
+import java.util.Map;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +128,11 @@ public class MemberController {
     public ResponseEntity<Member> updateMember(@PathVariable Long id, 
                                              @Valid @RequestBody MemberUpdateRequest updateRequest) {
         try {
-            System.out.println("🔍 Updating member " + id + " with chapter ID: " + updateRequest.getChapterId());
+            System.out.println("🔍 Updating member " + id);
+            System.out.println("🔍 Update request - First name: " + updateRequest.getFirstName());
+            System.out.println("🔍 Update request - Last name: " + updateRequest.getLastName());
+            System.out.println("🔍 Update request - Chapter ID: " + updateRequest.getChapterId());
+            
             Member updatedMember = memberService.updateMember(id, updateRequest);
             return ResponseEntity.ok(updatedMember);
         } catch (IllegalArgumentException e) {
@@ -137,6 +142,60 @@ public class MemberController {
             System.err.println("❌ Unexpected error updating member: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // PUT /api/members/{id}/flexible - Flexible update with Map
+    @PutMapping("/{id}/flexible")
+    public ResponseEntity<Member> updateMemberFlexible(@PathVariable Long id, @RequestBody Map<String, Object> updateData) {
+        System.out.println("=== FLEXIBLE UPDATE MEMBER DEBUG ===");
+        System.out.println("Member ID: " + id);
+        System.out.println("Raw Update Data: " + updateData);
+        System.out.println("Keys received: " + updateData.keySet());
+        System.out.println("====================================");
+        
+        try {
+            // Extract fields from the map
+            String firstName = (String) updateData.get("firstName");
+            String lastName = (String) updateData.get("lastName");
+            String email = (String) updateData.get("email");
+            String phone = (String) updateData.get("phone");
+            
+            // Handle chapterId - could be number or string
+            Long chapterId = null;
+            Object chapterIdObj = updateData.get("chapterId");
+            if (chapterIdObj != null) {
+                if (chapterIdObj instanceof Number) {
+                    chapterId = ((Number) chapterIdObj).longValue();
+                } else if (chapterIdObj instanceof String) {
+                    try {
+                        chapterId = Long.parseLong((String) chapterIdObj);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid chapterId format: " + chapterIdObj);
+                    }
+                }
+            }
+            
+            // Handle role
+            MemberRole role = null;
+            Object roleObj = updateData.get("role");
+            if (roleObj instanceof String) {
+                try {
+                    role = MemberRole.valueOf((String) roleObj);
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Invalid role: " + roleObj);
+                }
+            }
+            
+            System.out.println("Parsed - firstName: " + firstName + ", lastName: " + lastName + 
+                             ", chapterId: " + chapterId + ", role: " + role);
+            
+            Member updatedMember = memberService.updateMember(id, firstName, lastName, email, phone, chapterId, role);
+            return ResponseEntity.ok(updatedMember);
+        } catch (Exception e) {
+            System.err.println("Error in flexible update: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
         }
     }
 
