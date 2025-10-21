@@ -21,18 +21,21 @@ public class EventService {
     private final RecurringEventRepository recurringEventRepository;
     private final MemberRepository memberRepository;
     private final ChapterService chapterService;
+    private final WebSocketNotificationService notificationService;
 
     @Autowired
     public EventService(EventRepository eventRepository, 
                        EventRSVPRepository eventRSVPRepository,
                        RecurringEventRepository recurringEventRepository,
                        MemberRepository memberRepository,
-                       ChapterService chapterService) {
+                       ChapterService chapterService,
+                       WebSocketNotificationService notificationService) {
         this.eventRepository = eventRepository;
         this.eventRSVPRepository = eventRSVPRepository;
         this.recurringEventRepository = recurringEventRepository;
         this.memberRepository = memberRepository;
         this.chapterService = chapterService;
+        this.notificationService = notificationService;
     }
 
     public Event createEvent(Event event) {
@@ -51,7 +54,18 @@ public class EventService {
         }
 
         event.setActive(true);
-        return eventRepository.save(event);
+        Event savedEvent = eventRepository.save(event);
+        
+        // Send WebSocket notification for new event creation
+        if (savedEvent.getChapter() != null) {
+            notificationService.broadcastEventCreated(
+                savedEvent.getTitle(), 
+                savedEvent.getChapter().getId(), 
+                savedEvent.getId()
+            );
+        }
+        
+        return savedEvent;
     }
 
     public List<Event> getAllEvents() {
@@ -189,7 +203,25 @@ public class EventService {
             }
         }
 
-        return eventRSVPRepository.save(rsvp);
+        EventRSVP savedRSVP = eventRSVPRepository.save(rsvp);
+        
+        // Send WebSocket notification for RSVP creation/update
+        if (status == RSVPStatus.ATTENDING && savedRSVP.getEvent() != null && savedRSVP.getMember() != null) {
+            String memberName = savedRSVP.getMember().getFirstName() + " " + savedRSVP.getMember().getLastName();
+            String eventTitle = savedRSVP.getEvent().getTitle();
+            Long chapterId = savedRSVP.getEvent().getChapter() != null ? savedRSVP.getEvent().getChapter().getId() : null;
+            
+            if (chapterId != null) {
+                notificationService.broadcastEventRSVP(
+                    memberName,
+                    eventTitle,
+                    chapterId,
+                    savedRSVP.getEvent().getId()
+                );
+            }
+        }
+        
+        return savedRSVP;
     }
 
     public List<EventRSVP> getEventRSVPs(Long eventId) {

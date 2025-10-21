@@ -20,11 +20,14 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final ChapterService chapterService;
+    private final WebSocketNotificationService notificationService;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository, ChapterService chapterService) {
+    public MemberService(MemberRepository memberRepository, ChapterService chapterService, 
+                        WebSocketNotificationService notificationService) {
         this.memberRepository = memberRepository;
         this.chapterService = chapterService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -54,7 +57,15 @@ public class MemberService {
             member.setRole(MemberRole.MEMBER);
         }
 
-        return memberRepository.save(member);
+        Member savedMember = memberRepository.save(member);
+        
+        // Send WebSocket notification for new member
+        if (savedMember.getChapter() != null) {
+            String memberName = savedMember.getFirstName() + " " + savedMember.getLastName();
+            notificationService.broadcastMemberJoined(memberName, savedMember.getChapter().getId());
+        }
+        
+        return savedMember;
     }
 
     /**
