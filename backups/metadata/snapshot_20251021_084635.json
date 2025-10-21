@@ -1,0 +1,12 @@
+{
+    "backup_name": "snapshot_20251021_084635",
+    "timestamp": "20251021_084635",
+    "date_created": "2025-10-21T14:46:35Z",
+    "database_type": "snapshot",
+    "application_status": "running",
+    "git_commit": "8ac4b098baf1f18456d754156efd687098559705",
+    "git_branch": "main",
+    "application_info": {"status":500,"error":"Internal Server Error","message":"DEBUG: No static resource actuator/info. (NoResourceFoundException)","timestamp":[2025,10,21,14,46,35,349902010]},
+    "backup_size": "",
+    "created_by": "benh@Bens-MacBook-Pro.local"
+}

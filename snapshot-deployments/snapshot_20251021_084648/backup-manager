@@ -162,32 +162,7 @@ create_backup_now() {
 # Interactive restore
 interactive_restore() {
     log "Starting interactive restore process..."
-    
-    # Ask user what type of restore they want
-    echo "Select restore type:"
-    echo "1. Database restore (traditional restore environment)"
-    echo "2. Site snapshot (complete site deployment)"
-    echo "3. List all backups and choose"
-    echo -n "Enter choice (1-3): "
-    read -r choice
-    
-    case "$choice" in
-        "1")
-            "$RESTORE_SCRIPT" restore
-            ;;
-        "2")
-            "$PROJECT_ROOT/scripts/backup/deploy-snapshot.sh" deploy
-            ;;
-        "3")
-            "$RESTORE_SCRIPT" list
-            echo
-            echo "For database restore, use: ./backup-manager restore <backup_name>"
-            echo "For snapshot deployment, use: ./backup-manager deploy <snapshot_name>"
-            ;;
-        *)
-            error "Invalid choice: $choice"
-            ;;
-    esac
+    "$RESTORE_SCRIPT" restore
 }
 
 # List backups
@@ -269,15 +244,13 @@ COMMANDS:
     dashboard              Show system status dashboard
     create [type]          Create backup: 'database', 'snapshot', or 'both' (default)
     restore [backup_name]  Restore from backup/snapshot (interactive if no name)
-    deploy [snapshot_name] Deploy site snapshot (interactive if no name)
     list                   List all available backups and snapshots
-    snapshots              List available site snapshots
     
     schedule               Setup automatic backups (every 30 minutes)
     status                 Show scheduler and restore environment status
     logs [lines]           Show backup logs (default: 50 lines)
     
-    stop [name]            Stop restore environment or snapshot deployment
+    stop                   Stop restore environment
     cleanup                Remove old backups and temporary files
     
     setup                  Quick setup - install everything
@@ -362,12 +335,6 @@ main() {
         "list"|"ls")
             list_backups
             ;;
-        "deploy")
-            "$PROJECT_ROOT/scripts/backup/deploy-snapshot.sh" deploy "$2"
-            ;;
-        "snapshots")
-            "$PROJECT_ROOT/scripts/backup/deploy-snapshot.sh" list
-            ;;
         "schedule")
             setup_scheduler
             ;;
@@ -375,15 +342,10 @@ main() {
             show_logs "$2"
             ;;
         "stop")
-            if [ -n "$2" ] && [[ "$2" == snapshot_* ]]; then
-                "$PROJECT_ROOT/scripts/backup/deploy-snapshot.sh" stop "$2"
-            else
-                stop_restore
-            fi
+            stop_restore
             ;;
         "cleanup")
             cleanup
-            "$PROJECT_ROOT/scripts/backup/deploy-snapshot.sh" cleanup
             ;;
         "setup")
             quick_setup

@@ -1,0 +1,46 @@
+services:
+  # Backend Spring Boot Application (Docker approach)
+  - type: web
+    name: chapter-organizer-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: chapter-organizer-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: chapter-organizer-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: chapter-organizer-db
+          property: password
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: validate
+      - key: SPRING_JPA_DATABASE_PLATFORM
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://chapter-organizer-frontend.onrender.com
+
+  # Frontend Vue.js Application  
+  - type: web
+    name: chapter-organizer-frontend
+    env: node
+    buildCommand: cd frontend && npm ci && npm run build:prod
+    startCommand: cd frontend && npm run preview -- --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://chapter-organizer-backend.onrender.com
+
+# PostgreSQL Database
+databases:
+  - name: chapter-organizer-db
+    databaseName: chapter_organizer
+    user: chapter_user
+    plan: free
