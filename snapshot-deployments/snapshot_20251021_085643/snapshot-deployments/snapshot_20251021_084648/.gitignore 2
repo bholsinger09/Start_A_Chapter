@@ -1,0 +1,47 @@
+# Build artifacts
+target/
+frontend/dist/
+frontend/node_modules/
+node_modules/
+
+# Logs
+*.log
+logs/
+app.log
+server.log
+
+# Vite cache
+.vite/
+frontend/.vite/
+
+# Environment variables (except .env.production for deployment)
+.env.local
+.env.development
+frontend/.env.local
+frontend/.env.development
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot
+spring-boot-*.log
+
+# Test outputs
+test-output/
+coverage/
+
+# QA Environment
+qa-data/
+database-exports/
