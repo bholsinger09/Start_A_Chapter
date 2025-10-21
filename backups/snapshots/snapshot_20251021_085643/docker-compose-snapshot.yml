@@ -1,0 +1,93 @@
+# Docker Compose for Site Snapshot: snapshot_20251021_085643
+# Created: 2025-10-21T14:56:43Z
+# Git Commit: e89c1d65368a509b032c180eb5ebd28ee6e4f0ca
+
+services:
+  # Snapshot Database Service
+  snapshot-database:
+    image: postgres:15-alpine
+    container_name: snapshot-snapshot_20251021_085643-db
+    environment:
+      POSTGRES_DB: chapterdb_snapshot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: snapshot_password
+    ports:
+      - "0:5432"  # Docker will assign random port
+    volumes:
+      - snapshot_snapshot_20251021_085643_db_data:/var/lib/postgresql/data
+      - ./database-restore:/docker-entrypoint-initdb.d:ro
+    networks:
+      - snapshot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chapterdb_snapshot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Snapshot Application Service
+  snapshot-app:
+    build:
+      context: ./source-extracted
+      dockerfile: Dockerfile.qa
+    container_name: snapshot-snapshot_20251021_085643-app
+    ports:
+      - "0:8080"  # Docker will assign random port
+    environment:
+      - SPRING_PROFILES_ACTIVE=snapshot
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://snapshot-database:5432/chapterdb_snapshot
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=snapshot_password
+      - SNAPSHOT_NAME=snapshot_20251021_085643
+    depends_on:
+      snapshot-database:
+        condition: service_healthy
+    volumes:
+      - ./configs:/app/configs:ro
+    networks:
+      - snapshot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # Snapshot Frontend Service
+  snapshot-frontend:
+    build:
+      context: ./source-extracted/frontend
+      dockerfile: Dockerfile.qa
+    container_name: snapshot-snapshot_20251021_085643-frontend
+    ports:
+      - "0:3000"  # Docker will assign random port
+    environment:
+      - VUE_APP_API_BASE_URL=http://snapshot-app:8080
+      - NODE_ENV=development
+      - SNAPSHOT_NAME=snapshot_20251021_085643
+    depends_on:
+      snapshot-app:
+        condition: service_healthy
+    networks:
+      - snapshot-network
+
+  # Snapshot Admin Tool
+  snapshot-adminer:
+    image: adminer:4.8.1
+    container_name: snapshot-snapshot_20251021_085643-adminer
+    ports:
+      - "0:8080"  # Docker will assign random port
+    environment:
+      ADMINER_DEFAULT_SERVER: snapshot-database
+    depends_on:
+      - snapshot-database
+    networks:
+      - snapshot-network
+
+volumes:
+  snapshot_snapshot_20251021_085643_db_data:
+    name: snapshot_snapshot_20251021_085643_db_data
+
+networks:
+  snapshot-network:
+    name: snapshot_snapshot_20251021_085643_network
+    driver: bridge

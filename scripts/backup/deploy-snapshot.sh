@@ -169,7 +169,7 @@ prepare_snapshot_deployment() {
     local snapshot_dir="${SNAPSHOT_BACKUP_DIR}/${snapshot_name}"
     local deployment_dir="${DEPLOY_DIR}/${snapshot_name}"
     
-    log "Preparing snapshot deployment: $snapshot_name"
+    log "Preparing snapshot deployment: $snapshot_name" >&2
     
     # Create deployment directory
     mkdir -p "$deployment_dir"
@@ -180,7 +180,7 @@ prepare_snapshot_deployment() {
     tar -xzf "$snapshot_dir/source-code.tar.gz"
     
     # Copy Docker configurations
-    log "Setting up Docker configurations..."
+    log "Setting up Docker configurations..." >&2
     cp "$snapshot_dir/docker-compose-snapshot.yml" "$deployment_dir/"
     
     # Copy database backup and restore scripts
@@ -196,7 +196,7 @@ prepare_snapshot_deployment() {
     done
     
     # Copy application configurations
-    log "Setting up application configurations..."
+    log "Setting up application configurations..." >&2
     mkdir -p "$deployment_dir/source-extracted"
     
     # Move extracted source to subdirectory for Docker build context
