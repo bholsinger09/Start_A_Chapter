@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,4 +89,24 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // Find the president of a chapter
     @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = 'PRESIDENT' AND m.active = true")
     Optional<Member> findChapterPresident(@Param("chapterId") Long chapterId);
+
+    // Analytics and statistics methods
+    
+    // Count active members
+    Long countByActiveTrue();
+    
+    // Count members by chapter
+    Long countByChapter_Id(Long chapterId);
+    
+    // Count active members by chapter
+    Long countByChapter_IdAndActiveTrue(Long chapterId);
+    
+    // Date-based queries using createdAt field (join date)
+    Long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    Long countByCreatedAtBefore(LocalDateTime before);
+    Long countByCreatedAtAfter(LocalDateTime after);
+    Long countByActiveTrueAndCreatedAtBefore(LocalDateTime before);
+    
+    // Find recent members
+    List<Member> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime after);
 }

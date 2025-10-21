@@ -49,4 +49,8 @@ public interface EventRSVPRepository extends JpaRepository<EventRSVP, Long> {
     // Find pending RSVPs for upcoming events
     @Query("SELECT r FROM EventRSVP r WHERE r.status = 'PENDING' AND r.event.eventDateTime > CURRENT_TIMESTAMP")
     List<EventRSVP> findPendingRSVPsForUpcomingEvents();
+    
+    // Analytics methods for date-based queries
+    @Query("SELECT COUNT(r) FROM EventRSVP r WHERE r.createdAt BETWEEN :start AND :end")
+    Long countByRsvpDateBetween(@Param("start") java.time.LocalDateTime start, @Param("end") java.time.LocalDateTime end);
 }
