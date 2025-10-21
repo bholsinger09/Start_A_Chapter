@@ -72,10 +72,16 @@
         </div>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="text-center py-4">
-        <div class="spinner-border text-info" role="status">
-          <span class="visually-hidden">Loading...</span>
+      <!-- Loading State with Skeleton -->
+      <div v-if="loading" class="card">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-calendar-event me-2"></i>
+            Loading Events...
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <SkeletonLoader type="list" :rows="4" />
         </div>
       </div>
 
@@ -463,12 +469,14 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { eventService } from '../services/eventService'
 import { chapterService } from '../services/chapterService'
 import EventRSVPCard from '../components/EventRSVPCard.vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
 import { useEventAPI } from '../composables/useEventAPI'
 
 export default {
   name: 'Events',
   components: {
-    EventRSVPCard
+    EventRSVPCard,
+    SkeletonLoader
   },
   setup() {
     // API composable

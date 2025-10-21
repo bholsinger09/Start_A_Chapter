@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <!-- PWA Install Prompt -->
+    <PWAInstaller />
+    
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container">
@@ -91,6 +94,9 @@
       </div>
     </nav>
 
+    <!-- Mobile Navigation (shown on mobile devices) -->
+    <MobileNavigation :current-user="currentUser" @logout="logout" />
+
     <!-- Main Content -->
     <main class="container-fluid py-4">
       <router-view />
@@ -120,6 +126,8 @@
 <script>
 import ThemeToggle from './components/ThemeToggle.vue'
 import SimpleThemeToggle from './components/SimpleThemeToggle.vue'
+import PWAInstaller from './components/PWAInstaller.vue'
+import MobileNavigation from './components/MobileNavigation.vue'
 import { useTheme } from './composables/useTheme.js'
 import { onMounted } from 'vue'
 
@@ -127,7 +135,9 @@ export default {
   name: 'App',
   components: {
     ThemeToggle,
-    SimpleThemeToggle
+    SimpleThemeToggle,
+    PWAInstaller,
+    MobileNavigation
   },
   setup() {
     const { initializeTheme, setTheme, currentTheme } = useTheme()
@@ -277,5 +287,35 @@ main {
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  /* Hide desktop navigation on mobile */
+  .navbar {
+    display: none !important;
+  }
+  
+  /* Adjust main content padding for mobile navigation */
+  main {
+    padding-bottom: 100px !important; /* Space for bottom navigation */
+  }
+  
+  /* Hide footer on mobile for better UX */
+  footer {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Hide mobile navigation on desktop */
+  .mobile-navigation {
+    display: none !important;
+  }
+}
+
+/* Prevent theme transition flash */
+.preload * {
+  transition: none !important;
 }
 </style>

@@ -34,12 +34,16 @@
         <button type="button" class="btn-close" @click="error = null"></button>
       </div>
 
+      <!-- Enhanced Analytics Dashboard -->
+      <AnalyticsDashboard />
+
       <!-- Quick Stats -->
-      <div class="row g-4 mb-4">
+      <div class="row g-4 mb-4 mt-4">
         <div class="col-md-3">
-          <div class="card border-0 shadow-sm">
+          <div class="card border-0 shadow-sm metric-card">
             <div class="card-body">
-              <div class="d-flex align-items-center">
+              <SkeletonLoader v-if="loading" type="card" />
+              <div v-else class="d-flex align-items-center">
                 <div class="flex-shrink-0">
                   <div class="bg-primary bg-gradient rounded-3 p-3">
                     <i class="fas fa-users text-white fa-lg"></i>
@@ -55,12 +59,13 @@
         </div>
         
         <div class="col-md-3">
-          <div class="card border-0 shadow-sm">
+          <div class="card border-0 shadow-sm metric-card">
             <div class="card-body">
-              <div class="d-flex align-items-center">
+              <SkeletonLoader v-if="loading" type="card" />
+              <div v-else class="d-flex align-items-center">
                 <div class="flex-shrink-0">
                   <div class="bg-success bg-gradient rounded-3 p-3">
-                    <i class="fas fa-calendar-alt text-white fa-lg"></i>
+                    <i class="fas fa-calendar-check text-white fa-lg"></i>
                   </div>
                 </div>
                 <div class="flex-grow-1 ms-3">
@@ -73,9 +78,10 @@
         </div>
         
         <div class="col-md-3">
-          <div class="card border-0 shadow-sm">
+          <div class="card border-0 shadow-sm metric-card">
             <div class="card-body">
-              <div class="d-flex align-items-center">
+              <SkeletonLoader v-if="loading" type="card" />
+              <div v-else class="d-flex align-items-center">
                 <div class="flex-shrink-0">
                   <div class="bg-info bg-gradient rounded-3 p-3">
                     <i class="fas fa-university text-white fa-lg"></i>
@@ -91,9 +97,10 @@
         </div>
         
         <div class="col-md-3">
-          <div class="card border-0 shadow-sm">
+          <div class="card border-0 shadow-sm metric-card">
             <div class="card-body">
-              <div class="d-flex align-items-center">
+              <SkeletonLoader v-if="loading" type="card" />
+              <div v-else class="d-flex align-items-center">
                 <div class="flex-shrink-0">
                   <div class="bg-warning bg-gradient rounded-3 p-3">
                     <i class="fas fa-check-circle text-white fa-lg"></i>
@@ -179,9 +186,15 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import AnalyticsDashboard from '../components/AnalyticsDashboard.vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
 
 export default {
   name: 'Dashboard',
+  components: {
+    AnalyticsDashboard,
+    SkeletonLoader
+  },
   setup() {
     const totalMembers = ref(0)
     const activeEvents = ref(0)
@@ -307,6 +320,10 @@ export default {
   background: linear-gradient(135deg, var(--bs-warning) 0%, var(--bs-warning-dark, #664d03) 100%);
 }
 
+.metric-card {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
 @media (max-width: 768px) {
   .dashboard {
     padding: 1rem;
@@ -316,9 +333,40 @@ export default {
     text-align: center;
   }
   
-  .dashboard-header .row {
-    flex-direction: column;
-    gap: 1rem;
+  .col-md-3 {
+    margin-bottom: 1rem;
+  }
+  
+  .btn {
+    font-size: 0.875rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .dashboard {
+    background-color: #1a1d23;
+  }
+  
+  .dashboard-header {
+    background: #2d3748;
+    color: white;
+  }
+  
+  .card {
+    background-color: #2d3748;
+    color: white;
+    border-color: #4a5568;
+  }
+  
+  .card-header {
+    background-color: #2d3748 !important;
+    color: white;
+    border-bottom-color: #4a5568;
+  }
+  
+  .text-muted {
+    color: #a0aec0 !important;
   }
 }
 </style>

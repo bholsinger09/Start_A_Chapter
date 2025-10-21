@@ -26,19 +26,23 @@
           </button>
         </div>
         <div class="col-md-6">
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="bi bi-search"></i>
-            </span>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Search members..."
-              v-model="searchTerm"
-            >
-          </div>
+          <button 
+            class="btn btn-outline-primary" 
+            @click="showAdvancedSearch = !showAdvancedSearch"
+          >
+            <i class="bi bi-funnel me-2"></i>
+            Advanced Search
+          </button>
         </div>
       </div>
+
+      <!-- Advanced Search Panel -->
+      <AdvancedSearchPanel 
+        v-if="showAdvancedSearch"
+        :search-categories="memberSearchCategories"
+        @search="handleAdvancedSearch"
+        @close="showAdvancedSearch = false"
+      />
 
       <!-- Filters -->
       <div class="row mb-4">
@@ -69,10 +73,16 @@
         </div>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="text-center py-4">
-        <div class="spinner-border text-success" role="status">
-          <span class="visually-hidden">Loading...</span>
+      <!-- Loading State with Skeleton -->
+      <div v-if="loading" class="card">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-table me-2"></i>
+            Loading Members...
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <SkeletonLoader type="table" :rows="5" />
         </div>
       </div>
 
@@ -329,9 +339,15 @@
 <script>
 import { memberService } from '../services/memberService'
 import { chapterService } from '../services/chapterService'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
+import AdvancedSearchPanel from '../components/AdvancedSearchPanel.vue'
 
 export default {
   name: 'Members',
+  components: {
+    SkeletonLoader,
+    AdvancedSearchPanel
+  },
   data() {
     return {
       loading: true,
@@ -342,6 +358,55 @@ export default {
       selectedChapter: '',
       selectedRole: '',
       selectedStatus: '',
+      showAdvancedSearch: false,
+      memberSearchCategories: [
+        {
+          id: 'general',
+          name: 'General',
+          filters: [
+            { type: 'text', id: 'name', label: 'Name', placeholder: 'Search by first or last name' },
+            { type: 'text', id: 'email', label: 'Email', placeholder: 'Search by email address' },
+            { 
+              type: 'select', 
+              id: 'status', 
+              label: 'Status', 
+              options: [
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'membership',
+          name: 'Membership',
+          filters: [
+            { 
+              type: 'select', 
+              id: 'role', 
+              label: 'Role', 
+              options: [
+                { value: 'PRESIDENT', label: 'President' },
+                { value: 'VICE_PRESIDENT', label: 'Vice President' },
+                { value: 'SECRETARY', label: 'Secretary' },
+                { value: 'TREASURER', label: 'Treasurer' },
+                { value: 'MEMBER', label: 'Member' }
+              ]
+            },
+            { type: 'select', id: 'chapter', label: 'Chapter', options: [] },
+            { type: 'dateRange', id: 'joinDate', label: 'Join Date Range' }
+          ]
+        },
+        {
+          id: 'advanced',
+          name: 'Advanced',
+          filters: [
+            { type: 'multiSelect', id: 'tags', label: 'Tags', options: [] },
+            { type: 'number', id: 'minEvents', label: 'Min Events Attended', min: 0 },
+            { type: 'checkbox', id: 'hasEmail', label: 'Has Email Address' }
+          ]
+        }
+      ],
       showCreateModal: false,
       showEditModal: false,
       showDeleteModal: false,
@@ -397,6 +462,8 @@ export default {
   },
   async mounted() {
     await this.loadData()
+    // Populate chapter options for advanced search
+    this.populateSearchOptions()
   },
   methods: {
     async loadData() {
@@ -412,6 +479,31 @@ export default {
         console.error('Error loading members:', error)
       } finally {
         this.loading = false
+      }
+    },
+    handleAdvancedSearch(searchData) {
+      console.log('Advanced search:', searchData)
+      // Apply advanced search filters to the members list
+      // This is where you would implement the actual filtering logic
+      // For now, we'll just log the search data and close the panel
+      this.showAdvancedSearch = false
+      
+      // Example: Apply basic name filter if provided
+      if (searchData.filters.name) {
+        this.searchTerm = searchData.filters.name
+      }
+    },
+    populateSearchOptions() {
+      // Update chapter options in search categories
+      const membershipCategory = this.memberSearchCategories.find(cat => cat.id === 'membership')
+      if (membershipCategory) {
+        const chapterFilter = membershipCategory.filters.find(filter => filter.id === 'chapter')
+        if (chapterFilter) {
+          chapterFilter.options = this.chapters.map(chapter => ({
+            value: chapter.id,
+            label: chapter.name
+          }))
+        }
       }
     },
     formatDate(dateString) {
