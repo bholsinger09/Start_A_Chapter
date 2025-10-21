@@ -1,0 +1,12 @@
+{
+    "backup_name": "h2_backup_20251021_083608",
+    "timestamp": "20251021_083608",
+    "date_created": "2025-10-21T14:36:08Z",
+    "database_type": "h2",
+    "application_status": "running",
+    "git_commit": "9b5d679eea5732adb597864e6c5d12dfea717781",
+    "git_branch": "main",
+    "application_info": {"status":500,"error":"Internal Server Error","message":"DEBUG: No static resource actuator/info. (NoResourceFoundException)","timestamp":[2025,10,21,14,36,8,312778011]},
+    "backup_size": "  0B",
+    "created_by": "benh@Bens-MacBook-Pro.local"
+}
