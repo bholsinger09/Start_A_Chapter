@@ -103,7 +103,10 @@ import {
   RadialLinearScale,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  LineController,
+  DoughnutController,
+  RadarController
 } from 'chart.js'
 import { useMonitoring } from '../composables/useMonitoring'
 
@@ -117,7 +120,10 @@ Chart.register(
   RadialLinearScale,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  LineController,
+  DoughnutController,
+  RadarController
 )
 
 export default {
