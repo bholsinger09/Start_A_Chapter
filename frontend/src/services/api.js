@@ -67,4 +67,7 @@ api.interceptors.response.use(
   }
 )
 
+// Export the API base URL function for use in other modules
+export { getApiBaseUrl }
+
 export default api

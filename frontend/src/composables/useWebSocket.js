@@ -22,8 +22,10 @@ const eventListeners = new Map()
 export function useWebSocket() {
   const connect = () => {
     try {
-      // Use environment variable or fallback to localhost
-      const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8080/ws'
+      // Determine WebSocket URL based on environment
+      const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')
+      const wsUrl = import.meta.env.VITE_WS_URL || 
+                   (isProduction ? 'wss://chapter-organizer-backend.onrender.com/ws' : 'ws://localhost:8080/ws')
       
       socket.value = new WebSocket(wsUrl)
       

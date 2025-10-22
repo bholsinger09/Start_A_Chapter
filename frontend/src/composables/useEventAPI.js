@@ -1,8 +1,9 @@
 import { ref } from 'vue'
 import axios from 'axios'
+import { getApiBaseUrl } from '../services/api.js'
 
-// API base URL - adjust based on your backend configuration
-const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || import.meta?.env?.VITE_API_BASE_URL || 'http://localhost:8080'
+// API base URL - use centralized configuration
+const API_BASE_URL = getApiBaseUrl()
 
 // Create axios instance with default config
 const apiClient = axios.create({

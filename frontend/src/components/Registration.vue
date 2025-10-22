@@ -338,7 +338,9 @@ export default {
       this.successMessage = ''
 
       try {
-        const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || import.meta?.env?.VITE_API_BASE_URL || 'http://localhost:8080'
+        // Import API configuration function
+        const { getApiBaseUrl } = await import('../services/api.js')
+        const API_BASE_URL = getApiBaseUrl()
         const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: 'POST',
           headers: {
