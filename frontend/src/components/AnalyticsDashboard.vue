@@ -92,39 +92,10 @@
 
 <script>
 import { ref, onMounted, onUnmounted } from 'vue'
-import {
-  Chart,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  LineController,
-  DoughnutController,
-  RadarController
-} from 'chart.js'
+import Chart from 'chart.js/auto'
 import { useMonitoring } from '../composables/useMonitoring'
 
-Chart.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  LineController,
-  DoughnutController,
-  RadarController
-)
+// Chart.js auto imports all necessary components including controllers
 
 export default {
   name: 'AnalyticsDashboard',
