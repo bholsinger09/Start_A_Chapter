@@ -6,20 +6,33 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.StreamUtils;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 
 @Controller
 @CrossOrigin(origins = "*")
 public class RootController {
 
     @GetMapping("/")
-    public ResponseEntity<Void> index() {
-        return ResponseEntity.status(HttpStatus.FOUND)
-            .location(URI.create("/index.html"))
-            .build();
+    public ResponseEntity<String> index() {
+        try {
+            ClassPathResource resource = new ClassPathResource("static/index.html");
+            String content = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+            return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(content);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/index.html"))
+                .build();
+        }
     }
 
     @GetMapping("/api/info")
