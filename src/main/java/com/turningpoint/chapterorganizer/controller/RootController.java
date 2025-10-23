@@ -14,7 +14,7 @@ public class RootController {
 
     @GetMapping("/")
     public String index() {
-        return "redirect:/index.html";
+        return "forward:/index.html";
     }
 
     @GetMapping("/api/info")

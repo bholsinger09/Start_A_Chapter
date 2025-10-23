@@ -18,6 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(@NonNull ViewControllerRegistry registry) {
+        // Handle SPA routing - fallback to index.html for client-side routes
         registry.addViewController("/").setViewName("forward:/index.html");
+        registry.addViewController("/{spring:[^.]*}").setViewName("forward:/index.html");
+        registry.addViewController("/**/{spring:[^.]*}").setViewName("forward:/index.html");
     }
 }
