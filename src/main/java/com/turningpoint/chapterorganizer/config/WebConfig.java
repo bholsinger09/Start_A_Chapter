@@ -28,13 +28,13 @@ public class WebConfig implements WebMvcConfigurer {
     /**
      * Configure view controllers to handle SPA routing.
      * Any request that doesn't match static resources or API endpoints
-     * will be forwarded to index.html for Vue.js to handle.
+     * will be redirected to index.html for Vue.js to handle.
      */
     @Override
     public void addViewControllers(@NonNull ViewControllerRegistry registry) {
-        // Forward SPA routes to index.html for Vue.js client-side routing
-        // These patterns catch common SPA routes while excluding static resources
-        registry.addViewController("/").setViewName("forward:/index.html");
-        registry.addViewController("/{path:[^.]*}").setViewName("forward:/index.html");
+        // Redirect SPA routes to index.html for Vue.js client-side routing
+        // Using redirect instead of forward to avoid Thymeleaf template resolver conflicts
+        registry.addViewController("/").setViewName("redirect:/index.html");
+        registry.addViewController("/{path:[^.]*}").setViewName("redirect:/index.html");
     }
 }
