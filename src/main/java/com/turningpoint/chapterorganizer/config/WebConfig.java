@@ -3,7 +3,6 @@ package com.turningpoint.chapterorganizer.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -26,14 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Configure view controllers to handle SPA routing.
-     * Note: The root path "/" is handled by RootController, so we only need to handle
-     * other SPA routes that don't match API endpoints or static resources.
+     * Note: SPA routing is handled by RootController for root path and specific controllers for API paths.
+     * No view controller configuration needed since we're using proper controller methods.
      */
-    @Override
-    public void addViewControllers(@NonNull ViewControllerRegistry registry) {
-        // Handle non-root SPA routes for Vue.js client-side routing
-        // Exclude root "/" since RootController handles it, and exclude API paths
-        registry.addViewController("/{path:(?!api|static|js|css|img|fonts).*}").setViewName("redirect:/index.html");
-    }
 }
