@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.nio.file.Files;
 
 /**
  * Controller to serve static files for Vue.js SPA
@@ -23,7 +22,7 @@ public class StaticController {
     public ResponseEntity<String> index() throws IOException {
         Resource resource = new ClassPathResource("static/index.html");
         if (resource.exists()) {
-            String content = Files.readString(resource.getFile().toPath());
+            String content = new String(resource.getInputStream().readAllBytes());
             return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_HTML)
                 .body(content);
