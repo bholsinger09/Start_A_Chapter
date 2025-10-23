@@ -2,6 +2,8 @@ package com.turningpoint.chapterorganizer.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -13,8 +15,8 @@ import java.util.Map;
 public class RootController {
 
     @GetMapping("/")
-    public String index() {
-        return "forward:/index.html";
+    public void index(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/index.html");
     }
 
     @GetMapping("/api/info")
