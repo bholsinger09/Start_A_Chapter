@@ -1,32 +1,19 @@
 package com.turningpoint.chapterorganizer.controller;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * Controller to serve static files for Vue.js SPA
+ * Controller to handle SPA routing by forwarding all non-API requests to index.html
  */
-@RestController
+@Controller
 public class StaticController {
 
     /**
-     * Serves the index.html file for SPA routing
+     * Forward all requests (except API and static resources) to index.html for SPA routing
      */
-    @GetMapping(value = "/", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> index() throws IOException {
-        Resource resource = new ClassPathResource("static/index.html");
-        if (resource.exists()) {
-            String content = new String(resource.getInputStream().readAllBytes());
-            return ResponseEntity.ok()
-                .contentType(MediaType.TEXT_HTML)
-                .body(content);
-        }
-        return ResponseEntity.notFound().build();
+    @RequestMapping(value = "/{path:[^\\.]*}")
+    public String forward() {
+        return "forward:/index.html";
     }
 }
