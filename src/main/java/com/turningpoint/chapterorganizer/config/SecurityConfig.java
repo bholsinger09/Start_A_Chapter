@@ -32,6 +32,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/stats/public/**").permitAll()
                 // Allow public endpoints
                 .requestMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // Allow static resources and frontend routes
+                .requestMatchers("/", "/index.html", "/static/**", "/js/**", "/css/**", "/img/**", "/fonts/**").permitAll()
+                .requestMatchers("/api/info").permitAll()  // Allow API info endpoint
                 // Allow OPTIONS requests for CORS preflight
                 .requestMatchers("OPTIONS", "/**").permitAll()
                 // All other requests need authentication
