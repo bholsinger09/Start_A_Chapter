@@ -4,7 +4,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +16,10 @@ import java.util.Map;
 public class RootController {
 
     @GetMapping("/")
-    public String index() {
-        return "redirect:/index.html";
+    public ResponseEntity<Void> index() {
+        return ResponseEntity.status(HttpStatus.FOUND)
+            .location(URI.create("/index.html"))
+            .build();
     }
 
     @GetMapping("/api/info")
