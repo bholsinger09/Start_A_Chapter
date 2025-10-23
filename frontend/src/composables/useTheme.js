@@ -50,13 +50,13 @@ export function useTheme() {
     console.log('🌙 useTheme: Applying theme:', theme)
     console.log('🌙 useTheme: HTML element:', html)
     console.log('🌙 useTheme: Body element:', body)
-    
+
     // Update data attribute for CSS targeting
     html.setAttribute('data-theme', theme)
     body.setAttribute('data-theme', theme)
-    
+
     console.log('🌙 useTheme: Set data-theme attribute on html and body')
-    
+
     // Update Bootstrap theme classes
     if (theme === 'dark') {
       html.setAttribute('data-bs-theme', 'dark')
@@ -81,7 +81,7 @@ export function useTheme() {
     // Store preference
     localStorage.setItem('theme-preference', theme)
     localStorage.setItem('theme-is-system', isSystemTheme.value.toString())
-    
+
     console.log('🌙 useTheme: Theme applied. HTML data-theme:', html.getAttribute('data-theme'))
     console.log('🌙 useTheme: Body data-theme:', body.getAttribute('data-theme'))
     console.log('🌙 useTheme: HTML classes:', html.className)
@@ -114,7 +114,7 @@ export function useTheme() {
   const watchSystemTheme = () => {
     if (typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-      
+
       const handleSystemThemeChange = (e) => {
         if (isSystemTheme.value) {
           applyTheme()
@@ -122,7 +122,7 @@ export function useTheme() {
       }
 
       mediaQuery.addEventListener('change', handleSystemThemeChange)
-      
+
       return () => {
         mediaQuery.removeEventListener('change', handleSystemThemeChange)
       }

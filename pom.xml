@@ -75,17 +75,17 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
-		<!-- Jackson Hibernate 6 support for lazy loading -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-hibernate6</artifactId>
-		</dependency>
+        <!-- Jackson Hibernate 6 support for lazy loading -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate6</artifactId>
+        </dependency>
 		
-		<!-- Jackson JSR310 support for LocalDateTime -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>        <!-- Database -->
+        <!-- Jackson JSR310 support for LocalDateTime -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>        <!-- Database -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -143,6 +143,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.turningpoint.chapterorganizer.CampusChapterOrganizerApplication</mainClass>
+                </configuration>
             </plugin>
             
             <plugin>

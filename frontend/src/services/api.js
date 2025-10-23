@@ -6,17 +6,17 @@ const getApiBaseUrl = () => {
   if (import.meta?.env?.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL
   }
-  
+
   // Check Vue CLI environment variables (fallback)
   if (process.env.VUE_APP_API_BASE_URL) {
     return process.env.VUE_APP_API_BASE_URL
   }
-  
+
   // Production detection - if running on onrender.com, use production backend
   if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
     return 'https://chapter-organizer-backend.onrender.com'
   }
-  
+
   // Development fallback
   return 'http://localhost:8080'
 }

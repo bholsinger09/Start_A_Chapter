@@ -26,7 +26,7 @@ export function createMockRouter(routes = []) {
  */
 export function createMountingOptions(overrides = {}) {
   const router = createMockRouter()
-  
+
   return {
     global: {
       plugins: [router],

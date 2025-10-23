@@ -76,9 +76,9 @@ export const chapterService = {
     try {
       const response = await api.get('/chapters')
       console.log('🔍 SERVICE DEBUG: API response:', response)
-      
+
       let data = response.data
-      
+
       // Check if the response data is a JSON string that needs parsing
       if (typeof data === 'string') {
         try {
@@ -90,7 +90,7 @@ export const chapterService = {
           return mockChapters
         }
       }
-      
+
       // Ensure we return an array
       if (data && Array.isArray(data)) {
         console.log('🔍 SERVICE DEBUG: Returning API data:', data.length, 'chapters')
@@ -214,7 +214,7 @@ export const chapterService = {
   // Search institutions
   async searchInstitutions(query) {
     try {
-      const response = await api.get('/chapters/institutions/search', { 
+      const response = await api.get('/chapters/institutions/search', {
         params: { query }
       })
       return response.data

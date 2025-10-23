@@ -1,18 +1,25 @@
 package com.turningpoint.chapterorganizer.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+@Controller
 @CrossOrigin(origins = "*")
 public class RootController {
 
     @GetMapping("/")
-    public Map<String, Object> home() {
+    public String index() {
+        return "redirect:/index.html";
+    }
+
+    @GetMapping("/api/info")
+    @ResponseBody
+    public Map<String, Object> apiInfo() {
         Map<String, Object> response = new HashMap<>();
         response.put("service", "Campus Chapter Organizer API");
         response.put("version", "1.0.0");

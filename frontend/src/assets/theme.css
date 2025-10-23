@@ -5,35 +5,35 @@
   --color-bg-secondary: #f8f9fa;
   --color-bg-tertiary: #e9ecef;
   --color-bg-accent: #e3f2fd;
-  
+
   --color-text-primary: #212529;
   --color-text-secondary: #6c757d;
   --color-text-muted: #adb5bd;
   --color-text-inverse: #ffffff;
-  
+
   --color-border: #dee2e6;
   --color-border-light: #f1f3f4;
   --color-border-dark: #adb5bd;
-  
+
   --color-shadow: rgba(0, 0, 0, 0.1);
   --color-shadow-hover: rgba(0, 0, 0, 0.15);
-  
+
   /* Card colors */
   --color-card-bg: #ffffff;
   --color-card-border: #dee2e6;
   --color-card-shadow: rgba(0, 0, 0, 0.05);
-  
+
   /* Navigation */
   --color-nav-bg: var(--bs-primary);
   --color-nav-text: #ffffff;
   --color-nav-hover: rgba(255, 255, 255, 0.1);
-  
+
   /* Status colors remain the same */
   --color-success: #198754;
   --color-warning: #ffc107;
   --color-danger: #dc3545;
   --color-info: #0dcaf0;
-  
+
   /* Animation and transitions */
   --transition-theme: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-fast: all 0.15s ease-in-out;
@@ -46,24 +46,24 @@
   --color-bg-secondary: #2d3748;
   --color-bg-tertiary: #4a5568;
   --color-bg-accent: #2a4a6b;
-  
+
   --color-text-primary: #f7fafc;
   --color-text-secondary: #e2e8f0;
   --color-text-muted: #a0aec0;
   --color-text-inverse: #1a1d23;
-  
+
   --color-border: #4a5568;
   --color-border-light: #2d3748;
   --color-border-dark: #718096;
-  
+
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-hover: rgba(0, 0, 0, 0.4);
-  
+
   /* Card colors */
   --color-card-bg: #2d3748;
   --color-card-border: #4a5568;
   --color-card-shadow: rgba(0, 0, 0, 0.2);
-  
+
   /* Navigation - slightly darker in dark mode */
   --color-nav-bg: #1e3a8a;
   --color-nav-text: #f7fafc;
@@ -127,12 +127,12 @@ body {
   background-color: #2d3748 !important;
 }
 
-.table-hover > tbody > tr:hover > * {
+.table-hover>tbody>tr:hover>* {
   --bs-table-hover-bg: var(--color-bg-secondary);
 }
 
-[data-theme="dark"] .table-hover > tbody > tr:hover > *,
-.dark-theme .table-hover > tbody > tr:hover > * {
+[data-theme="dark"] .table-hover>tbody>tr:hover>*,
+.dark-theme .table-hover>tbody>tr:hover>* {
   background-color: #4a5568 !important;
 }
 

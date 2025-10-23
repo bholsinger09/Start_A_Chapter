@@ -141,9 +141,9 @@ export const memberService = {
       // Send chapter ID instead of full chapter object
       chapterId: member.chapter ? member.chapter.id : null
     }
-    
+
     console.log('🔍 Updating member with flexible request:', updateRequest)
-    
+
     try {
       const response = await api.put(`/members/${id}/flexible`, updateRequest)
       return response.data

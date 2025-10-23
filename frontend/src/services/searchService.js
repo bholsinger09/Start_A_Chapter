@@ -6,7 +6,7 @@ class SearchService {
   async globalSearch(query, filters = {}, pagination = {}) {
     try {
       const params = new URLSearchParams()
-      
+
       if (query) params.append('query', query)
       if (filters.states?.length) params.append('states', filters.states.join(','))
       if (filters.statuses?.length) params.append('statuses', filters.statuses.join(','))
@@ -80,7 +80,7 @@ class SearchService {
   async facetedSearch(facets = {}) {
     try {
       const params = new URLSearchParams()
-      
+
       Object.entries(facets).forEach(([key, value]) => {
         if (value) {
           params.append(key, value)
