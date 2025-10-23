@@ -1,6 +1,6 @@
 package com.turningpoint.chapterorganizer.controller;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,13 +10,15 @@ import org.springframework.http.MediaType;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 
-@Controller
+@RestController
 @CrossOrigin(origins = "*")
 public class RootController {
 
