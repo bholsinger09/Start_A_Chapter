@@ -1,16 +1,31 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: chapterdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
   backend:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=production
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/chapterdb
     volumes:
       - ./logs:/app/logs
+    depends_on:
+      - postgres
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/api/monitoring/health" ]
@@ -20,7 +35,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile.prod
     ports:
       - "80:80"
@@ -34,3 +49,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 300 --cleanup
     restart: unless-stopped
+
+volumes:
+  postgres_data:
