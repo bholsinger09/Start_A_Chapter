@@ -22,6 +22,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=production
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/chapterdb
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     volumes:
       - ./logs:/app/logs
     depends_on:
