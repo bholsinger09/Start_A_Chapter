@@ -13,9 +13,10 @@
           <div v-if="currentUser" class="text-end">
             <router-link 
               to="/blog/create" 
-              class="btn btn-primary btn-lg"
+              class="btn btn-primary btn-lg shadow-sm"
+              style="background: linear-gradient(45deg, #0d6efd, #0a58ca); border: none;"
             >
-              <i class="bi bi-plus-circle me-2"></i>Write a Post
+              <i class="bi bi-pencil-square me-2"></i>Write New Post
             </router-link>
           </div>
         </div>
@@ -187,6 +188,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Floating Action Button for Mobile -->
+    <router-link 
+      v-if="currentUser"
+      to="/blog/create" 
+      class="btn btn-primary btn-lg position-fixed d-md-none floating-action-btn"
+      style="bottom: 20px; right: 20px; z-index: 1000; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);"
+      title="Write a new post"
+    >
+      <i class="bi bi-plus-lg fs-4"></i>
+    </router-link>
   </div>
 </template>
 
@@ -478,5 +490,16 @@ export default {
   .btn-group .btn {
     flex: 1;
   }
+}
+
+.floating-action-btn {
+  transition: all 0.3s ease;
+  background: linear-gradient(45deg, #0d6efd, #0a58ca) !important;
+  border: none !important;
+}
+
+.floating-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4) !important;
 }
 </style>

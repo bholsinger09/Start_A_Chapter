@@ -64,17 +64,49 @@
                 <label for="content" class="form-label fw-semibold">
                   <i class="bi bi-text-paragraph me-2"></i>Content *
                 </label>
-                <textarea
-                  class="form-control"
-                  id="content"
-                  v-model="blog.content"
-                  rows="15"
-                  placeholder="Write your blog content here..."
-                  required
-                  :class="{ 'is-invalid': contentError }"
-                ></textarea>
-                <div class="form-text">
-                  {{ blog.content.length.toLocaleString() }} characters
+                <div class="position-relative">
+                  <textarea
+                    ref="contentTextarea"
+                    class="form-control"
+                    id="content"
+                    v-model="blog.content"
+                    rows="15"
+                    placeholder="Write your blog content here... Use @username to mention other users"
+                    required
+                    :class="{ 'is-invalid': contentError }"
+                    @input="handleContentInput"
+                    @keydown="handleContentKeydown"
+                  ></textarea>
+                  
+                  <!-- @mention dropdown -->
+                  <div 
+                    v-if="showMentionSuggestions" 
+                    class="position-absolute bg-white border rounded shadow-sm"
+                    :style="mentionDropdownStyle"
+                    style="z-index: 1000; max-height: 200px; overflow-y: auto;"
+                  >
+                    <div 
+                      v-for="(member, index) in filteredMembers" 
+                      :key="member.id"
+                      class="px-3 py-2 cursor-pointer hover-bg-light d-flex align-items-center"
+                      :class="{ 'bg-primary text-white': index === selectedMentionIndex }"
+                      @click="insertMention(member)"
+                    >
+                      <i class="bi bi-person-circle me-2"></i>
+                      <div>
+                        <div class="fw-semibold">{{ member.firstName }} {{ member.lastName }}</div>
+                        <small class="text-muted">@{{ member.username || `${member.firstName.toLowerCase()}${member.lastName.toLowerCase()}` }}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="form-text d-flex justify-content-between">
+                  <span>{{ blog.content.length.toLocaleString() }} characters • Type @ to mention users</span>
+                  <span class="text-primary">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <small>Mentioned users will be notified</small>
+                  </span>
                 </div>
                 <div v-if="contentError" class="invalid-feedback">
                   {{ contentError }}
@@ -285,12 +317,29 @@ export default {
     const titleError = ref('')
     const contentError = ref('')
 
+    // @mention functionality
+    const showMentionSuggestions = ref(false)
+    const mentionQuery = ref('')
+    const selectedMentionIndex = ref(0)
+    const mentionStartPos = ref(0)
+    const allMembers = ref([])
+    const contentTextarea = ref(null)
+    const mentionDropdownStyle = ref({})
+
     // Computed properties
     const isFormValid = computed(() => {
       return blog.value.title.trim().length > 0 && 
              blog.value.content.trim().length > 0 &&
              !titleError.value && 
              !contentError.value
+    })
+
+    const filteredMembers = computed(() => {
+      if (!mentionQuery.value) return allMembers.value.slice(0, 10)
+      return allMembers.value.filter(member => {
+        const searchText = `${member.firstName} ${member.lastName} ${member.username}`.toLowerCase()
+        return searchText.includes(mentionQuery.value.toLowerCase())
+      }).slice(0, 10)
     })
 
     // Methods
@@ -436,6 +485,90 @@ export default {
       }
     }
 
+    // @mention Methods
+    const loadMembers = async () => {
+      try {
+        const response = await fetch('/api/members')
+        if (response.ok) {
+          allMembers.value = await response.json()
+        }
+      } catch (error) {
+        console.error('Error loading members:', error)
+      }
+    }
+
+    const handleContentInput = (event) => {
+      const textarea = event.target
+      const cursorPos = textarea.selectionStart
+      const textBeforeCursor = blog.value.content.substring(0, cursorPos)
+      const lastAtSymbol = textBeforeCursor.lastIndexOf('@')
+      
+      if (lastAtSymbol >= 0) {
+        const textAfterAt = textBeforeCursor.substring(lastAtSymbol + 1)
+        
+        // Check if we're in a mention context (no spaces after @)
+        if (!textAfterAt.includes(' ') && textAfterAt.length <= 20) {
+          mentionQuery.value = textAfterAt
+          mentionStartPos.value = lastAtSymbol
+          showMentionSuggestions.value = true
+          selectedMentionIndex.value = 0
+          
+          // Position dropdown near cursor
+          const rect = textarea.getBoundingClientRect()
+          const lineHeight = parseInt(getComputedStyle(textarea).lineHeight)
+          const textAreaScrollTop = textarea.scrollTop
+          
+          mentionDropdownStyle.value = {
+            left: '10px',
+            top: `${Math.min(rect.height - 100, (cursorPos / blog.value.content.length) * rect.height - textAreaScrollTop + 25)}px`
+          }
+        } else {
+          showMentionSuggestions.value = false
+        }
+      } else {
+        showMentionSuggestions.value = false
+      }
+    }
+
+    const handleContentKeydown = (event) => {
+      if (!showMentionSuggestions.value) return
+      
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        selectedMentionIndex.value = Math.min(selectedMentionIndex.value + 1, filteredMembers.value.length - 1)
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        selectedMentionIndex.value = Math.max(selectedMentionIndex.value - 1, 0)
+      } else if (event.key === 'Enter' || event.key === 'Tab') {
+        if (filteredMembers.value[selectedMentionIndex.value]) {
+          event.preventDefault()
+          insertMention(filteredMembers.value[selectedMentionIndex.value])
+        }
+      } else if (event.key === 'Escape') {
+        showMentionSuggestions.value = false
+      }
+    }
+
+    const insertMention = (member) => {
+      const username = member.username || `${member.firstName.toLowerCase()}${member.lastName.toLowerCase()}`
+      const mentionText = `@${username}`
+      
+      const beforeMention = blog.value.content.substring(0, mentionStartPos.value)
+      const afterMention = blog.value.content.substring(mentionStartPos.value + mentionQuery.value.length + 1)
+      
+      blog.value.content = beforeMention + mentionText + ' ' + afterMention
+      showMentionSuggestions.value = false
+      
+      // Focus back to textarea and position cursor
+      setTimeout(() => {
+        if (contentTextarea.value) {
+          const newCursorPos = mentionStartPos.value + mentionText.length + 1
+          contentTextarea.value.focus()
+          contentTextarea.value.setSelectionRange(newCursorPos, newCursorPos)
+        }
+      }, 0)
+    }
+
     // Watchers
     watch(() => blog.value.title, (newTitle) => {
       if (titleError.value && newTitle.trim()) {
@@ -452,6 +585,7 @@ export default {
     // Lifecycle
     onMounted(() => {
       checkAuthState()
+      loadMembers()
       
       // Check if we're editing an existing blog
       const editId = route.query.edit
@@ -473,7 +607,16 @@ export default {
       saveBlog,
       previewBlog,
       resetForm,
-      validateForm
+      validateForm,
+      // @mention functionality
+      showMentionSuggestions,
+      filteredMembers,
+      selectedMentionIndex,
+      mentionDropdownStyle,
+      contentTextarea,
+      handleContentInput,
+      handleContentKeydown,
+      insertMention
     }
   }
 }
@@ -483,6 +626,18 @@ export default {
 .form-control:focus {
   border-color: var(--bs-primary);
   box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover-bg-light:hover {
+  background-color: #f8f9fa;
+}
+
+.position-relative textarea {
+  resize: vertical;
 }
 
 .form-control-lg {
