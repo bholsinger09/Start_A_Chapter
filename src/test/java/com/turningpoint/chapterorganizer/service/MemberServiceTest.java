@@ -28,6 +28,9 @@ class MemberServiceTest {
     @Mock
     private ChapterService chapterService;
 
+    @Mock
+    private WebSocketNotificationService notificationService;
+
     @InjectMocks
     private MemberService memberService;
 
