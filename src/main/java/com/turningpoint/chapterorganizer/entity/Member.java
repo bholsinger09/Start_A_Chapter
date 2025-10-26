@@ -64,7 +64,7 @@ public class Member {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id", nullable = true)
-    @JsonBackReference
+    @JsonBackReference("chapter-members")
     private Chapter chapter;
 
     @CreationTimestamp

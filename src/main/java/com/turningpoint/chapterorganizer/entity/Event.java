@@ -1,6 +1,7 @@
 package com.turningpoint.chapterorganizer.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -54,13 +55,15 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("chapter-events")
     private Chapter chapter;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("event-rsvps")
     private List<EventRSVP> rsvps = new ArrayList<>();
 
     @OneToOne(mappedBy = "baseEvent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("event-recurrence")
     private RecurringEvent recurringEvent;
 
     @CreationTimestamp

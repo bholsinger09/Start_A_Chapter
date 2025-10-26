@@ -21,13 +21,13 @@ public class EventRSVP {
     @NotNull(message = "Event is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("event-rsvps")
     private Event event;
 
     @NotNull(message = "Member is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("member-rsvps")
     private Member member;
 
     @NotNull(message = "RSVP status is required")

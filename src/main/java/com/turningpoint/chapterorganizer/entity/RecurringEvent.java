@@ -21,7 +21,7 @@ public class RecurringEvent {
     @NotNull(message = "Base event is required")
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "base_event_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("event-recurrence")
     private Event baseEvent;
 
     @NotNull(message = "Recurrence pattern is required")

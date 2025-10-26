@@ -55,11 +55,11 @@ public class Chapter {
     private Boolean active = true;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference("chapter-members")
     private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference("chapter-events")
     private List<Event> events = new ArrayList<>();
 
     @CreationTimestamp
