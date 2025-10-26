@@ -303,21 +303,28 @@
         Saved Searches
       </h6>
       <div class="d-flex flex-wrap gap-2">
-        <button
+        <div
           v-for="(search, index) in savedSearches"
           :key="`saved-${index}`"
-          class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
-          @click="loadSavedSearch(search)"
-          :title="search.description"
+          class="d-flex align-items-center"
         >
-          <i class="bi bi-bookmark"></i>
-          {{ search.name }}
           <button
-            class="btn-close"
+            class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2 flex-grow-1"
+            @click="loadSavedSearch(search)"
+            :title="search.description"
+          >
+            <i class="bi bi-bookmark"></i>
+            {{ search.name }}
+          </button>
+          <button
+            class="btn btn-outline-danger btn-sm ms-1"
             style="font-size: 0.6em;"
             @click.stop="removeSavedSearch(index)"
-          ></button>
-        </button>
+            title="Remove saved search"
+          >
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
       </div>
     </div>
 

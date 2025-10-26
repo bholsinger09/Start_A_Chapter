@@ -202,9 +202,11 @@ export default {
   methods: {
     checkAuthState() {
       const storedUser = localStorage.getItem('user')
+      console.log('🔍 DEBUG - Checking auth state:', { storedUser, currentUser: this.currentUser })
       if (storedUser) {
         try {
           this.currentUser = JSON.parse(storedUser)
+          console.log('✅ DEBUG - User authenticated:', this.currentUser)
         } catch (error) {
           console.error('Error parsing stored user:', error)
           localStorage.removeItem('user')
@@ -212,6 +214,7 @@ export default {
         }
       } else {
         this.currentUser = null
+        console.log('❌ DEBUG - No user in localStorage')
       }
     },
     logout() {

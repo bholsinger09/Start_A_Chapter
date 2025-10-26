@@ -1,10 +1,10 @@
-import { apiClient } from './api.js'
+import api from './api.js'
 
 export const blogService = {
   // Blog operations
   async getAllBlogs(page = 0, size = 10) {
     try {
-      const response = await apiClient.get(`/blogs?page=${page}&size=${size}`)
+      const response = await api.get(`/blogs?page=${page}&size=${size}`)
       return {
         success: true,
         data: response.data
