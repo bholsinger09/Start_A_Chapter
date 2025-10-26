@@ -43,6 +43,13 @@
               </router-link>
             </li>
             
+            <!-- Blog link - only visible when logged in -->
+            <li v-if="currentUser" class="nav-item">
+              <router-link class="nav-link" to="/blog" active-class="active">
+                <i class="bi bi-journal-text me-1"></i>Blog
+              </router-link>
+            </li>
+            
             <!-- Show login/register or user info based on authentication state -->
             <li v-if="!currentUser" class="nav-item">
               <router-link class="nav-link" to="/login" active-class="active">

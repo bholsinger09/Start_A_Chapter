@@ -7,6 +7,9 @@ import Events from '../views/Events.vue'
 import ChapterDetail from '../views/ChapterDetail.vue'
 import Login from '../views/Login.vue'
 import Registration from '../views/Registration.vue'
+import Blog from '../views/Blog.vue'
+import BlogDetail from '../views/BlogDetail.vue'
+import BlogCreate from '../views/BlogCreate.vue'
 
 const routes = [
   {
@@ -44,6 +47,23 @@ const routes = [
     path: '/register',
     name: 'Registration',
     component: Registration
+  },
+  {
+    path: '/blog',
+    name: 'Blog',
+    component: Blog
+  },
+  {
+    path: '/blog/create',
+    name: 'BlogCreate',
+    component: BlogCreate,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/blog/:id',
+    name: 'BlogDetail',
+    component: BlogDetail,
+    props: true
   }
 ]
 
