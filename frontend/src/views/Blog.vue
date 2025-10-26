@@ -23,6 +23,28 @@
       </div>
     </div>
 
+    <!-- Create Post Call-to-Action (Always Visible when Logged In) -->
+    <div v-if="currentUser" class="row mb-4">
+      <div class="col-12">
+        <div class="card bg-primary text-white">
+          <div class="card-body text-center py-4">
+            <h4 class="card-title mb-3">
+              <i class="bi bi-lightbulb me-2"></i>Share Your Story
+            </h4>
+            <p class="card-text mb-3">
+              Connect with fellow students by sharing your experiences, thoughts, and insights.
+            </p>
+            <router-link 
+              to="/blog/create" 
+              class="btn btn-light btn-lg"
+            >
+              <i class="bi bi-pencil-square me-2"></i>Create New Post
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Search and Filters -->
     <div class="row mb-4">
       <div class="col-md-8">
