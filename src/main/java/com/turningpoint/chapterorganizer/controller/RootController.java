@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.nio.charset.StandardCharsets;
-import java.io.IOException;
 
 @RestController
 @CrossOrigin(origins = "*")

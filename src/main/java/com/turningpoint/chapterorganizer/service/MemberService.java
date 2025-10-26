@@ -30,9 +30,6 @@ public class MemberService {
         this.notificationService = notificationService;
     }
 
-    /**
-     * Create a new member
-     */
     public Member createMember(Member member) {
         // Check if email already exists
         if (memberRepository.existsByEmail(member.getEmail())) {
@@ -68,9 +65,6 @@ public class MemberService {
         return savedMember;
     }
 
-    /**
-     * Create a new member from CreateMemberRequest
-     */
     public Member createMember(CreateMemberRequest request) {
         // Check if email already exists
         if (memberRepository.existsByEmail(request.getEmail())) {

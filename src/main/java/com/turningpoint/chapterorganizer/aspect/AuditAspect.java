@@ -6,7 +6,6 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
@@ -160,9 +159,6 @@ public class AuditAspect {
         try {
             // This is a simple example - in real implementation you'd measure execution time
             long executionTime = System.currentTimeMillis() % 1000; // Simplified for demo
-            
-            String methodName = joinPoint.getSignature().getName();
-            String className = joinPoint.getTarget().getClass().getSimpleName();
             
             // Record API response time metric
             auditService.recordApiResponseTime(executionTime);

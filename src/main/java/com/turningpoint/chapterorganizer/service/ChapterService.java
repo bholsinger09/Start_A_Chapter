@@ -1,8 +1,6 @@
 package com.turningpoint.chapterorganizer.service;
 
 import com.turningpoint.chapterorganizer.entity.Chapter;
-import com.turningpoint.chapterorganizer.entity.Member;
-import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.repository.ChapterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -156,7 +154,6 @@ public class ChapterService {
                 
         } catch (Exception e) {
             System.err.println("Fallback search also failed: " + e.getMessage());
-            e.printStackTrace();
             // Return empty list as last resort
             return new ArrayList<>();
         }
