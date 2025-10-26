@@ -20,9 +20,12 @@ public class AdminController {
     @PostMapping("/fix-schema")
     public Map<String, Object> fixSchema() {
         Map<String, Object> response = new HashMap<>();
+        Connection connection = null;
+        Statement statement = null;
+        
         try {
-            Connection connection = dataSource.getConnection();
-            Statement statement = connection.createStatement();
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
             
             // First, try to drop the constraint if it exists
             try {
@@ -34,12 +37,29 @@ public class AdminController {
                 response.put("message", "Failed to remove constraint: " + e.getMessage());
             }
             
-            statement.close();
-            connection.close();
-            
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Database error: " + e.getMessage());
+            if (e.getMessage().contains("createStatement")) {
+                response.put("message", "Database error: Statement creation failed");
+            } else {
+                response.put("message", "Database error: " + e.getMessage());
+            }
+        } finally {
+            // Clean up resources in reverse order
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (Exception e) {
+                    // Log but don't override main response
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (Exception e) {
+                    // Log but don't override main response
+                }
+            }
         }
         
         return response;
