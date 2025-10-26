@@ -299,4 +299,64 @@ class ChapterControllerTest {
 
         verify(chapterService).getAllActiveChapters();
     }
+
+    @Test
+    void reactivateChapter_ShouldReturnUpdatedChapter_WhenExists() throws Exception {
+        // Given
+        Chapter activatedChapter = testChapter;
+        activatedChapter.setActive(true);
+        when(chapterService.reactivateChapter(1L)).thenReturn(activatedChapter);
+
+        // When & Then
+        mockMvc.perform(put("/api/chapters/1/activate")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Test Chapter"))
+                .andExpect(jsonPath("$.active").value(true));
+
+        verify(chapterService).reactivateChapter(1L);
+    }
+
+    @Test
+    void reactivateChapter_ShouldReturnNotFound_WhenNotExists() throws Exception {
+        // Given
+        when(chapterService.reactivateChapter(999L)).thenThrow(new RuntimeException("Chapter not found"));
+
+        // When & Then
+        mockMvc.perform(put("/api/chapters/999/activate")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+
+        verify(chapterService).reactivateChapter(999L);
+    }
+
+    @Test
+    void getChaptersByState_ShouldReturnChaptersInState() throws Exception {
+        // Given
+        List<Chapter> stateChapters = Arrays.asList(testChapter);
+        when(chapterService.searchChaptersByState("CA")).thenReturn(stateChapters);
+
+        // When & Then
+        mockMvc.perform(get("/api/chapters/state/CA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Test Chapter"));
+
+        verify(chapterService).searchChaptersByState("CA");
+    }
+
+    @Test
+    void getChaptersByState_ShouldReturnEmptyList_WhenNoChaptersInState() throws Exception {
+        // Given
+        when(chapterService.searchChaptersByState("AK")).thenReturn(Arrays.asList());
+
+        // When & Then
+        mockMvc.perform(get("/api/chapters/state/AK"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+
+        verify(chapterService).searchChaptersByState("AK");
+    }
 }
