@@ -10,15 +10,6 @@
             </h1>
             <p class="lead text-muted">Share your thoughts and connect with fellow students</p>
           </div>
-          <div v-if="currentUser" class="text-end">
-            <router-link 
-              to="/blog/create" 
-              class="btn btn-primary btn-lg shadow-sm"
-              style="background: linear-gradient(45deg, #0d6efd, #0a58ca); border: none;"
-            >
-              <i class="bi bi-pencil-square me-2"></i>Write New Post
-            </router-link>
-          </div>
         </div>
       </div>
     </div>
