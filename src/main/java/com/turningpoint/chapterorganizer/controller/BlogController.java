@@ -79,6 +79,10 @@ public class BlogController {
     // Create new blog
     @PostMapping
     public ResponseEntity<Map<String, Object>> createBlog(@RequestBody Blog blog) {
+        System.out.println("DEBUG: BlogController.createBlog called");
+        System.out.println("DEBUG: Blog title: " + (blog != null ? blog.getTitle() : "null"));
+        System.out.println("DEBUG: Blog author: " + (blog != null && blog.getAuthor() != null ? blog.getAuthor().getId() : "null"));
+        
         try {
             Blog createdBlog = blogService.createBlog(blog);
             
@@ -88,6 +92,9 @@ public class BlogController {
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
+            System.err.println("DEBUG: Exception in BlogController: " + e.getMessage());
+            e.printStackTrace();
+            
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "Failed to create blog");
             errorResponse.put("message", e.getMessage());

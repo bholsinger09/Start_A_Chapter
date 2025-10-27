@@ -343,12 +343,15 @@ export default {
     })
 
     // Methods
-    const checkAuthState = () => {
+    const checkAuthState = async () => {
       try {
         const storedUser = localStorage.getItem('user')
         if (storedUser) {
-          currentUser.value = JSON.parse(storedUser)
-          blog.value.author = { id: currentUser.value.id }
+          const userData = JSON.parse(storedUser)
+          currentUser.value = userData
+          
+          // Fetch the full member details to get the member ID
+          await fetchMemberDetails(userData.username)
         } else {
           currentUser.value = null
           router.push('/login')
@@ -357,6 +360,38 @@ export default {
         console.error('Error parsing stored user:', error)
         currentUser.value = null
         router.push('/login')
+      }
+    }
+
+    const fetchMemberDetails = async (username) => {
+      try {
+        console.log('🔍 Fetching member details for username:', username)
+        const response = await fetch(`/api/members/username/${username}`)
+        console.log('📡 Member API response status:', response.status)
+        
+        if (response.ok) {
+          const member = await response.json()
+          console.log('✅ Member details fetched:', member)
+          
+          // Update current user with member details including ID
+          currentUser.value = {
+            ...currentUser.value,
+            id: member.id,
+            firstName: member.firstName,
+            lastName: member.lastName,
+            email: member.email,
+            role: member.role
+          }
+          // Set author for blog creation with member ID
+          blog.value.author = { id: member.id }
+          console.log('🎯 Author set for blog:', blog.value.author)
+        } else {
+          console.error('❌ Failed to fetch member details. Status:', response.status, 'Text:', response.statusText)
+          error.value = `Failed to load user details (Status: ${response.status})`
+        }
+      } catch (err) {
+        console.error('💥 Error fetching member details:', err)
+        error.value = 'Failed to load user details - network error'
       }
     }
 
@@ -430,30 +465,31 @@ export default {
             published: blog.value.published
           })
         } else {
-          result = await blogService.createBlog({
+          const blogData = {
             title: blog.value.title.trim(),
             content: blog.value.content.trim(),
             published: blog.value.published,
             author: blog.value.author
-          })
+          }
+          console.log('📝 Creating blog with data:', blogData)
+          console.log('👤 Current user state:', currentUser.value)
+          
+          result = await blogService.createBlog(blogData)
+          console.log('📤 Blog creation result:', result)
         }
         
         if (result.success) {
-          // Close preview modal if open
+          // Close preview modal if open (handle Bootstrap availability gracefully)
           const previewModal = document.getElementById('previewModal')
-          if (previewModal) {
-            const modal = bootstrap.Modal.getInstance(previewModal)
+          if (previewModal && typeof window.bootstrap !== 'undefined') {
+            const modal = window.bootstrap.Modal.getInstance(previewModal)
             if (modal) {
               modal.hide()
             }
           }
           
-          // Redirect to blog detail or list
-          if (result.data.blog && result.data.blog.id) {
-            router.push(`/blog/${result.data.blog.id}`)
-          } else {
-            router.push('/blog')
-          }
+          // Redirect to blog list (detail pages not implemented yet)
+          router.push('/blog')
         } else {
           error.value = result.error
         }
@@ -468,8 +504,14 @@ export default {
     const previewBlog = () => {
       if (!validateForm()) return
       
-      const previewModal = new bootstrap.Modal(document.getElementById('previewModal'))
-      previewModal.show()
+      // Handle Bootstrap availability gracefully
+      if (typeof window.bootstrap !== 'undefined') {
+        const previewModal = new window.bootstrap.Modal(document.getElementById('previewModal'))
+        previewModal.show()
+      } else {
+        // Fallback: just show alert if Bootstrap not available
+        alert('Preview feature requires Bootstrap to be loaded')
+      }
     }
 
     const resetForm = () => {
@@ -478,7 +520,7 @@ export default {
           title: '',
           content: '',
           published: false,
-          author: currentUser.value ? { id: currentUser.value.id } : null
+          author: currentUser.value?.id ? { id: currentUser.value.id } : null
         }
         titleError.value = ''
         contentError.value = ''
@@ -583,8 +625,8 @@ export default {
     })
 
     // Lifecycle
-    onMounted(() => {
-      checkAuthState()
+    onMounted(async () => {
+      await checkAuthState()
       loadMembers()
       
       // Check if we're editing an existing blog
@@ -608,6 +650,7 @@ export default {
       previewBlog,
       resetForm,
       validateForm,
+      fetchMemberDetails,
       // @mention functionality
       showMentionSuggestions,
       filteredMembers,

@@ -68,6 +68,14 @@ public class MemberController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // GET /api/members/username/{username} - Get member by username
+    @GetMapping("/username/{username}")
+    public ResponseEntity<Member> getMemberByUsername(@PathVariable String username) {
+        Optional<Member> member = memberService.getMemberByUsername(username);
+        return member.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // GET /api/members/chapter/{chapterId} - Get members by chapter
     @GetMapping("/chapter/{chapterId}")
     public ResponseEntity<List<Member>> getMembersByChapter(@PathVariable Long chapterId) {

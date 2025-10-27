@@ -46,9 +46,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Check if data already exists
-        if (chapterRepository.count() > 0) {
-            System.out.println("Data already exists, skipping initialization...");
+        // Check if test user already exists (more specific check)
+        if (memberRepository.existsByUsername("testuser")) {
+            System.out.println("Test user already exists, skipping initialization...");
             return;
         }
 
@@ -57,14 +57,14 @@ public class DataInitializer implements CommandLineRunner {
         // Create chapters for all 50 US states with realistic universities
         Chapter[] chapters = createAllStateChapters();
         
-        // Create members for each chapter
+        // CREATE TEST USER FIRST with predictable ID
+        createTestUserWithPermissions(chapters[0]); // Use first chapter
+        
+        // Create members for each chapter (after test user)
         createMembersForAllChapters(chapters);
         
         // Create events for each chapter
         createEventsForAllChapters(chapters);
-        
-        // Create test user with roles and permissions
-        createTestUserWithPermissions(chapters[0]); // Use first chapter
 
         System.out.println("Sample data initialization completed successfully!");
         System.out.println("Created " + chapterRepository.count() + " chapters, " + 
@@ -500,7 +500,7 @@ public class DataInitializer implements CommandLineRunner {
                 roleRepository.save(testRole);
             }
             
-            // Create test user
+            // Create test user (this will be the FIRST member created, so ID will be predictable)
             Member testUser = new Member();
             testUser.setFirstName("Test");
             testUser.setLastName("User");
@@ -514,6 +514,8 @@ public class DataInitializer implements CommandLineRunner {
             testUser.setGraduationYear("2025");
             testUser.setChapter(chapter);
             testUser = memberRepository.save(testUser);
+            
+            System.out.println("Test user created with ID: " + testUser.getId());
             
             // Assign role to test user
             UserRole userRole = new UserRole();

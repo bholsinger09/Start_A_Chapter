@@ -19,7 +19,7 @@ export const blogService = {
 
     async getAllBlogsList() {
         try {
-            const response = await apiClient.get('/blogs/list')
+            const response = await api.get('/blogs/list')
             return {
                 success: true,
                 data: response.data
@@ -34,7 +34,7 @@ export const blogService = {
 
     async getBlogById(id) {
         try {
-            const response = await apiClient.get(`/blogs/${id}`)
+            const response = await api.get(`/blogs/${id}`)
             return {
                 success: true,
                 data: response.data
@@ -49,7 +49,7 @@ export const blogService = {
 
     async createBlog(blogData) {
         try {
-            const response = await apiClient.post('/blogs', blogData)
+            const response = await api.post('/blogs', blogData)
             return {
                 success: true,
                 data: response.data
@@ -64,7 +64,7 @@ export const blogService = {
 
     async updateBlog(id, blogData) {
         try {
-            const response = await apiClient.put(`/blogs/${id}`, blogData)
+            const response = await api.put(`/blogs/${id}`, blogData)
             return {
                 success: true,
                 data: response.data
@@ -79,7 +79,7 @@ export const blogService = {
 
     async deleteBlog(id) {
         try {
-            const response = await apiClient.delete(`/blogs/${id}`)
+            const response = await api.delete(`/blogs/${id}`)
             return {
                 success: true,
                 data: response.data
@@ -94,7 +94,7 @@ export const blogService = {
 
     async publishBlog(id) {
         try {
-            const response = await apiClient.put(`/blogs/${id}/publish`)
+            const response = await api.put(`/blogs/${id}/publish`)
             return {
                 success: true,
                 data: response.data
@@ -109,7 +109,7 @@ export const blogService = {
 
     async unpublishBlog(id) {
         try {
-            const response = await apiClient.put(`/blogs/${id}/unpublish`)
+            const response = await api.put(`/blogs/${id}/unpublish`)
             return {
                 success: true,
                 data: response.data
@@ -124,7 +124,7 @@ export const blogService = {
 
     async getBlogsByAuthor(authorId, page = 0, size = 10, includeUnpublished = false) {
         try {
-            const response = await apiClient.get(`/blogs/author/${authorId}?page=${page}&size=${size}&includeUnpublished=${includeUnpublished}`)
+            const response = await api.get(`/blogs/author/${authorId}?page=${page}&size=${size}&includeUnpublished=${includeUnpublished}`)
             return {
                 success: true,
                 data: response.data
@@ -139,7 +139,7 @@ export const blogService = {
 
     async searchBlogs(keyword) {
         try {
-            const response = await apiClient.get(`/blogs/search?keyword=${encodeURIComponent(keyword)}`)
+            const response = await api.get(`/blogs/search?keyword=${encodeURIComponent(keyword)}`)
             return {
                 success: true,
                 data: response.data
@@ -154,7 +154,7 @@ export const blogService = {
 
     async getRecentBlogs(days = 7) {
         try {
-            const response = await apiClient.get(`/blogs/recent?days=${days}`)
+            const response = await api.get(`/blogs/recent?days=${days}`)
             return {
                 success: true,
                 data: response.data
@@ -169,7 +169,7 @@ export const blogService = {
 
     async getPopularBlogs(limit = 10) {
         try {
-            const response = await apiClient.get(`/blogs/popular?limit=${limit}`)
+            const response = await api.get(`/blogs/popular?limit=${limit}`)
             return {
                 success: true,
                 data: response.data
@@ -184,7 +184,7 @@ export const blogService = {
 
     async getBlogStats() {
         try {
-            const response = await apiClient.get('/blogs/stats')
+            const response = await api.get('/blogs/stats')
             return {
                 success: true,
                 data: response.data
@@ -200,7 +200,7 @@ export const blogService = {
     // Comment operations
     async getCommentsByBlog(blogId, page = 0, size = 20) {
         try {
-            const response = await apiClient.get(`/comments/blog/${blogId}?page=${page}&size=${size}`)
+            const response = await api.get(`/comments/blog/${blogId}?page=${page}&size=${size}`)
             return {
                 success: true,
                 data: response.data
@@ -215,7 +215,7 @@ export const blogService = {
 
     async getCommentsByBlogList(blogId) {
         try {
-            const response = await apiClient.get(`/comments/blog/${blogId}/list`)
+            const response = await api.get(`/comments/blog/${blogId}/list`)
             return {
                 success: true,
                 data: response.data
@@ -230,7 +230,7 @@ export const blogService = {
 
     async getCommentsByAuthor(authorId) {
         try {
-            const response = await apiClient.get(`/comments/author/${authorId}`)
+            const response = await api.get(`/comments/author/${authorId}`)
             return {
                 success: true,
                 data: response.data
@@ -245,7 +245,7 @@ export const blogService = {
 
     async createComment(commentData) {
         try {
-            const response = await apiClient.post('/comments', commentData)
+            const response = await api.post('/comments', commentData)
             return {
                 success: true,
                 data: response.data
@@ -260,7 +260,7 @@ export const blogService = {
 
     async createCommentForBlog(blogId, content, authorId) {
         try {
-            const response = await apiClient.post(`/comments/blog/${blogId}`, {
+            const response = await api.post(`/comments/blog/${blogId}`, {
                 content,
                 authorId
             })
@@ -278,7 +278,7 @@ export const blogService = {
 
     async updateComment(id, content) {
         try {
-            const response = await apiClient.put(`/comments/${id}`, { content })
+            const response = await api.put(`/comments/${id}`, { content })
             return {
                 success: true,
                 data: response.data
@@ -293,7 +293,7 @@ export const blogService = {
 
     async deleteComment(id) {
         try {
-            const response = await apiClient.delete(`/comments/${id}`)
+            const response = await api.delete(`/comments/${id}`)
             return {
                 success: true,
                 data: response.data
@@ -308,7 +308,7 @@ export const blogService = {
 
     async getCommentCount(blogId) {
         try {
-            const response = await apiClient.get(`/comments/blog/${blogId}/count`)
+            const response = await api.get(`/comments/blog/${blogId}/count`)
             return {
                 success: true,
                 data: response.data

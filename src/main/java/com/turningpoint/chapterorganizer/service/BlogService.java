@@ -41,15 +41,30 @@ public class BlogService {
     }
 
     public Blog createBlog(Blog blog) {
+        System.out.println("DEBUG: createBlog method called");
+        
         if (blog.getAuthor() == null || blog.getAuthor().getId() == null) {
+            System.out.println("DEBUG: Blog author is null or ID is null");
             throw new RuntimeException("Blog must have an author");
         }
         
-        Member author = memberRepository.findById(blog.getAuthor().getId())
-                .orElseThrow(() -> new RuntimeException("Member not found with id: " + blog.getAuthor().getId()));
+        Long authorId = blog.getAuthor().getId();
+        System.out.println("DEBUG: Looking for member with ID: " + authorId);
         
+        Member author = memberRepository.findById(authorId)
+                .orElseThrow(() -> {
+                    System.err.println("ERROR: Member not found with id: " + authorId);
+                    // Let's also check if any members exist
+                    long totalMembers = memberRepository.count();
+                    System.err.println("ERROR: Total members in database: " + totalMembers);
+                    return new RuntimeException("Member not found with id: " + authorId);
+                });
+        
+        System.out.println("DEBUG: Found member: " + author.getFirstName() + " " + author.getLastName());
         blog.setAuthor(author);
-        return blogRepository.save(blog);
+        Blog savedBlog = blogRepository.save(blog);
+        System.out.println("DEBUG: Blog saved with ID: " + savedBlog.getId());
+        return savedBlog;
     }
 
     @Transactional(readOnly = true)
