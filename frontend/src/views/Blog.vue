@@ -24,23 +24,22 @@
     </div>
 
     <!-- Create Post Call-to-Action (Always Visible when Logged In) -->
-    <div v-if="currentUser" class="row mb-4">
-      <div class="col-12">
-        <div class="card bg-primary text-white">
-          <div class="card-body text-center py-4">
-            <h4 class="card-title mb-3">
-              <i class="bi bi-lightbulb me-2"></i>Share Your Story
-            </h4>
-            <p class="card-text mb-3">
-              Connect with fellow students by sharing your experiences, thoughts, and insights.
-            </p>
-            <router-link 
-              to="/blog/create" 
-              class="btn btn-light btn-lg"
-            >
-              <i class="bi bi-pencil-square me-2"></i>Create New Post
-            </router-link>
-          </div>
+        <!-- Prominent Create Button Card - Always visible when authenticated -->
+    <div v-if="currentUser" class="mb-4">
+      <div class="card bg-gradient-primary text-white">
+        <div class="card-body text-center py-4">
+          <h4 class="card-title mb-3">
+            <i class="bi bi-lightbulb me-2"></i>Share Your Story
+          </h4>
+          <p class="card-text mb-3">
+            Connect with fellow students by sharing your experiences, thoughts, and insights.
+          </p>
+          <router-link 
+            to="/blog/create" 
+            class="btn btn-light btn-lg"
+          >
+            <i class="bi bi-pencil-square me-2"></i>Create New Post
+          </router-link>
         </div>
       </div>
     </div>
@@ -120,13 +119,36 @@
         <span v-if="isSearchActive">Try adjusting your search terms.</span>
         <span v-else>Be the first to share your story!</span>
       </p>
-      <router-link 
-        v-if="currentUser && !isSearchActive" 
-        to="/blog/create" 
-        class="btn btn-primary"
-      >
-        <i class="bi bi-plus-circle me-2"></i>Write the First Post
-      </router-link>
+      
+      <!-- Always show create button for authenticated users -->
+      <div v-if="currentUser" class="mt-4">
+        <router-link 
+          to="/blog/create" 
+          class="btn btn-primary btn-lg"
+        >
+          <i class="bi bi-plus-circle me-2"></i>Write the First Post
+        </router-link>
+      </div>
+      
+      <!-- Also add a large prominent button here -->
+      <div v-if="currentUser" class="mt-4">
+        <div class="card bg-primary text-white mx-auto" style="max-width: 500px;">
+          <div class="card-body text-center py-4">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-lightbulb me-2"></i>Share Your Story
+            </h5>
+            <p class="card-text mb-3">
+              Connect with fellow students by sharing your experiences, thoughts, and insights.
+            </p>
+            <router-link 
+              to="/blog/create" 
+              class="btn btn-light btn-lg"
+            >
+              <i class="bi bi-pencil-square me-2"></i>Create New Post
+            </router-link>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Blog Posts Grid -->

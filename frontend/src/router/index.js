@@ -56,8 +56,7 @@ const routes = [
   {
     path: '/blog/create',
     name: 'BlogCreate',
-    component: BlogCreate,
-    meta: { requiresAuth: true }
+    component: BlogCreate
   },
   {
     path: '/blog/:id',
