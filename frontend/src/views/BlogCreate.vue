@@ -345,7 +345,7 @@ export default {
     // Methods
     const checkAuthState = () => {
       try {
-        const storedUser = localStorage.getItem('currentUser')
+        const storedUser = localStorage.getItem('user')
         if (storedUser) {
           currentUser.value = JSON.parse(storedUser)
           blog.value.author = { id: currentUser.value.id }
