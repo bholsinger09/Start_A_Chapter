@@ -106,8 +106,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Long countByChapter(com.turningpoint.chapterorganizer.entity.Chapter chapter);
     Long countByChapterAndCreatedAtAfter(com.turningpoint.chapterorganizer.entity.Chapter chapter, LocalDateTime after);
     List<Event> findTop10ByOrderByCreatedAtDesc();
-    List<Event> findByEventDateBetweenOrderByEventDateAsc(LocalDateTime start, LocalDateTime end);
     List<Event> findByEventDateTimeBetweenOrderByEventDateTimeAsc(LocalDateTime start, LocalDateTime end);
-    Long countByChapterAndEventDateAfter(com.turningpoint.chapterorganizer.entity.Chapter chapter, LocalDateTime after);
     Long countByChapterAndEventDateTimeAfter(com.turningpoint.chapterorganizer.entity.Chapter chapter, LocalDateTime after);
 }

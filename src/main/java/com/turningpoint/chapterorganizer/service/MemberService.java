@@ -21,13 +21,15 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ChapterService chapterService;
     private final WebSocketNotificationService notificationService;
+    private final ActivityService activityService;
 
     @Autowired
     public MemberService(MemberRepository memberRepository, ChapterService chapterService, 
-                        WebSocketNotificationService notificationService) {
+                        WebSocketNotificationService notificationService, ActivityService activityService) {
         this.memberRepository = memberRepository;
         this.chapterService = chapterService;
         this.notificationService = notificationService;
+        this.activityService = activityService;
     }
 
     public Member createMember(Member member) {
@@ -60,6 +62,9 @@ public class MemberService {
         if (savedMember.getChapter() != null) {
             String memberName = savedMember.getFirstName() + " " + savedMember.getLastName();
             notificationService.broadcastMemberJoined(memberName, savedMember.getChapter().getId());
+            
+            // Log activity for member joining chapter
+            activityService.logMemberJoined(savedMember, savedMember.getChapter());
         }
         
         return savedMember;
@@ -88,7 +93,12 @@ public class MemberService {
         member.setChapter(chapter.get());
         member.setActive(true);
 
-        return memberRepository.save(member);
+        Member savedMember = memberRepository.save(member);
+        
+        // Log activity for member joining chapter
+        activityService.logMemberJoined(savedMember, savedMember.getChapter());
+        
+        return savedMember;
     }
 
     /**
@@ -302,8 +312,17 @@ public class MemberService {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
 
+        MemberRole oldRole = member.getRole();
         member.setRole(newRole);
-        return memberRepository.save(member);
+        Member updatedMember = memberRepository.save(member);
+        
+        // Log role change activity (using the member themselves as the actor for now)
+        // In a real app, you'd pass the admin who made the change
+        if (oldRole != newRole) {
+            activityService.logRoleChange(member, oldRole, newRole, member);
+        }
+        
+        return updatedMember;
     }
 
     /**

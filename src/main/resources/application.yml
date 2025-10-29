@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: Campus Chapter Organizer
+  datasource:
+    url: jdbc:h2:mem:chapterdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      static-locations: classpath:/static/
+      cache:
+        period: 0
+  security:
+    basic:
+      enabled: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.turningpoint.chapterorganizer: DEBUG
+    org.hibernate.SQL: WARN
+
+# Disable ABAC security temporarily
+abac:
+  enabled: false
+security:
+  abac:
+    enabled: false
