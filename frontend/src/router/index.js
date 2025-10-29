@@ -10,6 +10,7 @@ import Registration from '../views/Registration.vue'
 import Blog from '../views/Blog.vue'
 import BlogDetail from '../views/BlogDetail.vue'
 import BlogCreate from '../views/BlogCreate.vue'
+import About from '../views/About.vue'
 
 const routes = [
   {
@@ -63,6 +64,11 @@ const routes = [
     name: 'BlogDetail',
     component: BlogDetail,
     props: true
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: About
   }
 ]
 

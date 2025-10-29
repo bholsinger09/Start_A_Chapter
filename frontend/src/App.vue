@@ -50,6 +50,13 @@
               </router-link>
             </li>
             
+            <!-- About link - always visible -->
+            <li class="nav-item">
+              <router-link class="nav-link" to="/about" active-class="active">
+                <i class="bi bi-info-circle me-1"></i>About
+              </router-link>
+            </li>
+            
             <!-- Show login/register or user info based on authentication state -->
             <li v-if="!currentUser" class="nav-item">
               <router-link class="nav-link" to="/login" active-class="active">
