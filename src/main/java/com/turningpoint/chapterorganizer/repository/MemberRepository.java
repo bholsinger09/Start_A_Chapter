@@ -109,4 +109,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     
     // Find recent members
     List<Member> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime after);
+    
+    // Additional methods for analytics
+    List<Member> findTop10ByOrderByCreatedAtDesc();
+    Long countByChapter(com.turningpoint.chapterorganizer.entity.Chapter chapter);
+    Long countByChapterAndActiveTrue(com.turningpoint.chapterorganizer.entity.Chapter chapter);
+    Long countByChapterAndCreatedAtAfter(com.turningpoint.chapterorganizer.entity.Chapter chapter, LocalDateTime after);
 }
