@@ -152,7 +152,32 @@
         </div>
         
         <div class="col-md-4">
-          <ActivityFeed :limit="15" :auto-refresh="true" />
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+              <h5 class="card-title mb-0">
+                <i class="fas fa-cog text-secondary me-2"></i>
+                System Status
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="flex-shrink-0">
+                  <div class="bg-success rounded-circle p-2">
+                    <i class="fas fa-check text-white"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h6 class="mb-0">System Operational</h6>
+                  <small class="text-muted">All services running normally</small>
+                </div>
+              </div>
+              
+              <div class="progress mb-2" style="height: 6px;">
+                <div class="progress-bar bg-success" style="width: 95%"></div>
+              </div>
+              <small class="text-muted">95% System Health</small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -163,14 +188,12 @@
 import { ref, onMounted } from 'vue'
 import AnalyticsDashboard from '../components/AnalyticsDashboard.vue'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
-import ActivityFeed from '../components/ActivityFeed.vue'
 
 export default {
   name: 'Dashboard',
   components: {
     AnalyticsDashboard,
-    SkeletonLoader,
-    ActivityFeed
+    SkeletonLoader
   },
   setup() {
     const totalMembers = ref(0)

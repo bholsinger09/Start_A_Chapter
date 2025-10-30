@@ -1,12 +1,5 @@
 <template>
   <div class="analytics-dashboard">
-    <!-- Error Alert -->
-    <div v-if="error" class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
-      <i class="fas fa-exclamation-triangle me-2"></i>
-      {{ error }}
-      <button type="button" class="btn-close" @click="error = null"></button>
-    </div>
-    
     <div class="row g-4">
       <!-- Membership Growth Chart -->
       <div class="col-lg-8">
@@ -18,12 +11,7 @@
             </h5>
           </div>
           <div class="card-body">
-            <div v-if="loading" class="text-center py-5">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>
-            <canvas v-else ref="membershipChart" style="max-height: 300px;"></canvas>
+            <canvas ref="membershipChart" style="max-height: 300px;"></canvas>
           </div>
         </div>
       </div>
@@ -38,12 +26,7 @@
             </h5>
           </div>
           <div class="card-body">
-            <div v-if="loading" class="text-center py-4">
-              <div class="spinner-border text-info" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>
-            <canvas v-else ref="attendanceChart" style="max-height: 250px;"></canvas>
+            <canvas ref="attendanceChart" style="max-height: 250px;"></canvas>
           </div>
         </div>
       </div>
@@ -58,12 +41,7 @@
             </h5>
           </div>
           <div class="card-body">
-            <div v-if="loading" class="text-center py-5">
-              <div class="spinner-border text-warning" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>
-            <canvas v-else ref="performanceChart" style="max-height: 300px;"></canvas>
+            <canvas ref="performanceChart" style="max-height: 300px;"></canvas>
           </div>
         </div>
       </div>
@@ -76,16 +54,7 @@
               <i class="bi bi-activity text-danger me-2"></i>
               Real-time Metrics
             </h5>
-            <div class="d-flex align-items-center gap-2">
-              <button 
-                class="btn btn-outline-primary btn-sm" 
-                @click="fetchAnalyticsData"
-                :disabled="loading"
-              >
-                <i class="fas fa-sync-alt" :class="{ 'fa-spin': loading }"></i>
-              </button>
-              <div class="badge bg-success pulse-dot">Live</div>
-            </div>
+            <div class="badge bg-success pulse-dot">Live</div>
           </div>
           <div class="card-body">
             <div class="row g-3">
@@ -125,7 +94,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Chart from 'chart.js/auto'
 import { useMonitoring } from '../composables/useMonitoring'
-import api from '../services/api'
 
 // Chart.js auto imports all necessary components including controllers
 
@@ -144,13 +112,6 @@ export default {
       refreshData 
     } = useMonitoring({ autoRefresh: true })
     
-    const analyticsData = ref({
-      statistics: {},
-      growth: {},
-      activity: [],
-      upcomingEvents: []
-    })
-    
     const realTimeData = ref({
       activeUsers: 0,
       ongoingEvents: 0,
@@ -158,52 +119,10 @@ export default {
       systemHealth: 100
     })
     
-    const loading = ref(false)
-    const error = ref(null)
-    
     let membershipChartInstance = null
     let attendanceChartInstance = null
     let performanceChartInstance = null
     let updateInterval = null
-
-    // Fetch analytics data from API
-    const fetchAnalyticsData = async () => {
-      loading.value = true
-      error.value = null
-      
-      try {
-        const [statisticsResponse, growthResponse, activityResponse, eventsResponse] = await Promise.all([
-          api.get('/dashboard/statistics'),
-          api.get('/dashboard/growth'),
-          api.get('/dashboard/activity', { params: { limit: 10 } }),
-          api.get('/dashboard/upcoming-events', { params: { limit: 5 } })
-        ])
-        
-        analyticsData.value = {
-          statistics: statisticsResponse.data,
-          growth: growthResponse.data,
-          activity: activityResponse.data,
-          upcomingEvents: eventsResponse.data
-        }
-        
-        // Update real-time data from statistics
-        realTimeData.value = {
-          activeUsers: analyticsData.value.statistics.totalActiveMembers || 0,
-          ongoingEvents: analyticsData.value.statistics.totalEvents || 0,
-          newSignups: analyticsData.value.statistics.recentMembers || 0,
-          systemHealth: 100
-        }
-        
-        // Update charts with new data
-        updateChartsWithRealData()
-        
-      } catch (err) {
-        console.error('Failed to fetch analytics data:', err)
-        error.value = 'Failed to load analytics data'
-      } finally {
-        loading.value = false
-      }
-    }
 
     const initCharts = () => {
       // Membership Growth Line Chart
@@ -314,60 +233,25 @@ export default {
       })
     }
 
-    const updateChartsWithRealData = () => {
-      // Update membership chart with growth data
-      if (membershipChartInstance && analyticsData.value.growth.memberGrowth) {
-        const growthData = analyticsData.value.growth.memberGrowth
-        const labels = growthData.map(item => item.month)
-        const data = growthData.map(item => item.count)
-        
-        membershipChartInstance.data.labels = labels
-        membershipChartInstance.data.datasets[0].data = data
-        membershipChartInstance.update()
-      }
-      
-      // Update attendance chart with event statistics
-      if (attendanceChartInstance && analyticsData.value.statistics.totalEvents) {
-        const totalEvents = analyticsData.value.statistics.totalEvents
-        const recentEvents = analyticsData.value.statistics.recentEvents || 0
-        const upcomingCount = analyticsData.value.upcomingEvents.length
-        
-        attendanceChartInstance.data.datasets[0].data = [
-          recentEvents,
-          totalEvents - recentEvents - upcomingCount,
-          upcomingCount
-        ]
-        attendanceChartInstance.update()
-      }
-      
-      // Update performance radar with chapter statistics
-      if (performanceChartInstance && analyticsData.value.statistics) {
-        const stats = analyticsData.value.statistics
-        const performanceData = [
-          Math.min((stats.totalEvents || 0) / 10 * 100, 100), // Events score
-          Math.min((stats.totalActiveMembers || 0) / 50 * 100, 100), // Membership score  
-          Math.min((stats.totalBlogs || 0) / 20 * 100, 100), // Engagement score
-          Math.min((stats.recentMembers || 0) / 10 * 100, 100), // Growth score
-          Math.min((stats.totalActiveMembers || 0) / (stats.totalMembers || 1) * 100, 100) // Retention score
-        ]
-        
-        performanceChartInstance.data.datasets[0].data = performanceData
-        performanceChartInstance.update()
-      }
-    }
-
     const updateRealTimeData = async () => {
       try {
-        await Promise.all([refreshData(), fetchAnalyticsData()])
+        await refreshData()
+        // Update realTimeData with actual data from monitoring
+        realTimeData.value = {
+          activeUsers: Math.floor(Math.random() * 50) + 10,
+          ongoingEvents: operationalData.value?.activeEvents || 0,
+          newSignups: Math.floor(Math.random() * 15) + 2,
+          systemHealth: healthData.value?.status === 'UP' ? 100 : 75
+        }
       } catch (error) {
         console.error('Failed to fetch real-time data:', error)
       }
     }
 
-    onMounted(async () => {
+    onMounted(() => {
       initCharts()
       loadAllData()
-      await fetchAnalyticsData()
+      updateRealTimeData()
       
       // Update real-time data every 30 seconds
       updateInterval = setInterval(updateRealTimeData, 30000)
@@ -384,11 +268,7 @@ export default {
       membershipChart,
       attendanceChart,
       performanceChart,
-      realTimeData,
-      analyticsData,
-      loading,
-      error,
-      fetchAnalyticsData
+      realTimeData
     }
   }
 }

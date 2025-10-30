@@ -116,10 +116,6 @@ public class Event {
     public void setEventDateTime(LocalDateTime eventDateTime) {
         this.eventDateTime = eventDateTime;
     }
-    
-    public LocalDateTime getDate() {
-        return eventDateTime;
-    }
 
     public String getLocation() {
         return location;

@@ -145,17 +145,6 @@ public class Chapter {
     public void setCity(String city) {
         this.city = city;
     }
-    
-    public String getLocation() {
-        if (city != null && state != null) {
-            return city + ", " + state;
-        } else if (city != null) {
-            return city;
-        } else if (state != null) {
-            return state;
-        }
-        return "Unknown Location";
-    }
 
     public String getDescription() {
         return description;

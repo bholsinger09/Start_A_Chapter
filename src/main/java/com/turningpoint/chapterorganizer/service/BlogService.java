@@ -23,14 +23,12 @@ public class BlogService {
     private final BlogRepository blogRepository;
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
-    private final ActivityService activityService;
 
     @Autowired
-    public BlogService(BlogRepository blogRepository, CommentRepository commentRepository, MemberRepository memberRepository, ActivityService activityService) {
+    public BlogService(BlogRepository blogRepository, CommentRepository commentRepository, MemberRepository memberRepository) {
         this.blogRepository = blogRepository;
         this.commentRepository = commentRepository;
         this.memberRepository = memberRepository;
-        this.activityService = activityService;
     }
 
     // Blog CRUD operations
@@ -39,12 +37,7 @@ public class BlogService {
                 .orElseThrow(() -> new RuntimeException("Member not found with id: " + authorId));
         
         Blog blog = new Blog(title, content, author, published);
-        Blog savedBlog = blogRepository.save(blog);
-        
-        // Log activity for blog creation
-        activityService.logBlogCreated(savedBlog, author);
-        
-        return savedBlog;
+        return blogRepository.save(blog);
     }
 
     public Blog createBlog(Blog blog) {
@@ -71,10 +64,6 @@ public class BlogService {
         blog.setAuthor(author);
         Blog savedBlog = blogRepository.save(blog);
         System.out.println("DEBUG: Blog saved with ID: " + savedBlog.getId());
-        
-        // Log activity for blog creation
-        activityService.logBlogCreated(savedBlog, author);
-        
         return savedBlog;
     }
 

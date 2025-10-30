@@ -3,7 +3,6 @@ package com.turningpoint.chapterorganizer.security.abac.impl;
 import com.turningpoint.chapterorganizer.security.abac.PolicyDecision;
 import com.turningpoint.chapterorganizer.security.abac.PolicyEvaluationContext;
 import com.turningpoint.chapterorganizer.security.abac.PolicyEvaluator;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

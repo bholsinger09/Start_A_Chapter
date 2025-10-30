@@ -1,7 +1,6 @@
 package com.turningpoint.chapterorganizer.repository;
 
 import com.turningpoint.chapterorganizer.entity.Blog;
-import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,14 +67,4 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     
     // Find published blog by id
     Optional<Blog> findByIdAndPublishedTrue(Long id);
-    
-    // Analytics methods for dashboard
-    long countByCreatedAtAfter(LocalDateTime date);
-    
-    List<Blog> findTop5ByOrderByCreatedAtDesc();
-    
-    @Query("SELECT COUNT(b) FROM Blog b WHERE b.author.chapter = :chapter AND b.createdAt > :date")
-    long countByAuthorChapterAndCreatedAtAfter(@Param("chapter") Chapter chapter, @Param("date") LocalDateTime date);
-    
-    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }
