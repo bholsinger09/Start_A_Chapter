@@ -3,14 +3,11 @@ package com.turningpoint.chapterorganizer.service;
 import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.repository.ChapterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -26,8 +23,6 @@ public class ChapterService {
     /**
      * Create a new chapter
      */
-    // // @RequirePermissions("chapter:create")
-    // // @RequireRoles(value = {"National Director", "Regional Director", "System Administrator"}, minHierarchyLevel = 80)
     public Chapter createChapter(Chapter chapter) {
         // Check if chapter already exists with the same name at the same university
         if (chapterRepository.existsByNameIgnoreCaseAndUniversityNameIgnoreCase(
@@ -46,7 +41,6 @@ public class ChapterService {
     /**
      * Get chapter by ID
      */
-    // @RequirePermissions("chapter:read")
     @Transactional(readOnly = true)
     public Optional<Chapter> getChapterById(Long id) {
         return chapterRepository.findById(id);
@@ -55,7 +49,6 @@ public class ChapterService {
     /**
      * Get chapter by name (case-insensitive)
      */
-    // @RequirePermissions("chapter:read")
     @Transactional(readOnly = true)
     public Optional<Chapter> getChapterByName(String name) {
         return chapterRepository.findByNameIgnoreCase(name);
@@ -64,8 +57,6 @@ public class ChapterService {
     /**
      * Get all chapters
      */
-    // @RequirePermissions("chapter:read")
-    // @RequireRoles(value = {"National Director", "Regional Director", "System Administrator"}, minHierarchyLevel = 70)
     @Transactional(readOnly = true)
     public List<Chapter> getAllChapters() {
         return chapterRepository.findAll();
@@ -76,13 +67,7 @@ public class ChapterService {
      */
     @Transactional(readOnly = true)
     public List<Chapter> getAllActiveChapters() {
-        try {
-            return chapterRepository.findByActiveTrueWithMembers();
-        } catch (Exception e) {
-            // Fallback to simple query if JOIN FETCH fails during migration
-            System.out.println("DEBUG: findByActiveTrueWithMembers failed, using fallback: " + e.getMessage());
-            return chapterRepository.findByActiveTrue();
-        }
+        return chapterRepository.findByActiveTrue();
     }
 
     /**
@@ -107,66 +92,12 @@ public class ChapterService {
     @Transactional(readOnly = true)
     public List<Chapter> searchChapters(String name, String universityName, String state,
             String city, Boolean active) {
-        try {
-            // Convert empty strings to null so the query treats them as "not specified"
-            name = (name != null && name.trim().isEmpty()) ? null : name;
-            universityName = (universityName != null && universityName.trim().isEmpty()) ? null : universityName;
-            state = (state != null && state.trim().isEmpty()) ? null : state;
-            city = (city != null && city.trim().isEmpty()) ? null : city;
-            
-            // First try the complex query
-            return chapterRepository.findChaptersByCriteria(name, universityName, state, city, active);
-            
-        } catch (Exception e) {
-            // If the complex query fails, fall back to simple filtering
-            System.err.println("Complex search query failed, using fallback method: " + e.getMessage());
-            return searchChaptersFallback(name, universityName, state, city, active);
-        }
-    }
-    
-    /**
-     * Fallback search method using basic repository operations and Java filtering
-     */
-    private List<Chapter> searchChaptersFallback(String name, String universityName, String state,
-            String city, Boolean active) {
-        try {
-            // Start with all chapters or active chapters
-            List<Chapter> chapters;
-            if (active != null && active) {
-                chapters = chapterRepository.findByActiveTrue();
-            } else if (active != null && !active) {
-                chapters = chapterRepository.findByActiveFalse();
-            } else {
-                chapters = chapterRepository.findAll();
-            }
-            
-            // Apply filters using Java streams
-            return chapters.stream()
-                .filter(chapter -> name == null || 
-                    chapter.getName().toLowerCase().contains(name.toLowerCase()))
-                .filter(chapter -> universityName == null || 
-                    chapter.getUniversityName().toLowerCase().contains(universityName.toLowerCase()))
-                .filter(chapter -> state == null || 
-                    chapter.getState().equalsIgnoreCase(state))
-                .filter(chapter -> city == null || 
-                    chapter.getCity().equalsIgnoreCase(city))
-                .toList();
-                
-        } catch (Exception e) {
-            System.err.println("Fallback search also failed: " + e.getMessage());
-            // Return empty list as last resort
-            return new ArrayList<>();
-        }
+        return chapterRepository.findChaptersByCriteria(name, universityName, state, city, active);
     }
 
     /**
      * Update an existing chapter
      */
-    // @RequirePermissions("chapter:update")
-    // @RequireRoles(value = {"Chapter President", "National Director", "Regional Director"}, 
-    //              chapterScoped = true, chapterIdParam = "id", minHierarchyLevel = 60)
-    // @RequirePolicies(value = {"chapter-membership"}, 
-    //                 resourceAttributes = {"id->chapterId"})
     public Chapter updateChapter(Long id, Chapter updatedChapter) {
         Chapter existingChapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Chapter not found with id: " + id));
@@ -199,8 +130,6 @@ public class ChapterService {
     /**
      * Soft delete a chapter (mark as inactive)
      */
-    // @RequirePermissions("chapter:delete")
-    // @RequireRoles(value = {"National Director", "Regional Director"}, minHierarchyLevel = 80)
     public void deleteChapter(Long id) {
         Chapter chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Chapter not found with id: " + id));
@@ -212,8 +141,6 @@ public class ChapterService {
     /**
      * Permanently delete a chapter (use with caution)
      */
-    // @RequirePermissions("chapter:manage")
-    // @RequireRoles(value = {"Super Administrator", "National Director"}, minHierarchyLevel = 85)
     public void permanentlyDeleteChapter(Long id) {
         if (!chapterRepository.existsById(id)) {
             throw new IllegalArgumentException("Chapter not found with id: " + id);
@@ -254,13 +181,5 @@ public class ChapterService {
     @Transactional(readOnly = true)
     public List<Chapter> getActiveChaptersByStateOrderByMemberCount(String state) {
         return chapterRepository.findActiveChaptersByStateOrderByMemberCount(state);
-    }
-
-    /**
-     * Get paginated chapters with sorting
-     */
-    @Transactional(readOnly = true)
-    public Page<Chapter> getPaginatedChapters(Pageable pageable) {
-        return chapterRepository.findAll(pageable);
     }
 }

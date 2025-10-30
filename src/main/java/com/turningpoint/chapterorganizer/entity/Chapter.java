@@ -1,7 +1,5 @@
 package com.turningpoint.chapterorganizer.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,38 +25,33 @@ public class Chapter {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "institution_id", nullable = true)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "chapters"})
-    private Institution institution;
-
-    // Legacy fields for backward compatibility - will be deprecated
-    @Column(name = "university_name")
+    @NotBlank(message = "University name is required")
+    @Size(min = 2, max = 150, message = "University name must be between 2 and 150 characters")
+    @Column(nullable = false)
     private String universityName;
 
-    @Column(name = "state")
+    @NotBlank(message = "State is required")
+    @Size(min = 2, max = 50, message = "State must be between 2 and 50 characters")
+    @Column(nullable = false)
     private String state;
 
-    @Column(name = "city")
+    @NotBlank(message = "City is required")
+    @Size(min = 2, max = 100, message = "City must be between 2 and 100 characters")
+    @Column(nullable = false)
     private String city;
 
     @Size(max = 500, message = "Description cannot exceed 500 characters")
     @Column(length = 500)
     private String description;
 
-    @Column(name = "founded_date")
-    private LocalDateTime foundedDate;
-
     @NotNull(message = "Active status is required")
     @Column(nullable = false)
     private Boolean active = true;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference("chapter-members")
     private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference("chapter-events")
     private List<Event> events = new ArrayList<>();
 
     @CreationTimestamp
@@ -80,17 +73,6 @@ public class Chapter {
         this.city = city;
     }
 
-    public Chapter(String name, Institution institution) {
-        this.name = name;
-        this.institution = institution;
-        // Set legacy fields for backward compatibility
-        if (institution != null) {
-            this.universityName = institution.getName();
-            this.state = institution.getState();
-            this.city = institution.getCity();
-        }
-    }
-
     // Getters and Setters
     public Long getId() {
         return id;
@@ -106,20 +88,6 @@ public class Chapter {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Institution getInstitution() {
-        return institution;
-    }
-
-    public void setInstitution(Institution institution) {
-        this.institution = institution;
-        // Update legacy fields for backward compatibility
-        if (institution != null) {
-            this.universityName = institution.getName();
-            this.state = institution.getState();
-            this.city = institution.getCity();
-        }
     }
 
     public String getUniversityName() {
@@ -154,14 +122,6 @@ public class Chapter {
         this.description = description;
     }
 
-    public LocalDateTime getFoundedDate() {
-        return foundedDate;
-    }
-
-    public void setFoundedDate(LocalDateTime foundedDate) {
-        this.foundedDate = foundedDate;
-    }
-
     public Boolean getActive() {
         return active;
     }
@@ -176,10 +136,6 @@ public class Chapter {
 
     public void setMembers(List<Member> members) {
         this.members = members;
-    }
-
-    public int getMemberCount() {
-        return members != null ? members.size() : 0;
     }
 
     public List<Event> getEvents() {

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,24 +15,21 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // Find member by email
     Optional<Member> findByEmail(String email);
-    
-    // Find member by username
-    Optional<Member> findByUsername(String username);
 
     // Find members by chapter ID
-    List<Member> findByChapter_Id(Long chapterId);
+    List<Member> findByChapterId(Long chapterId);
 
     // Find active members by chapter ID
-    List<Member> findByChapter_IdAndActiveTrue(Long chapterId);
+    List<Member> findByChapterIdAndActiveTrue(Long chapterId);
 
     // Find members by role
     List<Member> findByRole(MemberRole role);
 
     // Find members by chapter ID and role
-    List<Member> findByChapter_IdAndRole(Long chapterId, MemberRole role);
+    List<Member> findByChapterIdAndRole(Long chapterId, MemberRole role);
 
     // Find active members by chapter ID and role
-    List<Member> findByChapter_IdAndRoleAndActiveTrue(Long chapterId, MemberRole role);
+    List<Member> findByChapterIdAndRoleAndActiveTrue(Long chapterId, MemberRole role);
 
     // Find members by first and last name (case-insensitive)
     List<Member> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
@@ -47,9 +43,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // Check if email exists
     boolean existsByEmail(String email);
-    
-    // Check if username exists
-    boolean existsByUsername(String username);
 
     // Check if email exists for a different member (for updates)
     boolean existsByEmailAndIdNot(String email, Long id);
@@ -89,24 +82,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // Find the president of a chapter
     @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = 'PRESIDENT' AND m.active = true")
     Optional<Member> findChapterPresident(@Param("chapterId") Long chapterId);
-
-    // Analytics and statistics methods
-    
-    // Count active members
-    Long countByActiveTrue();
-    
-    // Count members by chapter
-    Long countByChapter_Id(Long chapterId);
-    
-    // Count active members by chapter
-    Long countByChapter_IdAndActiveTrue(Long chapterId);
-    
-    // Date-based queries using createdAt field (join date)
-    Long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-    Long countByCreatedAtBefore(LocalDateTime before);
-    Long countByCreatedAtAfter(LocalDateTime after);
-    Long countByActiveTrueAndCreatedAtBefore(LocalDateTime before);
-    
-    // Find recent members
-    List<Member> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime after);
 }

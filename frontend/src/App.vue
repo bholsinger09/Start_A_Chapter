@@ -169,22 +169,10 @@ export default {
     
     // Debug method to test theme toggle
     const debugToggleTheme = () => {
-      console.log('🔥 DEBUG: Current theme before toggle:', currentTheme.value)
-      const newTheme = currentTheme.value === 'dark' ? 'light' : 'dark'
-      console.log('🔥 DEBUG: Setting theme to:', newTheme)
+      toggleTheme() {
+      const newTheme = currentTheme.value === 'light' ? 'dark' : 'light'
       setTheme(newTheme)
-      
-      // Force check DOM after a short delay
-      setTimeout(() => {
-        const html = document.documentElement
-        const body = document.body
-        console.log('🔥 DEBUG: HTML data-theme:', html.getAttribute('data-theme'))
-        console.log('🔥 DEBUG: Body data-theme:', body.getAttribute('data-theme'))
-        console.log('🔥 DEBUG: HTML classes:', html.className)
-        console.log('🔥 DEBUG: Body classes:', body.className)
-        console.log('🔥 DEBUG: Body background color:', body.style.backgroundColor)
-        console.log('🔥 DEBUG: Body color:', body.style.color)
-      }, 100)
+    },
     }
     
     return {

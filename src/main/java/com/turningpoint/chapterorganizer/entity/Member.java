@@ -1,6 +1,5 @@
 package com.turningpoint.chapterorganizer.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -35,13 +34,6 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    @Column(nullable = true, unique = true)
-    private String username;
-
-    @Column(name = "password_hash")
-    private String passwordHash;
-
     @Size(max = 15, message = "Phone number cannot exceed 15 characters")
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -63,8 +55,7 @@ public class Member {
     private String graduationYear;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chapter_id", nullable = true)
-    @JsonBackReference("chapter-members")
+    @JoinColumn(name = "chapter_id", nullable = false)
     private Chapter chapter;
 
     @CreationTimestamp
@@ -83,15 +74,6 @@ public class Member {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.chapter = chapter;
-    }
-
-    public Member(String firstName, String lastName, String email, String username, String passwordHash, Chapter chapter) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.username = username;
-        this.passwordHash = passwordHash;
         this.chapter = chapter;
     }
 
@@ -126,22 +108,6 @@ public class Member {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
     }
 
     public String getPhoneNumber() {
@@ -211,16 +177,6 @@ public class Member {
     // Helper method for full name
     public String getFullName() {
         return firstName + " " + lastName;
-    }
-
-    // Helper method to get chapter ID for JSON serialization
-    public Long getChapterId() {
-        return chapter != null ? chapter.getId() : null;
-    }
-
-    // Helper method to get chapter name for JSON serialization
-    public String getChapterName() {
-        return chapter != null ? chapter.getName() : null;
     }
 
     // equals and hashCode based on email (business key)

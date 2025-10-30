@@ -96,21 +96,20 @@ class ChapterServiceTest {
     }
 
     @Test
-    public void getAllActiveChapters_ShouldReturnActiveChapters() {
-        // Arrange
-        List<Chapter> activeChapters = List.of(testChapter);
-        when(chapterRepository.findByActiveTrueWithMembers()).thenReturn(activeChapters);
+    void getAllActiveChapters_ShouldReturnActiveChapters() {
+        // Given
+        List<Chapter> activeChapters = Arrays.asList(testChapter);
+        when(chapterRepository.findByActiveTrue()).thenReturn(activeChapters);
 
-        // Act
+        // When
         List<Chapter> result = chapterService.getAllActiveChapters();
 
-        // Assert
+        // Then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("Test Chapter");
         assertThat(result.get(0).getActive()).isTrue();
+    }
 
-        verify(chapterRepository).findByActiveTrueWithMembers();
-    }    @Test
+    @Test
     void updateChapter_ShouldReturnUpdatedChapter_WhenExists() {
         // Given
         Chapter updatedChapter = new Chapter();

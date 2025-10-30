@@ -29,9 +29,6 @@ class EventServiceTest {
     @Mock
     private ChapterService chapterService;
 
-    @Mock
-    private WebSocketNotificationService notificationService;
-
     @InjectMocks
     private EventService eventService;
 

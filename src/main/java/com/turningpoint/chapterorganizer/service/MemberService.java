@@ -1,13 +1,10 @@
 package com.turningpoint.chapterorganizer.service;
 
-import com.turningpoint.chapterorganizer.dto.CreateMemberRequest;
 import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,31 +17,32 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final ChapterService chapterService;
-    private final WebSocketNotificationService notificationService;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository, ChapterService chapterService, 
-                        WebSocketNotificationService notificationService) {
+    public MemberService(MemberRepository memberRepository, ChapterService chapterService) {
         this.memberRepository = memberRepository;
         this.chapterService = chapterService;
-        this.notificationService = notificationService;
     }
 
+    /**
+     * Create a new member
+     */
     public Member createMember(Member member) {
         // Check if email already exists
         if (memberRepository.existsByEmail(member.getEmail())) {
             throw new IllegalArgumentException("Member with this email already exists");
         }
 
-                // Validate chapter exists if provided (chapter is now optional)
-        if (member.getChapter() != null) {
+        // Validate that the chapter exists
+        if (member.getChapter() != null && member.getChapter().getId() != null) {
             Optional<Chapter> chapter = chapterService.getChapterById(member.getChapter().getId());
             if (chapter.isEmpty()) {
                 throw new IllegalArgumentException("Chapter not found with id: " + member.getChapter().getId());
             }
             member.setChapter(chapter.get());
+        } else {
+            throw new IllegalArgumentException("Chapter is required for member creation");
         }
-        // Chapter is optional - members can be created without a chapter and join one later
 
         // Set default values
         if (member.getActive() == null) {
@@ -54,49 +52,7 @@ public class MemberService {
             member.setRole(MemberRole.MEMBER);
         }
 
-        Member savedMember = memberRepository.save(member);
-        
-        // Send WebSocket notification for new member
-        if (savedMember.getChapter() != null) {
-            String memberName = savedMember.getFirstName() + " " + savedMember.getLastName();
-            notificationService.broadcastMemberJoined(memberName, savedMember.getChapter().getId());
-        }
-        
-        return savedMember;
-    }
-
-    public Member createMember(CreateMemberRequest request) {
-        // Check if email already exists
-        if (memberRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Member with this email already exists");
-        }
-
-        // Get the chapter
-        Optional<Chapter> chapter = chapterService.getChapterById(request.getChapterId());
-        if (chapter.isEmpty()) {
-            throw new IllegalArgumentException("Chapter not found with id: " + request.getChapterId());
-        }
-
-        // Create new member
-        Member member = new Member();
-        member.setFirstName(request.getFirstName());
-        member.setLastName(request.getLastName());
-        member.setEmail(request.getEmail());
-        member.setUsername(request.getUsername());
-        member.setPhoneNumber(request.getPhoneNumber());
-        member.setRole(request.getRole() != null ? request.getRole() : MemberRole.MEMBER);
-        member.setChapter(chapter.get());
-        member.setActive(true);
-
         return memberRepository.save(member);
-    }
-
-    /**
-     * Get all members across all chapters
-     */
-    @Transactional(readOnly = true)
-    public List<Member> getAllMembers() {
-        return memberRepository.findAll();
     }
 
     /**
@@ -116,35 +72,11 @@ public class MemberService {
     }
 
     /**
-     * Get member by username
-     */
-    @Transactional(readOnly = true)
-    public Optional<Member> getMemberByUsername(String username) {
-        return memberRepository.findByUsername(username);
-    }
-
-    /**
-     * Check if member exists by username
-     */
-    @Transactional(readOnly = true)
-    public boolean existsByUsername(String username) {
-        return memberRepository.existsByUsername(username);
-    }
-
-    /**
-     * Check if member exists by email
-     */
-    @Transactional(readOnly = true)
-    public boolean existsByEmail(String email) {
-        return memberRepository.existsByEmail(email);
-    }
-
-    /**
      * Get all active members by chapter
      */
     @Transactional(readOnly = true)
     public List<Member> getMembersByChapter(Long chapterId) {
-        return memberRepository.findByChapter_IdAndActiveTrue(chapterId);
+        return memberRepository.findByChapterIdAndActiveTrue(chapterId);
     }
 
     /**
@@ -152,7 +84,7 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public List<Member> getAllMembersByChapter(Long chapterId) {
-        return memberRepository.findByChapter_Id(chapterId);
+        return memberRepository.findByChapterId(chapterId);
     }
 
     /**
@@ -160,7 +92,7 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public List<Member> getMembersByRole(Long chapterId, MemberRole role) {
-        return memberRepository.findByChapter_IdAndRoleAndActiveTrue(chapterId, role);
+        return memberRepository.findByChapterIdAndRoleAndActiveTrue(chapterId, role);
     }
 
     /**
@@ -180,94 +112,7 @@ public class MemberService {
     }
 
     /**
-     * Update member information using DTO
-     */
-    public Member updateMember(Long id, com.turningpoint.chapterorganizer.dto.MemberUpdateRequest updateRequest) {
-        Member existingMember = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
-
-        // Check if email is changing and if new email already exists
-        if (!existingMember.getEmail().equals(updateRequest.getEmail())) {
-            if (memberRepository.existsByEmailAndIdNot(updateRequest.getEmail(), id)) {
-                throw new IllegalArgumentException("Member with this email already exists");
-            }
-        }
-
-        // Update basic fields
-        existingMember.setFirstName(updateRequest.getFirstName());
-        existingMember.setLastName(updateRequest.getLastName());
-        existingMember.setEmail(updateRequest.getEmail());
-        existingMember.setPhoneNumber(updateRequest.getPhoneNumber());
-        existingMember.setMajor(updateRequest.getMajor());
-        existingMember.setGraduationYear(updateRequest.getGraduationYear());
-
-        if (updateRequest.getRole() != null) {
-            existingMember.setRole(updateRequest.getRole());
-        }
-
-        if (updateRequest.getActive() != null) {
-            existingMember.setActive(updateRequest.getActive());
-        }
-
-        // Handle chapter assignment
-        if (updateRequest.getChapterId() != null) {
-            Optional<Chapter> chapterOpt = chapterService.getChapterById(updateRequest.getChapterId());
-            if (chapterOpt.isPresent()) {
-                existingMember.setChapter(chapterOpt.get());
-                System.out.println("✅ Updated member " + id + " to chapter: " + chapterOpt.get().getName());
-            } else {
-                System.err.println("⚠️ Chapter not found with ID: " + updateRequest.getChapterId());
-            }
-        }
-
-        return memberRepository.save(existingMember);
-    }
-
-    /**
-     * Update member information using individual parameters (flexible)
-     */
-    public Member updateMember(Long id, String firstName, String lastName, String email, String phone, Long chapterId, MemberRole role) {
-        Member existingMember = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
-
-        // Check if email is changing and if new email already exists
-        if (email != null && !existingMember.getEmail().equals(email)) {
-            if (memberRepository.existsByEmailAndIdNot(email, id)) {
-                throw new IllegalArgumentException("Member with this email already exists");
-            }
-            existingMember.setEmail(email);
-        }
-
-        // Update basic fields if provided
-        if (firstName != null) {
-            existingMember.setFirstName(firstName);
-        }
-        if (lastName != null) {
-            existingMember.setLastName(lastName);
-        }
-        if (phone != null) {
-            existingMember.setPhoneNumber(phone);
-        }
-        if (role != null) {
-            existingMember.setRole(role);
-        }
-
-        // Handle chapter assignment
-        if (chapterId != null) {
-            Optional<Chapter> chapterOpt = chapterService.getChapterById(chapterId);
-            if (chapterOpt.isPresent()) {
-                existingMember.setChapter(chapterOpt.get());
-                System.out.println("✅ Updated member " + id + " to chapter: " + chapterOpt.get().getName());
-            } else {
-                System.err.println("⚠️ Chapter not found with ID: " + chapterId);
-            }
-        }
-
-        return memberRepository.save(existingMember);
-    }
-
-    /**
-     * Update member information (legacy method)
+     * Update member information
      */
     public Member updateMember(Long id, Member updatedMember) {
         Member existingMember = memberRepository.findById(id)
@@ -385,13 +230,5 @@ public class MemberService {
 
         member.setChapter(newChapter);
         return memberRepository.save(member);
-    }
-
-    /**
-     * Get paginated members with sorting
-     */
-    @Transactional(readOnly = true)
-    public Page<Member> getPaginatedMembers(Pageable pageable) {
-        return memberRepository.findAll(pageable);
     }
 }
