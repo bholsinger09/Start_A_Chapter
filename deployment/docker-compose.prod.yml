@@ -18,13 +18,15 @@ services:
     networks:
       - chapter-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
 
   backend:
-    image: openjdk:21-jdk-slim
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: chapter-backend
     ports:
       - "8080:8080"
@@ -34,22 +36,18 @@ services:
       - SPRING_DATASOURCE_USERNAME=chapter_user
       - SPRING_DATASOURCE_PASSWORD=secure_password_2024
       - JAVA_OPTS=-Xmx2g -Xms512m
-    volumes:
-      - ../target/chapter-organizer-1.0-SNAPSHOT.jar:/app/app.jar
-      - ../startup.sh:/app/startup.sh:ro
-    command: ["/bin/bash", "/app/startup.sh"]
     depends_on:
       db:
         condition: service_healthy
-    restart: unless-stopped
     networks:
       - chapter-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 120s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
 
   db:
     image: postgres:15
@@ -67,7 +65,7 @@ services:
     networks:
       - chapter-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U chapter_user -d chapter_organizer_prod"]
+      test: [ "CMD-SHELL", "pg_isready -U chapter_user -d chapter_organizer_prod" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -84,6 +82,7 @@ services:
 
 volumes:
   postgres_data:
+
 
 networks:
   chapter-network:
