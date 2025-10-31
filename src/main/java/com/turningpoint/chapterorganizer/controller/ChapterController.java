@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/chapters")
+@RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class ChapterController {
 
     @Autowired
     private ChapterService chapterService;
 
-    @GetMapping
+    @GetMapping("/chapters")
     public ResponseEntity<List<Chapter>> getAllChapters() {
         try {
             List<Chapter> chapters = chapterService.getAllActiveChapters();
@@ -27,7 +27,8 @@ public class ChapterController {
         }
     }
 
-    @GetMapping("/{id}")
+
+    @GetMapping("/chapters/{id}")
     public ResponseEntity<Chapter> getChapterById(@PathVariable Long id) {
         try {
             Optional<Chapter> chapter = chapterService.getChapterById(id);
@@ -38,7 +39,7 @@ public class ChapterController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/chapters")
     public ResponseEntity<Chapter> createChapter(@RequestBody Chapter chapter) {
         try {
             Chapter createdChapter = chapterService.createChapter(chapter);

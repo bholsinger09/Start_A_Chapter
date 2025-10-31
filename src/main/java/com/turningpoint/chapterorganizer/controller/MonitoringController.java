@@ -13,7 +13,7 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class MonitoringController {
 
-    @GetMapping("/health")
+        @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> getHealth() {
         Map<String, Object> health = new HashMap<>();
         health.put("status", "UP");
@@ -24,7 +24,18 @@ public class MonitoringController {
         return ResponseEntity.ok(health);
     }
 
-    @GetMapping("/metrics")
+    @GetMapping("/monitoring/health")
+    public ResponseEntity<Map<String, Object>> getSystemHealth() {
+        Map<String, Object> health = new HashMap<>();
+        health.put("status", "UP");
+        health.put("timestamp", LocalDateTime.now());
+        health.put("database", "Connected");
+        health.put("application", "Running");
+        health.put("memory", Runtime.getRuntime().freeMemory());
+        return ResponseEntity.ok(health);
+    }
+
+    @GetMapping({"/metrics", "/monitoring/metrics"})
     public ResponseEntity<Map<String, Object>> getMetrics() {
         Map<String, Object> metrics = new HashMap<>();
         Runtime runtime = Runtime.getRuntime();
@@ -47,7 +58,7 @@ public class MonitoringController {
         return ResponseEntity.ok(metrics);
     }
 
-    @GetMapping("/operational")
+    @GetMapping({"/operational", "/monitoring/operational"})
     public ResponseEntity<Map<String, Object>> getOperationalMetrics() {
         Map<String, Object> operational = new HashMap<>();
         operational.put("timestamp", LocalDateTime.now());
@@ -69,7 +80,7 @@ public class MonitoringController {
         return ResponseEntity.ok(operational);
     }
 
-    @GetMapping("/audit")
+    @GetMapping({"/audit", "/monitoring/audit"})
     public ResponseEntity<Map<String, Object>> getAuditLogs() {
         Map<String, Object> audit = new HashMap<>();
         audit.put("timestamp", LocalDateTime.now());
