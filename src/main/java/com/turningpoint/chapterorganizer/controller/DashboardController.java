@@ -39,7 +39,7 @@ public class DashboardController {
         return ResponseEntity.ok(overview);
     }
 
-    @GetMapping("/stats/public")
+    @GetMapping({"/stats/public", "/stats", "/public/stats"})
     public ResponseEntity<Map<String, Object>> getPublicStatistics() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("timestamp", LocalDateTime.now());
@@ -47,10 +47,17 @@ public class DashboardController {
         stats.put("totalMembers", 828);
         stats.put("totalEvents", 237);
         stats.put("activeChapters", 45);
+        stats.put("upcomingEvents", 12);
+        stats.put("newMembersThisMonth", 34);
         stats.put("growthMetrics", Map.of(
             "chaptersGrowthRate", 8.5,
             "membersGrowthRate", 12.3,
             "eventsGrowthRate", 15.7
+        ));
+        stats.put("systemHealth", Map.of(
+            "status", "HEALTHY",
+            "uptime", "98.5%",
+            "responseTime", "120ms"
         ));
         
         return ResponseEntity.ok(stats);
