@@ -44,4 +44,29 @@ coverage/
 
 # QA Environment
 qa-data/
-database-exports/
+database-exports/*.tar.gz
+*.tar
+*.tar.gz
+
+# Large files and Docker images
+backend-image.tar.gz
+frontend-image.tar.gz
+*.docker.tar
+
+# AWS and deployment artifacts
+AWSCLIV2.pkg
+deployment/app.jar
+*.pkg
+*.jar
+
+# Distribution archives
+frontend/dist-latest.tar.gz
+*.tar.gz
+
+# SSH Keys
+temp_key
+temp_key.pub
+*.pem
+
+# Node modules maps (large files)
+frontend/node_modules/**/*.map

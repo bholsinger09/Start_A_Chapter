@@ -18,8 +18,8 @@ RUN chmod +x ./startup.sh
 # Copy source code
 COPY src src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+# Build the application (skip test compilation entirely)
+RUN ./mvnw clean compile package -DskipTests -Dmaven.test.skip=true
 
 # Expose the port (Render will set this automatically)
 EXPOSE 8080

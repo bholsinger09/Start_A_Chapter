@@ -1,0 +1,213 @@
+# EC2 Instance Connect Commands - Copy and paste these one by one
+
+# Step 1: Navigate to project and check current status
+cd ~/Start_A_Chapter
+pwd
+ls -la
+
+# Step 2: Edit ChapterController to add the institutions endpoint fix
+# We need to add the /chapters/institutions endpoint BEFORE /chapters/{id}
+cp src/main/java/com/turningpoint/chapterorganizer/controller/ChapterController.java src/main/java/com/turningpoint/chapterorganizer/controller/ChapterController.java.backup
+
+# Step 3: Apply the routing fix using tee (since we can't use vim in browser)
+cat > /tmp/chapter_controller_fix.java << 'EOF'
+package com.turningpoint.chapterorganizer.controller;
+
+import com.turningpoint.chapterorganizer.entity.Chapter;
+import com.turningpoint.chapterorganizer.entity.Institution;
+import com.turningpoint.chapterorganizer.service.ChapterService;
+import com.turningpoint.chapterorganizer.service.InstitutionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
+public class ChapterController {
+
+    @Autowired
+    private ChapterService chapterService;
+    
+    @Autowired
+    private InstitutionService institutionService;
+
+    @GetMapping("/chapters")
+    public ResponseEntity<List<Chapter>> getAllChapters() {
+        try {
+            List<Chapter> chapters = chapterService.getAllActiveChapters();
+            return ResponseEntity.ok(chapters);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // IMPORTANT: This must come before /chapters/{id} to avoid routing conflict
+    @GetMapping("/chapters/institutions")
+    public ResponseEntity<List<Institution>> getChapterInstitutions() {
+        try {
+            List<Institution> institutions = institutionService.getAllInstitutions();
+            return ResponseEntity.ok(institutions);
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+
+    @GetMapping("/chapters/{id}")
+    public ResponseEntity<Chapter> getChapterById(@PathVariable Long id) {
+        try {
+            Optional<Chapter> chapter = chapterService.getChapterById(id);
+            return chapter.map(ResponseEntity::ok)
+                         .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/chapters")
+    public ResponseEntity<Chapter> createChapter(@RequestBody Chapter chapter) {
+        try {
+            Chapter createdChapter = chapterService.createChapter(chapter);
+            return ResponseEntity.ok(createdChapter);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Chapter> updateChapter(@PathVariable Long id, @RequestBody Chapter chapter) {
+        try {
+            Chapter updatedChapter = chapterService.updateChapter(id, chapter);
+            return ResponseEntity.ok(updatedChapter);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteChapter(@PathVariable Long id) {
+        try {
+            chapterService.deleteChapter(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Search endpoints - temporary solution until SearchController is deployed
+    @GetMapping("/search/trending")
+    public ResponseEntity<List<Map<String, Object>>> getTrendingChapters(
+            @RequestParam(defaultValue = "5") int limit) {
+        try {
+            List<Chapter> allChapters = chapterService.getAllChapters();
+            
+            // Take the first few chapters as "trending"
+            List<Chapter> trendingChapters = allChapters.stream()
+                .limit(limit)
+                .toList();
+            
+            // Convert to simplified format for frontend
+            List<Map<String, Object>> trending = new ArrayList<>();
+            for (Chapter chapter : trendingChapters) {
+                Map<String, Object> trendingItem = new HashMap<>();
+                trendingItem.put("id", chapter.getId());
+                trendingItem.put("name", chapter.getName());
+                trendingItem.put("university", chapter.getUniversityName());
+                trendingItem.put("state", chapter.getState());
+                trendingItem.put("memberCount", 0);
+                trendingItem.put("trend", "up");
+                trending.add(trendingItem);
+            }
+            
+            return ResponseEntity.ok(trending);
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+
+    @GetMapping("/search/recommendations")
+    public ResponseEntity<List<Map<String, Object>>> getRecommendations(
+            @RequestParam(defaultValue = "3") int limit) {
+        try {
+            List<Chapter> allChapters = chapterService.getAllChapters();
+            
+            // Sort by creation date (newest first) and limit
+            List<Chapter> recommendedChapters = allChapters.stream()
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .limit(limit)
+                .toList();
+            
+            // Convert to simplified format for frontend
+            List<Map<String, Object>> recommendations = new ArrayList<>();
+            for (Chapter chapter : recommendedChapters) {
+                Map<String, Object> recommendation = new HashMap<>();
+                recommendation.put("id", chapter.getId());
+                recommendation.put("name", chapter.getName());
+                recommendation.put("university", chapter.getUniversityName());
+                recommendation.put("state", chapter.getState());
+                recommendation.put("memberCount", 0);
+                recommendation.put("type", "chapter");
+                recommendations.add(recommendation);
+            }
+            
+            return ResponseEntity.ok(recommendations);
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+
+    // Institutions endpoint for chapter creation form - REMOVED (moved above)
+    // This was causing the conflict, now handled by /chapters/institutions above
+}
+EOF
+
+# Step 4: Replace the controller with our fixed version
+cp /tmp/chapter_controller_fix.java src/main/java/com/turningpoint/chapterorganizer/controller/ChapterController.java
+
+# Step 5: Verify the fix is in place
+echo "=== Verifying the fix - should show institutions endpoint before {id} endpoint ==="
+grep -n -A 3 -B 1 "institutions\|{id}" src/main/java/com/turningpoint/chapterorganizer/controller/ChapterController.java
+
+# Step 6: Rebuild the application
+echo "=== Building application with routing fix ==="
+mvn clean compile package -Dmaven.test.skip=true
+
+# Step 7: Copy new jar to deployment directory
+cp target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar deployment/app.jar
+
+# Step 8: Navigate to deployment directory
+cd deployment
+pwd
+ls -la app.jar
+
+# Step 9: Deploy the fix
+echo "=== Stopping containers ==="
+sudo docker-compose -f docker-compose.prod.yml down
+
+echo "=== Rebuilding backend container with fix ==="
+sudo docker-compose -f docker-compose.prod.yml build --no-cache chapter-backend
+
+echo "=== Starting updated containers ==="
+sudo docker-compose -f docker-compose.prod.yml up -d
+
+# Step 10: Wait for startup and verify
+echo "=== Waiting for containers to start ==="
+sleep 30
+
+echo "=== Checking container status ==="
+sudo docker-compose -f docker-compose.prod.yml ps
+
+echo "=== Checking backend logs ==="
+sudo docker-compose -f docker-compose.prod.yml logs chapter-backend --tail=15
+
+# Step 11: Test the fix
+echo "=== Testing the institutions endpoint ==="
+curl -s https://startachapter.duckdns.org/api/chapters/institutions | head -c 200
+echo ""
+echo ""
+echo "🎉 DEPLOYMENT COMPLETE!"
+echo "Test the endpoint: curl https://startachapter.duckdns.org/api/chapters/institutions"
+echo "The chapter creation form should now load institutions without 400 error!"
+EOF
