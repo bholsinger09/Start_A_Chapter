@@ -63,6 +63,51 @@ public class ChapterController {
         }
     }
 
+    @PostMapping("/chapters/with-institution")
+    public ResponseEntity<Chapter> createChapterWithInstitution(@RequestBody Map<String, Object> requestBody) {
+        try {
+            // Extract chapter and institution data from request
+            Chapter chapter = new Chapter();
+            
+            if (requestBody.containsKey("name")) {
+                chapter.setName((String) requestBody.get("name"));
+            }
+            if (requestBody.containsKey("description")) {
+                chapter.setDescription((String) requestBody.get("description"));
+            }
+            
+            // Handle institution ID
+            if (requestBody.containsKey("institutionId")) {
+                Object institutionIdObj = requestBody.get("institutionId");
+                Long institutionId;
+                
+                if (institutionIdObj instanceof Integer) {
+                    institutionId = ((Integer) institutionIdObj).longValue();
+                } else if (institutionIdObj instanceof Long) {
+                    institutionId = (Long) institutionIdObj;
+                } else if (institutionIdObj instanceof String) {
+                    institutionId = Long.parseLong((String) institutionIdObj);
+                } else {
+                    return ResponseEntity.badRequest().build();
+                }
+                
+                // Get institution and set university details
+                Optional<Institution> institutionOpt = institutionService.getInstitutionById(institutionId);
+                if (institutionOpt.isPresent()) {
+                    Institution institution = institutionOpt.get();
+                    chapter.setUniversityName(institution.getName());
+                    chapter.setCity(institution.getLocation());
+                    chapter.setState(institution.getState());
+                }
+            }
+            
+            Chapter createdChapter = chapterService.createChapter(chapter);
+            return ResponseEntity.ok(createdChapter);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Chapter> updateChapter(@PathVariable Long id, @RequestBody Chapter chapter) {
         try {
