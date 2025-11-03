@@ -21,6 +21,9 @@ COPY src src
 # Build the application (skip test compilation entirely)
 RUN ./mvnw clean compile package -DskipTests -Dmaven.test.skip=true
 
+# Copy the JAR file to the expected location
+RUN cp target/campus-chapter-organizer-*.jar app.jar
+
 # Expose the port (Render will set this automatically)
 EXPOSE 8080
 
