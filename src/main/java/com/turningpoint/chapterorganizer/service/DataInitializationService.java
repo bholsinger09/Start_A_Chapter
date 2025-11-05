@@ -24,9 +24,28 @@ public class DataInitializationService implements CommandLineRunner {
             initializeInstitutions();
         }
         
+        // Check and add Idaho universities if missing
+        addIdahoUniversitiesIfMissing();
+        
         // Only initialize if we have fewer than 10 chapters
         if (chapterRepository.count() < 10) {
             initializeChapters();
+        }
+    }
+    
+    private void addIdahoUniversitiesIfMissing() {
+        // Check if University of Idaho already exists
+        if (institutionRepository.findByNameContainingIgnoreCase("University of Idaho").isEmpty()) {
+            Institution[] idahoInstitutions = {
+                new Institution("University of Idaho", "University", "Moscow", "ID", "USA"),
+                new Institution("Boise State University", "University", "Boise", "ID", "USA"),
+                new Institution("Idaho State University", "University", "Pocatello", "ID", "USA"),
+                new Institution("Lewis-Clark State College", "College", "Lewiston", "ID", "USA")
+            };
+            
+            for (Institution institution : idahoInstitutions) {
+                institutionRepository.save(institution);
+            }
         }
     }
 
@@ -81,7 +100,13 @@ public class DataInitializationService implements CommandLineRunner {
             new Institution("University of Florida", "University", "Gainesville", "FL", "USA"),
             new Institution("University of Illinois at Urbana-Champaign", "University", "Urbana", "IL", "USA"),
             new Institution("University of Georgia", "University", "Athens", "GA", "USA"),
-            new Institution("Purdue University", "University", "West Lafayette", "IN", "USA")
+            new Institution("Purdue University", "University", "West Lafayette", "IN", "USA"),
+            
+            // Idaho Universities
+            new Institution("University of Idaho", "University", "Moscow", "ID", "USA"),
+            new Institution("Boise State University", "University", "Boise", "ID", "USA"),
+            new Institution("Idaho State University", "University", "Pocatello", "ID", "USA"),
+            new Institution("Lewis-Clark State College", "College", "Lewiston", "ID", "USA")
         };
 
         for (Institution institution : institutions) {

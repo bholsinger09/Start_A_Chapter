@@ -200,4 +200,32 @@ public class ChapterController {
             return ResponseEntity.ok(new ArrayList<>());
         }
     }
+
+    // Manual endpoint to add Idaho universities if missing
+    @PostMapping("/add-idaho-universities")
+    public ResponseEntity<String> addIdahoUniversities() {
+        try {
+            // Check if University of Idaho already exists
+            List<Institution> existing = institutionService.searchByName("University of Idaho");
+            if (existing.isEmpty()) {
+                Institution[] idahoInstitutions = {
+                    new Institution("University of Idaho", "University", "Moscow", "ID", "USA"),
+                    new Institution("Boise State University", "University", "Boise", "ID", "USA"),
+                    new Institution("Idaho State University", "University", "Pocatello", "ID", "USA"),
+                    new Institution("Lewis-Clark State College", "College", "Lewiston", "ID", "USA")
+                };
+                
+                int added = 0;
+                for (Institution institution : idahoInstitutions) {
+                    institutionService.createInstitution(institution);
+                    added++;
+                }
+                return ResponseEntity.ok("Added " + added + " Idaho universities successfully");
+            } else {
+                return ResponseEntity.ok("Idaho universities already exist");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error adding Idaho universities: " + e.getMessage());
+        }
+    }
 }
