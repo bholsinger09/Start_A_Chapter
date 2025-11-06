@@ -399,4 +399,35 @@ curl -X POST http://localhost:8080/api/members \
     "role": "MEMBER",
     "chapter": {"id": 1}
   }'
+
+## Institution Endpoints
+
+### Get Institutions for Chapter Creation (with filtering)
+```
+GET /api/chapters/institutions
+GET /api/chapters/institutions?state=CA
+GET /api/chapters/institutions?type=University
+GET /api/chapters/institutions?exclude=ID,AK,HI
+```
+This endpoint supports filtering options to customize which institutions are returned for chapter creation forms:
+
+- **No parameters**: Returns all institutions except default excluded states (ID, AK, HI, WY, ND, SD, VT, DE, RI, DC)
+- **state**: Returns institutions only from the specified state
+- **type**: Returns institutions only of the specified type (University, College, etc.)
+- **exclude**: Comma-separated list of state codes to exclude
+
+**Example Usage:**
+```bash
+# Get all institutions (with default filtering)
+curl -X GET https://startachapter.duckdns.org/api/chapters/institutions
+
+# Get only California institutions
+curl -X GET https://startachapter.duckdns.org/api/chapters/institutions?state=CA
+
+# Get all universities (no state filter)
+curl -X GET https://startachapter.duckdns.org/api/chapters/institutions?type=University
+
+# Exclude Idaho and Alaska institutions specifically
+curl -X GET https://startachapter.duckdns.org/api/chapters/institutions?exclude=ID,AK
+```
 ```

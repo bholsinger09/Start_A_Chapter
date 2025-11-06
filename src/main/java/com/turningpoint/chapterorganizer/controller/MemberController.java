@@ -1,12 +1,15 @@
 package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.entity.Member;
+import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.service.MemberService;
+import com.turningpoint.chapterorganizer.service.ChapterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -16,6 +19,9 @@ public class MemberController {
 
     @Autowired
     private MemberService memberService;
+    
+    @Autowired
+    private ChapterService chapterService;
 
     @GetMapping
     public ResponseEntity<List<Member>> getAllMembers() {
@@ -50,12 +56,43 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<Member> createMember(@RequestBody Member member) {
+    public ResponseEntity<?> createMember(@RequestBody Map<String, Object> request) {
         try {
+            // Extract chapterId from request
+            Long chapterId = Long.valueOf(request.get("chapterId").toString());
+            
+            // Get the chapter
+            Optional<Chapter> chapterOpt = chapterService.getChapterById(chapterId);
+            if (!chapterOpt.isPresent()) {
+                return ResponseEntity.badRequest().body("{\"error\": \"Chapter not found\"}");
+            }
+            
+            // Create member object
+            Member member = new Member();
+            member.setFirstName((String) request.get("firstName"));
+            member.setLastName((String) request.get("lastName"));
+            member.setEmail((String) request.get("email"));
+            member.setPhoneNumber((String) request.get("phoneNumber"));
+            
+            // Handle role
+            String roleStr = (String) request.get("role");
+            if (roleStr != null) {
+                member.setRole(com.turningpoint.chapterorganizer.entity.MemberRole.valueOf(roleStr));
+            }
+            
+            // Set chapter
+            member.setChapter(chapterOpt.get());
+            
             Member createdMember = memberService.createMember(member);
             return ResponseEntity.ok(createdMember);
+        } catch (IllegalArgumentException e) {
+            // Return the actual error message for validation errors
+            return ResponseEntity.badRequest().body("{\"error\": \"" + e.getMessage() + "\"}");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            // Log the error and return a generic message
+            System.err.println("Error creating member: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("{\"error\": \"Failed to create member: " + e.getMessage() + "\"}");
         }
     }
 
