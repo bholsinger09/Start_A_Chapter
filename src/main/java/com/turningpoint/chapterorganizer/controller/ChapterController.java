@@ -58,7 +58,7 @@ public class ChapterController {
                         .toList();
                 } else {
                     // Default: exclude less commonly relevant states for general use
-                    List<String> defaultExcludeStates = List.of("ID", "AK", "HI", "WY", "ND", "SD", "VT", "DE", "RI", "DC");
+                    List<String> defaultExcludeStates = List.of("AK", "HI", "WY", "ND", "SD", "VT", "DE", "RI", "DC");
                     institutions = institutions.stream()
                         .filter(institution -> !defaultExcludeStates.contains(institution.getState()))
                         .toList();
