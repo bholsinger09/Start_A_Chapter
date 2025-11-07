@@ -5,8 +5,6 @@ import com.turningpoint.chapterorganizer.service.ChapterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -14,8 +12,6 @@ import java.util.*;
 @RequestMapping("/api/chapters")
 @CrossOrigin(origins = "*")
 public class ChapterController {
-    
-    private static final Logger logger = LoggerFactory.getLogger(ChapterController.class);
 
     @Autowired
     private ChapterService chapterService;
@@ -50,52 +46,6 @@ public class ChapterController {
             return ResponseEntity.ok(createdChapter);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
-        }
-    }
-
-    // Simple endpoint for frontend that accepts state and city fields directly
-    @PostMapping("/with-institution")
-    public ResponseEntity<?> createChapterWithInstitution(@RequestBody Map<String, Object> requestData) {
-        try {
-            logger.info("📋 CREATE CHAPTER WITH INSTITUTION - Simple approach with state/city fields");
-            logger.info("🔍 Request data: {}", requestData);
-            
-            Chapter chapter = new Chapter();
-            
-            // Set chapter name
-            if (requestData.containsKey("name")) {
-                chapter.setName((String) requestData.get("name"));
-            }
-            
-            // Set university name (from institution selection or direct input)
-            if (requestData.containsKey("universityName")) {
-                chapter.setUniversityName((String) requestData.get("universityName"));
-            }
-            
-            // Set state and city from frontend form fields
-            if (requestData.containsKey("state")) {
-                chapter.setState((String) requestData.get("state"));
-            }
-            
-            if (requestData.containsKey("city")) {
-                chapter.setCity((String) requestData.get("city"));
-            }
-            
-            // Set description
-            if (requestData.containsKey("description")) {
-                chapter.setDescription((String) requestData.get("description"));
-            }
-            
-            logger.info("📋 Chapter data: Name={}, University={}, State={}, City={}", 
-                       chapter.getName(), chapter.getUniversityName(), chapter.getState(), chapter.getCity());
-            
-            Chapter createdChapter = chapterService.createChapter(chapter);
-            logger.info("✅ Created chapter with ID: {}", createdChapter.getId());
-            
-            return ResponseEntity.ok(createdChapter);
-        } catch (Exception e) {
-            logger.error("❌ Error creating chapter: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 

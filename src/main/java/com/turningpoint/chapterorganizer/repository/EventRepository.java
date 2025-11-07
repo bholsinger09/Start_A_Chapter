@@ -92,4 +92,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     // Find events with available spots
     @Query("SELECT e FROM Event e WHERE (e.maxAttendees IS NULL OR e.currentAttendees < e.maxAttendees) AND e.eventDateTime > :now AND e.active = true ORDER BY e.eventDateTime ASC")
     List<Event> findEventsWithAvailableSpots(@Param("now") LocalDateTime now);
+
+    // Find events by chapter ID and event type
+    List<Event> findByChapterIdAndType(Long chapterId, EventType type);
+
+    // Find upcoming events by chapter ID ordered by date
+    List<Event> findByChapterIdAndEventDateTimeAfterOrderByEventDateTime(Long chapterId, LocalDateTime eventDateTime);
 }

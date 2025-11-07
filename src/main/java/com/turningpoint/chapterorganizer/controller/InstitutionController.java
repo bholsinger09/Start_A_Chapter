@@ -5,6 +5,8 @@ import com.turningpoint.chapterorganizer.service.InstitutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/institutions")
 public class InstitutionController {
+
+    private static final Logger logger = LoggerFactory.getLogger(InstitutionController.class);
 
     @Autowired
     private InstitutionService institutionService;
@@ -23,35 +27,48 @@ public class InstitutionController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String exclude) {
         try {
+            logger.info("📋 INSTITUTIONS REQUEST - Parameters: state={}, type={}, exclude={}", state, type, exclude);
+            
             List<Institution> institutions;
             
             if (state != null && !state.isEmpty()) {
                 // Filter by specific state if provided
+                logger.info("📍 Filtering institutions by state: {}", state);
                 institutions = institutionService.findByState(state);
+                logger.info("📊 Found {} institutions for state: {}", institutions.size(), state);
             } else if (type != null && !type.isEmpty()) {
                 // Filter by type if provided
+                logger.info("🏫 Filtering institutions by type: {}", type);
                 institutions = institutionService.findByType(type);
+                logger.info("📊 Found {} institutions for type: {}", institutions.size(), type);
             } else {
                 // Get all institutions but apply exclusion filter
+                logger.info("🏢 Getting all institutions with exclusion filter");
                 institutions = institutionService.getAllInstitutions();
+                logger.info("📊 Total institutions before filtering: {}", institutions.size());
                 
                 if (exclude != null && !exclude.isEmpty()) {
                     // Exclude specific states (comma-separated list)
                     List<String> excludeStates = List.of(exclude.split(","));
+                    logger.info("🚫 Excluding states: {}", excludeStates);
                     institutions = institutions.stream()
                         .filter(institution -> !excludeStates.contains(institution.getState()))
                         .toList();
                 } else {
                     // Default: exclude less commonly relevant states for general use
                     List<String> defaultExcludeStates = List.of("AK", "HI", "WY", "ND", "SD", "VT", "DE", "RI", "DC");
+                    logger.info("🚫 Applying default state exclusions: {}", defaultExcludeStates);
                     institutions = institutions.stream()
                         .filter(institution -> !defaultExcludeStates.contains(institution.getState()))
                         .toList();
                 }
+                logger.info("📊 Final institutions count after filtering: {}", institutions.size());
             }
             
+            logger.info("✅ Successfully returning {} institutions", institutions.size());
             return ResponseEntity.ok(institutions);
         } catch (Exception e) {
+            logger.error("❌ INSTITUTIONS ERROR: Failed to fetch institutions", e);
             return ResponseEntity.ok(new ArrayList<>());
         }
     }
