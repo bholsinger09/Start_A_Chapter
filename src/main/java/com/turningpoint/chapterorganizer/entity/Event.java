@@ -52,7 +52,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("chapter-events")
     private Chapter chapter;
 
     @CreationTimestamp
