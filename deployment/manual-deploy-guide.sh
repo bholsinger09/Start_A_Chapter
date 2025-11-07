@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Manual deployment commands for when SSH keys aren't set up
+# Run these commands step by step
+
+echo "📋 MANUAL DEPLOYMENT INSTRUCTIONS"
+echo "================================="
+echo ""
+echo "Since you're logged into the server, here's what to do:"
+echo ""
+echo "1. First, let's check your current setup:"
+echo "   ls -la /home/ubuntu/app/"
+echo "   sudo systemctl status startachapter"
+echo ""
+echo "2. Stop the current service:"
+echo "   sudo systemctl stop startachapter"
+echo ""
+echo "3. Back up current JAR (optional but recommended):"
+echo "   cp /home/ubuntu/app/app.jar /home/ubuntu/app/app.jar.backup"
+echo ""
+echo "4. On your LOCAL MACHINE, upload the new JAR:"
+echo "   From your deployment directory, run:"
+echo "   scp app.jar ubuntu@13.222.125.134:/home/ubuntu/app/"
+echo ""
+echo "   OR if SSH keys aren't set up, use another method like:"
+echo "   - AWS Systems Manager Session Manager"
+echo "   - EC2 Instance Connect"
+echo "   - Or set up SSH keys first"
+echo ""
+echo "5. Start the service with the new JAR:"
+echo "   sudo systemctl start startachapter"
+echo ""
+echo "6. Check that it's running:"
+echo "   sudo systemctl status startachapter"
+echo "   curl -I http://localhost:8080"
+echo ""
+echo "7. Check logs if there are issues:"
+echo "   sudo journalctl -u startachapter -f"
+echo ""
+
+# Let's also show the file sizes for verification
+echo "📊 Current JAR file info:"
+ls -lh app.jar 2>/dev/null || echo "app.jar not found in current directory"

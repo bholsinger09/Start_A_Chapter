@@ -1,122 +1,100 @@
-# Manual Deployment Guide - ChapterController Routing Fix
+# Manual Deployment Guide
 
-## Problem
-The frontend chapter creation form fails with 400 error when loading institutions because of a Spring Boot routing conflict:
-- `/api/chapters/{id}` was intercepting `/api/chapters/institutions` requests
-- Spring Boot was trying to parse "institutions" as a Long ID parameter
+## Quick Deployment to startachapter.duckdns.org
 
-## Solution Applied
-✅ Added `/chapters/institutions` endpoint BEFORE `/chapters/{id}` in ChapterController.java
-✅ Built corrected application jar: `app.jar` (ready to deploy)
+### Prerequisites
+1. SSH access to your server
+2. The latest JAR file: `app.jar`
 
-## Deployment Steps
-
-### Method 1: AWS Console Browser SSH
-1. Go to AWS EC2 Console → Instances
-2. Select your instance → Connect → EC2 Instance Connect
-3. Open browser terminal
-
-### Method 2: If you have the correct SSH key
+### Option 1: Automatic Deployment Script
 ```bash
-ssh -i /path/to/your-key.pem ubuntu@184.73.57.225
+cd deployment
+./deploy-to-production.sh
 ```
 
-### Once Connected to Server:
+### Option 2: Manual Steps
 
-1. **Navigate to deployment directory:**
+1. **Copy JAR to server:**
 ```bash
-cd ~/Start_A_Chapter/deployment
+scp app.jar ubuntu@startachapter.duckdns.org:/home/ubuntu/app/
 ```
 
-2. **Upload the corrected jar** (you'll need to transfer the file somehow):
-   - Option A: Use AWS console file transfer
-   - Option B: If you get SSH working: `scp app.jar ubuntu@184.73.57.225:~/Start_A_Chapter/deployment/`
-   - Option C: Rebuild on server (see alternative method below)
-
-3. **Stop current containers:**
+2. **SSH into server and restart service:**
 ```bash
-sudo docker-compose -f docker-compose.prod.yml down
+ssh ubuntu@startachapter.duckdns.org
+cd /home/ubuntu/app
+sudo systemctl stop startachapter
+sudo systemctl start startachapter
+sudo systemctl status startachapter
 ```
 
-4. **Rebuild backend container:**
+3. **Verify deployment:**
 ```bash
-sudo docker-compose -f docker-compose.prod.yml build --no-cache chapter-backend
+curl -I https://startachapter.duckdns.org
 ```
 
-5. **Start updated containers:**
+### If SSH Key Authentication Not Set Up
+
+1. **Generate SSH key (if you don't have one):**
 ```bash
-sudo docker-compose -f docker-compose.prod.yml up -d
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 ```
 
-6. **Wait for startup and check logs:**
+2. **Copy public key to server:**
 ```bash
-sleep 30
-sudo docker-compose -f docker-compose.prod.yml logs chapter-backend --tail=20
+ssh-copy-id ubuntu@startachapter.duckdns.org
 ```
 
-## Alternative Method: Rebuild on Server
+### Alternative: Docker Deployment
 
-If you can't transfer the jar file, you can apply the fix directly on the server:
+If your server uses Docker, you can also build and deploy using Docker:
 
-1. **Connect to server and navigate to source:**
 ```bash
-cd ~/Start_A_Chapter
+# Build Docker image locally
+docker build -t startachapter:latest .
+
+# Save image to tar file
+docker save startachapter:latest > startachapter.tar
+
+# Copy to server
+scp startachapter.tar ubuntu@startachapter.duckdns.org:/home/ubuntu/
+
+# SSH to server and load image
+ssh ubuntu@startachapter.duckdns.org
+docker load < startachapter.tar
+docker-compose down
+docker-compose up -d
 ```
 
-2. **Edit ChapterController.java on server:**
-```bash
-# Add the institutions endpoint before the {id} endpoint
-# The fix is to add this method after getAllChapters() and before getChapterById():
+### Troubleshooting
 
-# @GetMapping("/chapters/institutions")
-# public ResponseEntity<List<Institution>> getChapterInstitutions() {
-#     try {
-#         List<Institution> institutions = institutionService.getAllInstitutions();
-#         return ResponseEntity.ok(institutions);
-#     } catch (Exception e) {
-#         return ResponseEntity.ok(new ArrayList<>());
-#     }
-# }
-```
+- **Service won't start:** Check logs with `sudo journalctl -u startachapter -f`
+- **Permission issues:** Make sure JAR file is executable: `chmod +x app.jar`
+- **Port conflicts:** Ensure port 8080 is available: `sudo lsof -i :8080`
 
-3. **Rebuild application:**
-```bash
-mvn clean compile package -Dmaven.test.skip=true
-cp target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar deployment/app.jar
-```
+### New Features in This Deployment
 
-4. **Follow deployment steps 3-6 above**
+✨ **University Dropdown Implementation:**
+- Replace text input with university/institution dropdown
+- Auto-populate state and city fields when university is selected
+- Enhanced form validation and user experience
+- Complete Vue.js 3 frontend with Bootstrap 5 styling
 
-## Testing the Fix
+🔧 **Backend Improvements:**
+- Enhanced `/api/chapters/with-institution` endpoint
+- Comprehensive SQL logging for debugging
+- Global exception handler for better error responses
+- Maintained backward compatibility
 
-After deployment, test the institutions endpoint:
-```bash
-curl https://startachapter.duckdns.org/api/chapters/institutions
-```
+### Verification
 
-Should return a JSON array of institutions instead of a 400 error.
+After deployment, verify the new features:
+1. Visit https://startachapter.duckdns.org/#/chapters/create
+2. Check that university field is now a dropdown
+3. Select a university and verify state/city auto-population
+4. Test form submission and validation
 
-## Verification
+---
 
-1. **Check container status:**
-```bash
-sudo docker-compose -f docker-compose.prod.yml ps
-```
-
-2. **Test the endpoint:**
-```bash
-curl -v https://startachapter.duckdns.org/api/chapters/institutions
-```
-
-3. **Check backend logs if issues:**
-```bash
-sudo docker-compose -f docker-compose.prod.yml logs chapter-backend --tail=50
-```
-
-## Expected Result
-
-✅ `/api/chapters/institutions` returns list of institutions  
-✅ Chapter creation form loads institution dropdown  
-✅ No more 400 "Failed to convert 'institutions' to Long" errors  
-
-The fix ensures Spring Boot routes `/chapters/institutions` to the specific endpoint before trying to match it against `/chapters/{id}`.
+**Last Updated:** November 7, 2025
+**Version:** 1.0.0-SNAPSHOT with University Dropdown Feature
