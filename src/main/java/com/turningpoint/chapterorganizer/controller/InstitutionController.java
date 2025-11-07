@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +18,42 @@ public class InstitutionController {
     private InstitutionService institutionService;
 
     @GetMapping
-    public ResponseEntity<List<Institution>> getAllInstitutions() {
-        List<Institution> institutions = institutionService.getAllInstitutions();
-        return ResponseEntity.ok(institutions);
+    public ResponseEntity<List<Institution>> getAllInstitutions(
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String exclude) {
+        try {
+            List<Institution> institutions;
+            
+            if (state != null && !state.isEmpty()) {
+                // Filter by specific state if provided
+                institutions = institutionService.findByState(state);
+            } else if (type != null && !type.isEmpty()) {
+                // Filter by type if provided
+                institutions = institutionService.findByType(type);
+            } else {
+                // Get all institutions but apply exclusion filter
+                institutions = institutionService.getAllInstitutions();
+                
+                if (exclude != null && !exclude.isEmpty()) {
+                    // Exclude specific states (comma-separated list)
+                    List<String> excludeStates = List.of(exclude.split(","));
+                    institutions = institutions.stream()
+                        .filter(institution -> !excludeStates.contains(institution.getState()))
+                        .toList();
+                } else {
+                    // Default: exclude less commonly relevant states for general use
+                    List<String> defaultExcludeStates = List.of("AK", "HI", "WY", "ND", "SD", "VT", "DE", "RI", "DC");
+                    institutions = institutions.stream()
+                        .filter(institution -> !defaultExcludeStates.contains(institution.getState()))
+                        .toList();
+                }
+            }
+            
+            return ResponseEntity.ok(institutions);
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
     }
 
     @GetMapping("/{id}")

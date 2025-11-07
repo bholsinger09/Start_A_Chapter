@@ -1,9 +1,7 @@
 package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.entity.Chapter;
-import com.turningpoint.chapterorganizer.entity.Institution;
 import com.turningpoint.chapterorganizer.service.ChapterService;
-import com.turningpoint.chapterorganizer.service.InstitutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +15,6 @@ public class ChapterController {
 
     @Autowired
     private ChapterService chapterService;
-    
-    @Autowired
-    private InstitutionService institutionService;
 
     @GetMapping("")
     public ResponseEntity<List<Chapter>> getAllChapters() {
@@ -31,45 +26,7 @@ public class ChapterController {
         }
     }
 
-    // IMPORTANT: This must come before /chapters/{id} to avoid routing conflict
-    @GetMapping("/institutions")
-    public ResponseEntity<List<Institution>> getChapterInstitutions(
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String exclude) {
-        try {
-            List<Institution> institutions;
-            
-            if (state != null && !state.isEmpty()) {
-                // Filter by specific state if provided
-                institutions = institutionService.findByState(state);
-            } else if (type != null && !type.isEmpty()) {
-                // Filter by type if provided
-                institutions = institutionService.findByType(type);
-            } else {
-                // Get all institutions but apply exclusion filter
-                institutions = institutionService.getAllInstitutions();
-                
-                if (exclude != null && !exclude.isEmpty()) {
-                    // Exclude specific states (comma-separated list)
-                    List<String> excludeStates = List.of(exclude.split(","));
-                    institutions = institutions.stream()
-                        .filter(institution -> !excludeStates.contains(institution.getState()))
-                        .toList();
-                } else {
-                    // Default: exclude less commonly relevant states for general use
-                    List<String> defaultExcludeStates = List.of("AK", "HI", "WY", "ND", "SD", "VT", "DE", "RI", "DC");
-                    institutions = institutions.stream()
-                        .filter(institution -> !defaultExcludeStates.contains(institution.getState()))
-                        .toList();
-                }
-            }
-            
-            return ResponseEntity.ok(institutions);
-        } catch (Exception e) {
-            return ResponseEntity.ok(new ArrayList<>());
-        }
-    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Chapter> getChapterById(@PathVariable Long id) {
@@ -92,50 +49,7 @@ public class ChapterController {
         }
     }
 
-    @PostMapping("/with-institution")
-    public ResponseEntity<Chapter> createChapterWithInstitution(@RequestBody Map<String, Object> requestBody) {
-        try {
-            // Extract chapter and institution data from request
-            Chapter chapter = new Chapter();
-            
-            if (requestBody.containsKey("name")) {
-                chapter.setName((String) requestBody.get("name"));
-            }
-            if (requestBody.containsKey("description")) {
-                chapter.setDescription((String) requestBody.get("description"));
-            }
-            
-            // Handle institution ID
-            if (requestBody.containsKey("institutionId")) {
-                Object institutionIdObj = requestBody.get("institutionId");
-                Long institutionId;
-                
-                if (institutionIdObj instanceof Integer) {
-                    institutionId = ((Integer) institutionIdObj).longValue();
-                } else if (institutionIdObj instanceof Long) {
-                    institutionId = (Long) institutionIdObj;
-                } else if (institutionIdObj instanceof String) {
-                    institutionId = Long.parseLong((String) institutionIdObj);
-                } else {
-                    return ResponseEntity.badRequest().build();
-                }
-                
-                // Get institution and set university details
-                Optional<Institution> institutionOpt = institutionService.getInstitutionById(institutionId);
-                if (institutionOpt.isPresent()) {
-                    Institution institution = institutionOpt.get();
-                    chapter.setUniversityName(institution.getName());
-                    chapter.setCity(institution.getLocation());
-                    chapter.setState(institution.getState());
-                }
-            }
-            
-            Chapter createdChapter = chapterService.createChapter(chapter);
-            return ResponseEntity.ok(createdChapter);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Chapter> updateChapter(@PathVariable Long id, @RequestBody Chapter chapter) {
@@ -219,31 +133,5 @@ public class ChapterController {
         }
     }
 
-    // Manual endpoint to add Idaho universities if missing
-    @PostMapping("/add-idaho-universities")
-    public ResponseEntity<String> addIdahoUniversities() {
-        try {
-            // Check if University of Idaho already exists
-            List<Institution> existing = institutionService.searchByName("University of Idaho");
-            if (existing.isEmpty()) {
-                Institution[] idahoInstitutions = {
-                    new Institution("University of Idaho", "University", "Moscow", "ID", "USA"),
-                    new Institution("Boise State University", "University", "Boise", "ID", "USA"),
-                    new Institution("Idaho State University", "University", "Pocatello", "ID", "USA"),
-                    new Institution("Lewis-Clark State College", "College", "Lewiston", "ID", "USA")
-                };
-                
-                int added = 0;
-                for (Institution institution : idahoInstitutions) {
-                    institutionService.createInstitution(institution);
-                    added++;
-                }
-                return ResponseEntity.ok("Added " + added + " Idaho universities successfully");
-            } else {
-                return ResponseEntity.ok("Idaho universities already exist");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error adding Idaho universities: " + e.getMessage());
-        }
-    }
+
 }
