@@ -1,5 +1,5 @@
-# Use OpenJDK 21 runtime
-FROM openjdk:21-jdk-slim
+# Use OpenJDK 21 JDK for building
+FROM eclipse-temurin:21-jdk-alpine
 
 # Set working directory
 WORKDIR /app
