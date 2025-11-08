@@ -1,15 +1,14 @@
 package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.entity.Member;
-import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.service.MemberService;
-import com.turningpoint.chapterorganizer.service.ChapterService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -17,102 +16,84 @@ import java.util.Optional;
 @CrossOrigin(origins = "*")
 public class MemberController {
 
-    @Autowired
-    private MemberService memberService;
-    
-    @Autowired
-    private ChapterService chapterService;
+    private final MemberService memberService;
 
-    @GetMapping
-    public ResponseEntity<List<Member>> getAllMembers() {
-        try {
-            // For now, return an empty list since we don't have a getAllActiveMembers method
-            // This would typically be implemented or we'd require a chapter ID parameter
-            return ResponseEntity.ok(List.of());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+    @Autowired
+    public MemberController(MemberService memberService) {
+        this.memberService = memberService;
     }
 
+    // GET /api/members/{id} - Get member by ID
     @GetMapping("/{id}")
     public ResponseEntity<Member> getMemberById(@PathVariable Long id) {
-        try {
-            Optional<Member> member = memberService.getMemberById(id);
-            return member.map(ResponseEntity::ok)
-                         .orElse(ResponseEntity.notFound().build());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        Optional<Member> member = memberService.getMemberById(id);
+        return member.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+    // GET /api/members/username/{username} - Get member by email/username (for blog feature)
+    @GetMapping("/username/{username}")
+    public ResponseEntity<Member> getMemberByUsername(@PathVariable String username) {
+        // Since we don't have a username field, we'll use email as username
+        Optional<Member> member = memberService.getMemberByEmail(username);
+        return member.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // GET /api/members/chapter/{chapterId} - Get members by chapter
     @GetMapping("/chapter/{chapterId}")
     public ResponseEntity<List<Member>> getMembersByChapter(@PathVariable Long chapterId) {
-        try {
-            List<Member> members = memberService.getMembersByChapter(chapterId);
-            return ResponseEntity.ok(members);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        List<Member> members = memberService.getMembersByChapter(chapterId);
+        return ResponseEntity.ok(members);
     }
 
+    // GET /api/members/chapter/{chapterId}/active - Get active members by chapter
+    @GetMapping("/chapter/{chapterId}/active")
+    public ResponseEntity<List<Member>> getActiveMembersByChapter(@PathVariable Long chapterId) {
+        List<Member> members = memberService.getMembersByChapter(chapterId);
+        return ResponseEntity.ok(members);
+    }
+
+    // POST /api/members - Create new member
     @PostMapping
-    public ResponseEntity<?> createMember(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<Member> createMember(@Valid @RequestBody Member member) {
         try {
-            // Extract chapterId from request
-            Long chapterId = Long.valueOf(request.get("chapterId").toString());
-            
-            // Get the chapter
-            Optional<Chapter> chapterOpt = chapterService.getChapterById(chapterId);
-            if (!chapterOpt.isPresent()) {
-                return ResponseEntity.badRequest().body("{\"error\": \"Chapter not found\"}");
-            }
-            
-            // Create member object
-            Member member = new Member();
-            member.setFirstName((String) request.get("firstName"));
-            member.setLastName((String) request.get("lastName"));
-            member.setEmail((String) request.get("email"));
-            member.setPhoneNumber((String) request.get("phoneNumber"));
-            
-            // Handle role
-            String roleStr = (String) request.get("role");
-            if (roleStr != null) {
-                member.setRole(com.turningpoint.chapterorganizer.entity.MemberRole.valueOf(roleStr));
-            }
-            
-            // Set chapter
-            member.setChapter(chapterOpt.get());
-            
             Member createdMember = memberService.createMember(member);
-            return ResponseEntity.ok(createdMember);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdMember);
         } catch (IllegalArgumentException e) {
-            // Return the actual error message for validation errors
-            return ResponseEntity.badRequest().body("{\"error\": \"" + e.getMessage() + "\"}");
-        } catch (Exception e) {
-            // Log the error and return a generic message
-            System.err.println("Error creating member: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("{\"error\": \"Failed to create member: " + e.getMessage() + "\"}");
+            return ResponseEntity.badRequest().build();
         }
     }
 
+    // PUT /api/members/{id} - Update existing member
     @PutMapping("/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member member) {
+    public ResponseEntity<Member> updateMember(@PathVariable Long id, 
+                                             @Valid @RequestBody Member updateRequest) {
         try {
-            Member updatedMember = memberService.updateMember(id, member);
+            Member updatedMember = memberService.updateMember(id, updateRequest);
             return ResponseEntity.ok(updatedMember);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+    // DELETE /api/members/{id} - Deactivate member (soft delete)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
+    public ResponseEntity<Void> deactivateMember(@PathVariable Long id) {
         try {
             memberService.deactivateMember(id);
             return ResponseEntity.noContent().build();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // GET /api/members/chapter/{chapterId}/count - Count active members in chapter
+    @GetMapping("/chapter/{chapterId}/count")
+    public ResponseEntity<Long> countActiveMembers(@PathVariable Long chapterId) {
+        Long count = memberService.countActiveMembersByChapter(chapterId);
+        return ResponseEntity.ok(count);
     }
 }

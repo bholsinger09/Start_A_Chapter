@@ -13,7 +13,7 @@
         </button>
         
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav me-auto">
             <li class="nav-item">
               <router-link class="nav-link" to="/" exact-active-class="active">
                 <i class="bi bi-speedometer2 me-1"></i>Dashboard
@@ -25,8 +25,49 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/chapters/create" active-class="active">
-                <i class="bi bi-plus-circle me-1"></i>Create Chapter
+              <router-link class="nav-link" to="/members" active-class="active">
+                <i class="bi bi-people me-1"></i>Members
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/events" active-class="active">
+                <i class="bi bi-calendar-event me-1"></i>Events
+              </router-link>
+            </li>
+            <li class="nav-item" v-if="isAuthenticated">
+              <router-link class="nav-link" to="/blog" active-class="active">
+                <i class="bi bi-journal-text me-1"></i>Blog
+              </router-link>
+            </li>
+          </ul>
+          
+          <!-- Authentication Menu -->
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown" v-if="isAuthenticated">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-1"></i>{{ currentUser?.username || 'User' }}
+              </a>
+              <ul class="dropdown-menu">
+                <li><router-link class="dropdown-item" to="/profile">
+                  <i class="bi bi-person me-2"></i>Profile
+                </router-link></li>
+                <li><router-link class="dropdown-item" to="/settings">
+                  <i class="bi bi-gear me-2"></i>Settings
+                </router-link></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" @click="logout">
+                  <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </a></li>
+              </ul>
+            </li>
+            <li class="nav-item" v-if="!isAuthenticated">
+              <router-link class="nav-link" to="/login">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+              </router-link>
+            </li>
+            <li class="nav-item" v-if="!isAuthenticated">
+              <router-link class="nav-link" to="/register">
+                <i class="bi bi-person-plus me-1"></i>Register
               </router-link>
             </li>
           </ul>
@@ -61,8 +102,56 @@
 </template>
 
 <script>
+import { ref, computed, onMounted } from 'vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+  setup() {
+    const currentUser = ref(null)
+
+    // Check authentication status
+    const isAuthenticated = computed(() => {
+      return currentUser.value !== null
+    })
+
+    // Check auth state on mount
+    const checkAuthState = () => {
+      try {
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+          currentUser.value = JSON.parse(storedUser)
+        }
+      } catch (error) {
+        console.error('Error parsing stored user:', error)
+        localStorage.removeItem('user')
+      }
+    }
+
+    // Logout function
+    const logout = () => {
+      localStorage.removeItem('user')
+      currentUser.value = null
+      // Redirect to home page
+      window.location.href = '/'
+    }
+
+    onMounted(() => {
+      checkAuthState()
+      
+      // Listen for storage changes (login/logout in other tabs)
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'user') {
+          checkAuthState()
+        }
+      })
+    })
+
+    return {
+      currentUser,
+      isAuthenticated,
+      logout
+    }
+  }
 }
 </script>
 

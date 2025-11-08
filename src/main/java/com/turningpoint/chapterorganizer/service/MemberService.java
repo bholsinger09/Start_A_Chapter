@@ -231,4 +231,82 @@ public class MemberService {
         member.setChapter(newChapter);
         return memberRepository.save(member);
     }
+
+    /**
+     * Find member by username
+     */
+    @Transactional(readOnly = true)
+    public Optional<Member> findByUsername(String username) {
+        return memberRepository.findByUsername(username);
+    }
+
+    /**
+     * Find member by email
+     */
+    @Transactional(readOnly = true)
+    public Optional<Member> findByEmail(String email) {
+        return memberRepository.findByEmail(email);
+    }
+
+    /**
+     * Find member by username or email
+     */
+    @Transactional(readOnly = true)
+    public Optional<Member> findByUsernameOrEmail(String username, String email) {
+        // First try username if provided
+        if (username != null && !username.trim().isEmpty()) {
+            Optional<Member> byUsername = memberRepository.findByUsername(username);
+            if (byUsername.isPresent()) {
+                return byUsername;
+            }
+        }
+        
+        // Then try email if provided
+        if (email != null && !email.trim().isEmpty()) {
+            return memberRepository.findByEmail(email);
+        }
+        
+        return Optional.empty();
+    }
+
+    /**
+     * Save member (for authentication and registration)
+     */
+    public Member saveMember(Member member) {
+        // Handle chapter assignment if chapterId is provided
+        if (member.getChapterId() != null) {
+            Optional<Chapter> chapter = chapterService.getChapterById(member.getChapterId());
+            if (chapter.isPresent()) {
+                member.setChapter(chapter.get());
+            }
+        }
+
+        // Set default values
+        if (member.getActive() == null) {
+            member.setActive(true);
+        }
+        if (member.getRole() == null) {
+            member.setRole(MemberRole.MEMBER);
+        }
+
+        return memberRepository.save(member);
+    }
+
+    /**
+     * Get all members (for admin purposes)
+     */
+    @Transactional(readOnly = true)
+    public List<Member> getAllMembers() {
+        return memberRepository.findAll();
+    }
+
+    /**
+     * Delete member by ID
+     */
+    public void deleteMember(Long id) {
+        if (!memberRepository.existsById(id)) {
+            throw new IllegalArgumentException("Member not found with id: " + id);
+        }
+        memberRepository.deleteById(id);
+    }
 }
