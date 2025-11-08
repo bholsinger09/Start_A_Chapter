@@ -1,184 +1,146 @@
 package com.turningpoint.chapterorganizer.controller;
 
+import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.MemberRole;
+import com.turningpoint.chapterorganizer.service.ChapterService;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"})
 public class AuthController {
 
     @Autowired
     private MemberService memberService;
 
+    @Autowired
+    private ChapterService chapterService;
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            // Find member by username or email
-            Optional<Member> memberOpt = memberService.findByUsernameOrEmail(
-                loginRequest.getUsernameOrEmail(), 
-                loginRequest.getUsernameOrEmail()
-            );
-            
-            if (memberOpt.isEmpty()) {
-                return ResponseEntity.status(401)
-                    .body(Map.of("message", "Invalid username/email or password"));
-            }
-            
-            Member member = memberOpt.get();
-            
-            // Simple password check (in production, use proper password hashing)
-            if (!loginRequest.getPassword().equals(member.getPassword())) {
-                return ResponseEntity.status(401)
-                    .body(Map.of("message", "Invalid username/email or password"));
-            }
-            
-            // Check if member is active
-            if (!member.getActive()) {
-                return ResponseEntity.status(403)
-                    .body(Map.of("message", "Your account has been disabled"));
-            }
-            
-            // Generate simple token (in production, use JWT)
-            String token = generateToken(member);
-            
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> loginData) {
+        String email = loginData.get("email");
+        String password = loginData.get("password");
+
+        if (email == null || password == null) {
             Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
-            response.put("user", createUserResponse(member));
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            return ResponseEntity.status(500)
-                .body(Map.of("message", "Login failed"));
+            response.put("success", false);
+            response.put("message", "Email and password are required");
+            return ResponseEntity.badRequest().body(response);
         }
+
+        Optional<Member> member = memberService.getMemberByEmail(email);
+
+        if (member.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        // For now, just check if member exists (password validation would go here)
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Login successful");
+        
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("id", member.get().getId());
+        userData.put("email", member.get().getEmail());
+        userData.put("firstName", member.get().getFirstName());
+        userData.put("lastName", member.get().getLastName());
+        userData.put("role", member.get().getRole());
+        userData.put("chapterId", member.get().getChapter() != null ? member.get().getChapter().getId() : null);
+        
+        response.put("user", userData);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, Object> registrationData) {
         try {
-            // Check if username already exists
-            if (registerRequest.getUsername() != null && 
-                memberService.findByUsername(registerRequest.getUsername()).isPresent()) {
-                return ResponseEntity.status(400)
-                    .body(Map.of("message", "Username already exists", "field", "username"));
+            String firstName = (String) registrationData.get("firstName");
+            String lastName = (String) registrationData.get("lastName");
+            String email = (String) registrationData.get("email");
+            String roleStr = (String) registrationData.get("role");
+
+            // Validate required fields
+            if (firstName == null || lastName == null || email == null) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "First name, last name, and email are required");
+                return ResponseEntity.badRequest().body(response);
             }
-            
-            // Check if email already exists
-            if (memberService.findByEmail(registerRequest.getEmail()).isPresent()) {
-                return ResponseEntity.status(400)
-                    .body(Map.of("message", "Email already exists", "field", "email"));
+
+            // Check if member already exists
+            if (memberService.getMemberByEmail(email).isPresent()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Member with this email already exists");
+                return ResponseEntity.badRequest().body(response);
             }
-            
+
+            // Get a default chapter (first available chapter)
+            List<Chapter> chapters = chapterService.getAllChapters();
+            if (chapters.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "No chapters available for registration");
+                return ResponseEntity.badRequest().body(response);
+            }
+
             // Create new member
             Member member = new Member();
-            member.setFirstName(registerRequest.getFirstName());
-            member.setLastName(registerRequest.getLastName());
-            member.setEmail(registerRequest.getEmail());
-            member.setUsername(registerRequest.getUsername());
-            member.setPassword(registerRequest.getPassword()); // In production, hash the password
-            member.setPhoneNumber(registerRequest.getPhoneNumber());
-            member.setMajor(registerRequest.getMajor());
-            member.setGraduationYear(registerRequest.getGraduationYear() != null ? 
-                registerRequest.getGraduationYear().toString() : null);
-            member.setChapterId(registerRequest.getChapterId());
+            member.setFirstName(firstName);
+            member.setLastName(lastName);
+            member.setEmail(email);
+            member.setChapter(chapters.get(0)); // Assign to first available chapter
             
-            // Convert string role to enum
-            if (registerRequest.getRole() != null) {
-                member.setRole(MemberRole.valueOf(registerRequest.getRole()));
+            // Set role
+            MemberRole role = MemberRole.MEMBER;
+            if (roleStr != null) {
+                try {
+                    role = MemberRole.valueOf(roleStr.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    role = MemberRole.MEMBER;
+                }
             }
-            member.setActive(true);
-            
-            Member savedMember = memberService.saveMember(member);
-            
+            member.setRole(role);
+
+            // Save the member
+            Member savedMember = memberService.createMember(member);
+
+            // Return success response
             Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
             response.put("message", "Registration successful");
-            response.put("user", createUserResponse(savedMember));
             
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("id", savedMember.getId());
+            userData.put("email", savedMember.getEmail());
+            userData.put("firstName", savedMember.getFirstName());
+            userData.put("lastName", savedMember.getLastName());
+            userData.put("role", savedMember.getRole());
+            userData.put("chapterId", savedMember.getChapter().getId());
+            
+            response.put("user", userData);
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
-            return ResponseEntity.status(500)
-                .body(Map.of("message", "Registration failed"));
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Registration failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // In a real application, you would invalidate the token
-        return ResponseEntity.ok(Map.of("message", "Logout successful"));
-    }
-
-    private String generateToken(Member member) {
-        // Simple token generation (in production, use JWT)
-        return "token_" + member.getId() + "_" + System.currentTimeMillis();
-    }
-
-    private Map<String, Object> createUserResponse(Member member) {
-        Map<String, Object> user = new HashMap<>();
-        user.put("id", member.getId());
-        user.put("username", member.getUsername());
-        user.put("email", member.getEmail());
-        user.put("firstName", member.getFirstName());
-        user.put("lastName", member.getLastName());
-        user.put("role", member.getRole());
-        user.put("chapterId", member.getChapterId());
-        user.put("active", member.getActive());
-        return user;
-    }
-
-    // Request DTOs
-    public static class LoginRequest {
-        private String usernameOrEmail;
-        private String password;
-        
-        // Getters and setters
-        public String getUsernameOrEmail() { return usernameOrEmail; }
-        public void setUsernameOrEmail(String usernameOrEmail) { this.usernameOrEmail = usernameOrEmail; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-    }
-
-    public static class RegisterRequest {
-        private String firstName;
-        private String lastName;
-        private String email;
-        private String username;
-        private String password;
-        private String phoneNumber;
-        private String major;
-        private Integer graduationYear;
-        private Long chapterId;
-        private String role;
-        
-        // Getters and setters
-        public String getFirstName() { return firstName; }
-        public void setFirstName(String firstName) { this.firstName = firstName; }
-        public String getLastName() { return lastName; }
-        public void setLastName(String lastName) { this.lastName = lastName; }
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-        public String getPhoneNumber() { return phoneNumber; }
-        public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-        public String getMajor() { return major; }
-        public void setMajor(String major) { this.major = major; }
-        public Integer getGraduationYear() { return graduationYear; }
-        public void setGraduationYear(Integer graduationYear) { this.graduationYear = graduationYear; }
-        public Long getChapterId() { return chapterId; }
-        public void setChapterId(Long chapterId) { this.chapterId = chapterId; }
-        public String getRole() { return role; }
-        public void setRole(String role) { this.role = role; }
     }
 }
