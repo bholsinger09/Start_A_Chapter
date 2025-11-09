@@ -1,0 +1,4401 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.1.5)
+
+2025-11-07T15:31:41.168-07:00  INFO 29935 --- [           main] c.t.c.CampusChapterOrganizerApplication  : Starting CampusChapterOrganizerApplication v1.0.0-SNAPSHOT using Java 25 with PID 29935 (/Users/benh/Documents/StartAChapter/target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar started by benh in /Users/benh/Documents/StartAChapter)
+2025-11-07T15:31:41.168-07:00 DEBUG 29935 --- [           main] c.t.c.CampusChapterOrganizerApplication  : Running with Spring Boot v3.1.5, Spring v6.0.13
+2025-11-07T15:31:41.169-07:00  INFO 29935 --- [           main] c.t.c.CampusChapterOrganizerApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-11-07T15:31:41.449-07:00  INFO 29935 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-11-07T15:31:41.473-07:00  INFO 29935 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 20 ms. Found 4 JPA repository interfaces.
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module (jar:file:/Users/benh/Documents/StartAChapter/target/campus-chapter-organizer-1.0.0-SNAPSHOT.jar!/BOOT-INF/lib/tomcat-embed-core-10.1.15.jar!/)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2025-11-07T15:31:41.695-07:00  INFO 29935 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-11-07T15:31:41.699-07:00  INFO 29935 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-11-07T15:31:41.699-07:00  INFO 29935 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.15]
+2025-11-07T15:31:41.724-07:00  INFO 29935 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-11-07T15:31:41.724-07:00  INFO 29935 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 535 ms
+2025-11-07T15:31:41.736-07:00  INFO 29935 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-11-07T15:31:41.820-07:00  INFO 29935 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:chapterdb user=SA
+2025-11-07T15:31:41.820-07:00  INFO 29935 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-11-07T15:31:41.825-07:00  INFO 29935 --- [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:chapterdb'
+2025-11-07T15:31:41.876-07:00  INFO 29935 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-11-07T15:31:41.900-07:00  INFO 29935 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.13.Final
+2025-11-07T15:31:41.901-07:00  INFO 29935 --- [           main] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2025-11-07T15:31:42.005-07:00  INFO 29935 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-11-07T15:31:42.022-07:00  WARN 29935 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-11-07T15:31:42.389-07:00  INFO 29935 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-11-07T15:31:42.394-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    drop table if exists chapters cascade 
+Hibernate: 
+    drop table if exists chapters cascade 
+2025-11-07T15:31:42.396-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    drop table if exists events cascade 
+Hibernate: 
+    drop table if exists events cascade 
+2025-11-07T15:31:42.396-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    drop table if exists institutions cascade 
+Hibernate: 
+    drop table if exists institutions cascade 
+2025-11-07T15:31:42.396-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    drop table if exists members cascade 
+Hibernate: 
+    drop table if exists members cascade 
+2025-11-07T15:31:42.398-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    create table chapters (
+        active boolean not null,
+        created_at timestamp(6) not null,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        state varchar(50) not null,
+        city varchar(100) not null,
+        name varchar(100) not null unique,
+        university_name varchar(150) not null,
+        description varchar(500),
+        primary key (id)
+    )
+Hibernate: 
+    create table chapters (
+        active boolean not null,
+        created_at timestamp(6) not null,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        state varchar(50) not null,
+        city varchar(100) not null,
+        name varchar(100) not null unique,
+        university_name varchar(150) not null,
+        description varchar(500),
+        primary key (id)
+    )
+2025-11-07T15:31:42.401-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    create table events (
+        active boolean not null,
+        current_attendees integer,
+        max_attendees integer,
+        chapter_id bigint not null,
+        created_at timestamp(6) not null,
+        event_date_time timestamp(6) not null,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        title varchar(150) not null,
+        location varchar(200),
+        description varchar(1000),
+        type varchar(255) not null check (type in ('MEETING','SOCIAL','FUNDRAISER','VOLUNTEER','EDUCATIONAL','POLITICAL','NETWORKING','RECRUITMENT','OTHER')),
+        primary key (id)
+    )
+Hibernate: 
+    create table events (
+        active boolean not null,
+        current_attendees integer,
+        max_attendees integer,
+        chapter_id bigint not null,
+        created_at timestamp(6) not null,
+        event_date_time timestamp(6) not null,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        title varchar(150) not null,
+        location varchar(200),
+        description varchar(1000),
+        type varchar(255) not null check (type in ('MEETING','SOCIAL','FUNDRAISER','VOLUNTEER','EDUCATIONAL','POLITICAL','NETWORKING','RECRUITMENT','OTHER')),
+        primary key (id)
+    )
+2025-11-07T15:31:42.403-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    create table institutions (
+        student_count integer,
+        id bigint generated by default as identity,
+        country varchar(255),
+        location varchar(255),
+        name varchar(255) not null,
+        state varchar(255),
+        type varchar(255),
+        website varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table institutions (
+        student_count integer,
+        id bigint generated by default as identity,
+        country varchar(255),
+        location varchar(255),
+        name varchar(255) not null,
+        state varchar(255),
+        type varchar(255),
+        website varchar(255),
+        primary key (id)
+    )
+2025-11-07T15:31:42.404-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    create table members (
+        active boolean not null,
+        chapter_id bigint not null,
+        created_at timestamp(6) not null,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        phone_number varchar(15),
+        graduation_year varchar(20),
+        first_name varchar(50) not null,
+        last_name varchar(50) not null,
+        major varchar(50),
+        email varchar(255) not null unique,
+        role varchar(255) not null check (role in ('PRESIDENT','VICE_PRESIDENT','SECRETARY','TREASURER','OFFICER','MEMBER')),
+        primary key (id)
+    )
+Hibernate: 
+    create table members (
+        active boolean not null,
+        chapter_id bigint not null,
+        created_at timestamp(6) not null,
+        id bigint generated by default as identity,
+        updated_at timestamp(6),
+        phone_number varchar(15),
+        graduation_year varchar(20),
+        first_name varchar(50) not null,
+        last_name varchar(50) not null,
+        major varchar(50),
+        email varchar(255) not null unique,
+        role varchar(255) not null check (role in ('PRESIDENT','VICE_PRESIDENT','SECRETARY','TREASURER','OFFICER','MEMBER')),
+        primary key (id)
+    )
+2025-11-07T15:31:42.405-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    alter table if exists events 
+       add constraint FKoh3x41cbsvxy46mbsb8baw2np 
+       foreign key (chapter_id) 
+       references chapters
+Hibernate: 
+    alter table if exists events 
+       add constraint FKoh3x41cbsvxy46mbsb8baw2np 
+       foreign key (chapter_id) 
+       references chapters
+2025-11-07T15:31:42.408-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    alter table if exists members 
+       add constraint FKdlonkpslhqtyoonq9c3aaqha 
+       foreign key (chapter_id) 
+       references chapters
+Hibernate: 
+    alter table if exists members 
+       add constraint FKdlonkpslhqtyoonq9c3aaqha 
+       foreign key (chapter_id) 
+       references chapters
+2025-11-07T15:31:42.411-07:00  INFO 29935 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-11-07T15:31:42.540-07:00  INFO 29935 --- [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-11-07T15:31:42.831-07:00  WARN 29935 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-11-07T15:31:42.883-07:00  INFO 29935 --- [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2025-11-07T15:31:42.924-07:00  WARN 29935 --- [           main] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2025-11-07T15:31:42.957-07:00  INFO 29935 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2025-11-07T15:31:42.965-07:00  INFO 29935 --- [           main] c.t.c.CampusChapterOrganizerApplication  : Started CampusChapterOrganizerApplication in 1.96 seconds (process running for 2.14)
+2025-11-07T15:31:42.990-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    select
+        count(*) 
+    from
+        institutions i1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        institutions i1_0
+2025-11-07T15:31:43.004-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.009-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.010-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.010-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.011-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.012-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.012-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.013-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.013-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.014-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.014-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.015-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.016-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.016-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.017-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.017-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.018-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.018-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.019-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.019-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.020-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.021-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.021-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.022-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.022-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.023-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.023-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.024-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.024-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.025-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.025-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.026-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.026-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.027-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.028-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.028-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.029-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.030-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.030-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.031-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.031-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.031-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.032-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.033-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.033-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.034-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.034-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.035-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.035-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.037-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.037-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.038-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.038-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.039-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        institutions
+        (country,location,name,state,student_count,type,website,id) 
+    values
+        (?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.059-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    select
+        i1_0.id,
+        i1_0.country,
+        i1_0.location,
+        i1_0.name,
+        i1_0.state,
+        i1_0.student_count,
+        i1_0.type,
+        i1_0.website 
+    from
+        institutions i1_0 
+    where
+        upper(i1_0.name) like upper(?) escape '\'
+Hibernate: 
+    select
+        i1_0.id,
+        i1_0.country,
+        i1_0.location,
+        i1_0.name,
+        i1_0.state,
+        i1_0.student_count,
+        i1_0.type,
+        i1_0.website 
+    from
+        institutions i1_0 
+    where
+        upper(i1_0.name) like upper(?) escape '\'
+2025-11-07T15:31:43.061-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    select
+        count(*) 
+    from
+        chapters c1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        chapters c1_0
+2025-11-07T15:31:43.062-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    select
+        i1_0.id,
+        i1_0.country,
+        i1_0.location,
+        i1_0.name,
+        i1_0.state,
+        i1_0.student_count,
+        i1_0.type,
+        i1_0.website 
+    from
+        institutions i1_0
+Hibernate: 
+    select
+        i1_0.id,
+        i1_0.country,
+        i1_0.location,
+        i1_0.name,
+        i1_0.state,
+        i1_0.student_count,
+        i1_0.type,
+        i1_0.website 
+    from
+        institutions i1_0
+2025-11-07T15:31:43.073-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.077-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.078-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.078-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.079-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.080-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.081-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.081-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.082-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.083-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.084-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.084-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.085-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.086-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.087-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.087-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.088-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.088-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.089-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:43.090-07:00 DEBUG 29935 --- [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:31:55.904-07:00  INFO 29935 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-11-07T15:31:55.904-07:00  INFO 29935 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-11-07T15:31:55.904-07:00  INFO 29935 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2025-11-07T15:32:09.445-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        c1_0.id,
+        c1_0.active,
+        c1_0.city,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.state,
+        c1_0.university_name,
+        c1_0.updated_at 
+    from
+        chapters c1_0 
+    where
+        c1_0.active
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.active,
+        c1_0.city,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.state,
+        c1_0.university_name,
+        c1_0.updated_at 
+    from
+        chapters c1_0 
+    where
+        c1_0.active
+2025-11-07T15:32:09.469-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.471-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.471-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.472-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.472-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.472-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.472-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.472-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.472-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.473-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.473-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.473-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.473-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.473-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.474-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.474-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.474-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.474-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.474-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.475-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.475-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.475-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.475-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.475-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.475-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.476-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.476-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.476-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.476-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.476-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.476-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.477-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.477-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.477-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.477-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.477-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.478-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.478-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:09.478-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:09.478-07:00 DEBUG 29935 --- [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:12.187-07:00  INFO 29935 --- [nio-8080-exec-8] c.t.c.controller.InstitutionController   : 📋 INSTITUTIONS REQUEST - Parameters: state=null, type=null, exclude=null
+2025-11-07T15:32:12.187-07:00  INFO 29935 --- [nio-8080-exec-8] c.t.c.controller.InstitutionController   : 🏢 Getting all institutions with exclusion filter
+2025-11-07T15:32:12.188-07:00 DEBUG 29935 --- [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        i1_0.id,
+        i1_0.country,
+        i1_0.location,
+        i1_0.name,
+        i1_0.state,
+        i1_0.student_count,
+        i1_0.type,
+        i1_0.website 
+    from
+        institutions i1_0
+Hibernate: 
+    select
+        i1_0.id,
+        i1_0.country,
+        i1_0.location,
+        i1_0.name,
+        i1_0.state,
+        i1_0.student_count,
+        i1_0.type,
+        i1_0.website 
+    from
+        institutions i1_0
+2025-11-07T15:32:12.189-07:00  INFO 29935 --- [nio-8080-exec-8] c.t.c.controller.InstitutionController   : 📊 Total institutions before filtering: 54
+2025-11-07T15:32:12.189-07:00  INFO 29935 --- [nio-8080-exec-8] c.t.c.controller.InstitutionController   : 🚫 Applying default state exclusions: [AK, HI, WY, ND, SD, VT, DE, RI, DC]
+2025-11-07T15:32:12.190-07:00  INFO 29935 --- [nio-8080-exec-8] c.t.c.controller.InstitutionController   : 📊 Final institutions count after filtering: 52
+2025-11-07T15:32:12.190-07:00  INFO 29935 --- [nio-8080-exec-8] c.t.c.controller.InstitutionController   : ✅ Successfully returning 52 institutions
+2025-11-07T15:32:37.815-07:00  INFO 29935 --- [nio-8080-exec-9] c.t.c.controller.ChapterController       : 📋 CREATE CHAPTER WITH INSTITUTION - Simple approach with state/city fields
+2025-11-07T15:32:37.815-07:00  INFO 29935 --- [nio-8080-exec-9] c.t.c.controller.ChapterController       : 🔍 Request data: {name=Boise State, universityName=Boise State University, state=ID, city=Boise, description=Christians for boise state}
+2025-11-07T15:32:37.815-07:00  INFO 29935 --- [nio-8080-exec-9] c.t.c.controller.ChapterController       : 📋 Chapter data: Name=Boise State, University=Boise State University, State=ID, City=Boise
+2025-11-07T15:32:37.818-07:00 DEBUG 29935 --- [nio-8080-exec-9] org.hibernate.SQL                        : 
+    select
+        c1_0.id 
+    from
+        chapters c1_0 
+    where
+        upper(c1_0.name)=upper(?) 
+        and upper(c1_0.university_name)=upper(?) 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        c1_0.id 
+    from
+        chapters c1_0 
+    where
+        upper(c1_0.name)=upper(?) 
+        and upper(c1_0.university_name)=upper(?) 
+    fetch
+        first ? rows only
+2025-11-07T15:32:37.820-07:00 DEBUG 29935 --- [nio-8080-exec-9] org.hibernate.SQL                        : 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+Hibernate: 
+    insert 
+    into
+        chapters
+        (active,city,created_at,description,name,state,university_name,updated_at,id) 
+    values
+        (?,?,?,?,?,?,?,?,default)
+2025-11-07T15:32:37.820-07:00  INFO 29935 --- [nio-8080-exec-9] c.t.c.controller.ChapterController       : ✅ Created chapter with ID: 21
+2025-11-07T15:32:39.834-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        c1_0.id,
+        c1_0.active,
+        c1_0.city,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.state,
+        c1_0.university_name,
+        c1_0.updated_at 
+    from
+        chapters c1_0 
+    where
+        c1_0.active
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.active,
+        c1_0.city,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.state,
+        c1_0.university_name,
+        c1_0.updated_at 
+    from
+        chapters c1_0 
+    where
+        c1_0.active
+2025-11-07T15:32:39.838-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.838-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.839-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.839-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.839-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.840-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.840-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.840-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.840-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.841-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.841-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.841-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.841-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.842-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.842-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.842-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.842-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.843-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.843-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.843-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.844-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.844-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.844-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.845-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.845-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.845-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.845-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.846-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.846-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.846-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.846-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.846-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.847-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.847-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.847-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.847-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.848-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.848-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.848-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.848-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:32:39.848-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+Hibernate: 
+    select
+        m1_0.chapter_id,
+        m1_0.id,
+        m1_0.active,
+        m1_0.created_at,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.graduation_year,
+        m1_0.last_name,
+        m1_0.major,
+        m1_0.phone_number,
+        m1_0.role,
+        m1_0.updated_at 
+    from
+        members m1_0 
+    where
+        m1_0.chapter_id=?
+2025-11-07T15:32:39.849-07:00 DEBUG 29935 --- [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+Hibernate: 
+    select
+        e1_0.chapter_id,
+        e1_0.id,
+        e1_0.active,
+        e1_0.created_at,
+        e1_0.current_attendees,
+        e1_0.description,
+        e1_0.event_date_time,
+        e1_0.location,
+        e1_0.max_attendees,
+        e1_0.title,
+        e1_0.type,
+        e1_0.updated_at 
+    from
+        events e1_0 
+    where
+        e1_0.chapter_id=?
+2025-11-07T15:56:26.381-07:00  INFO 29935 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-11-07T15:56:26.383-07:00 DEBUG 29935 --- [ionShutdownHook] org.hibernate.SQL                        : 
+    drop table if exists chapters cascade 
+Hibernate: 
+    drop table if exists chapters cascade 
+2025-11-07T15:56:26.558-07:00 DEBUG 29935 --- [ionShutdownHook] org.hibernate.SQL                        : 
+    drop table if exists events cascade 
+Hibernate: 
+    drop table if exists events cascade 
+2025-11-07T15:56:26.559-07:00 DEBUG 29935 --- [ionShutdownHook] org.hibernate.SQL                        : 
+    drop table if exists institutions cascade 
+Hibernate: 
+    drop table if exists institutions cascade 
+2025-11-07T15:56:26.559-07:00 DEBUG 29935 --- [ionShutdownHook] org.hibernate.SQL                        : 
+    drop table if exists members cascade 
+Hibernate: 
+    drop table if exists members cascade 
+2025-11-07T15:56:26.563-07:00  INFO 29935 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-11-07T15:56:26.572-07:00  INFO 29935 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

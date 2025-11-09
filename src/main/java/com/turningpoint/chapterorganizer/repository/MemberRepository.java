@@ -17,23 +17,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
 
     // Find members by chapter ID
-    @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId")
-    List<Member> findByChapterId(@Param("chapterId") Long chapterId);
+    List<Member> findByChapterId(Long chapterId);
 
     // Find active members by chapter ID
-    @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.active = true")
-    List<Member> findByChapterIdAndActiveTrue(@Param("chapterId") Long chapterId);
+    List<Member> findByChapterIdAndActiveTrue(Long chapterId);
 
     // Find members by role
     List<Member> findByRole(MemberRole role);
 
     // Find members by chapter ID and role
-    @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = :role")
-    List<Member> findByChapterIdAndRole(@Param("chapterId") Long chapterId, @Param("role") MemberRole role);
+    List<Member> findByChapterIdAndRole(Long chapterId, MemberRole role);
 
     // Find active members by chapter ID and role
-    @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = :role AND m.active = true")
-    List<Member> findByChapterIdAndRoleAndActiveTrue(@Param("chapterId") Long chapterId, @Param("role") MemberRole role);
+    List<Member> findByChapterIdAndRoleAndActiveTrue(Long chapterId, MemberRole role);
 
     // Find members by first and last name (case-insensitive)
     List<Member> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
@@ -86,11 +82,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // Find the president of a chapter
     @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = 'PRESIDENT' AND m.active = true")
     Optional<Member> findChapterPresident(@Param("chapterId") Long chapterId);
-
-    // Authentication methods
-    Optional<Member> findByUsername(String username);
-    
-    boolean existsByUsername(String username);
-    
-    boolean existsByUsernameAndIdNot(String username, Long id);
 }

@@ -34,13 +34,6 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Size(min = 3, max = 30, message = "Username must be between 3 and 30 characters")
-    @Column(unique = true)
-    private String username;
-
-    @Size(min = 6, message = "Password must be at least 6 characters")
-    private String password;
-
     @Size(max = 15, message = "Phone number cannot exceed 15 characters")
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -62,7 +55,7 @@ public class Member {
     private String graduationYear;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chapter_id")
+    @JoinColumn(name = "chapter_id", nullable = false)
     private Chapter chapter;
 
     @CreationTimestamp
@@ -117,22 +110,6 @@ public class Member {
         this.email = email;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -179,19 +156,6 @@ public class Member {
 
     public void setChapter(Chapter chapter) {
         this.chapter = chapter;
-    }
-
-    // Helper method for chapter ID
-    public Long getChapterId() {
-        return chapter != null ? chapter.getId() : null;
-    }
-
-    public void setChapterId(Long chapterId) {
-        // This will be handled in the service layer
-        // For now, we'll set it to null and handle chapter assignment in service
-        if (chapterId == null) {
-            this.chapter = null;
-        }
     }
 
     public LocalDateTime getCreatedAt() {

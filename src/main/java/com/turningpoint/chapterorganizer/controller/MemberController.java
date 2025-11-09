@@ -2,7 +2,6 @@ package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.service.MemberService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,61 +15,102 @@ import java.util.Optional;
 @CrossOrigin(origins = "*")
 public class MemberController {
 
-    private final MemberService memberService;
-
     @Autowired
-    public MemberController(MemberService memberService) {
-        this.memberService = memberService;
-    }
+    private MemberService memberService;
 
-    // GET /api/members/{id} - Get member by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Member> getMemberById(@PathVariable Long id) {
-        Optional<Member> member = memberService.getMemberById(id);
-        return member.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // GET /api/members/username/{username} - Get member by email/username (for blog feature)
+    /**
+     * Get member by username (treating username as email for compatibility)
+     * This endpoint is needed for blog functionality
+     */
     @GetMapping("/username/{username}")
     public ResponseEntity<Member> getMemberByUsername(@PathVariable String username) {
-        // Since we don't have a username field, we'll use email as username
-        Optional<Member> member = memberService.getMemberByEmail(username);
-        return member.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            // In our system, username is treated as email
+            Optional<Member> member = memberService.getMemberByEmail(username);
+            
+            if (member.isPresent()) {
+                return ResponseEntity.ok(member.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    // GET /api/members/chapter/{chapterId} - Get members by chapter
-    @GetMapping("/chapter/{chapterId}")
-    public ResponseEntity<List<Member>> getMembersByChapter(@PathVariable Long chapterId) {
-        List<Member> members = memberService.getMembersByChapter(chapterId);
-        return ResponseEntity.ok(members);
+    /**
+     * Get all members
+     */
+    @GetMapping
+    public ResponseEntity<List<Member>> getAllMembers() {
+        try {
+            // For now, get all members from all chapters
+            // In a real system, you might want to filter by user's chapter
+            List<Member> members = memberService.getAllMembers();
+            return ResponseEntity.ok(members);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    // GET /api/members/chapter/{chapterId}/active - Get active members by chapter
-    @GetMapping("/chapter/{chapterId}/active")
-    public ResponseEntity<List<Member>> getActiveMembersByChapter(@PathVariable Long chapterId) {
-        List<Member> members = memberService.getMembersByChapter(chapterId);
-        return ResponseEntity.ok(members);
+    /**
+     * Get member by ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Member> getMemberById(@PathVariable Long id) {
+        try {
+            Optional<Member> member = memberService.getMemberById(id);
+            
+            if (member.isPresent()) {
+                return ResponseEntity.ok(member.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    // POST /api/members - Create new member
+    /**
+     * Get member by email
+     */
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Member> getMemberByEmail(@PathVariable String email) {
+        try {
+            Optional<Member> member = memberService.getMemberByEmail(email);
+            
+            if (member.isPresent()) {
+                return ResponseEntity.ok(member.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Create new member
+     */
     @PostMapping
-    public ResponseEntity<Member> createMember(@Valid @RequestBody Member member) {
+    public ResponseEntity<Member> createMember(@RequestBody Member member) {
         try {
             Member createdMember = memberService.createMember(member);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdMember);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    // PUT /api/members/{id} - Update existing member
+    /**
+     * Update member
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable Long id, 
-                                             @Valid @RequestBody Member updateRequest) {
+    public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member member) {
         try {
-            Member updatedMember = memberService.updateMember(id, updateRequest);
+            Member updatedMember = memberService.updateMember(id, member);
             return ResponseEntity.ok(updatedMember);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
@@ -79,21 +119,29 @@ public class MemberController {
         }
     }
 
-    // DELETE /api/members/{id} - Deactivate member (soft delete)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deactivateMember(@PathVariable Long id) {
+    /**
+     * Get members by chapter
+     */
+    @GetMapping("/chapter/{chapterId}")
+    public ResponseEntity<List<Member>> getMembersByChapter(@PathVariable Long chapterId) {
         try {
-            memberService.deactivateMember(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            List<Member> members = memberService.getMembersByChapter(chapterId);
+            return ResponseEntity.ok(members);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    // GET /api/members/chapter/{chapterId}/count - Count active members in chapter
-    @GetMapping("/chapter/{chapterId}/count")
-    public ResponseEntity<Long> countActiveMembers(@PathVariable Long chapterId) {
-        Long count = memberService.countActiveMembersByChapter(chapterId);
-        return ResponseEntity.ok(count);
+    /**
+     * Search members by name
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<Member>> searchMembersByName(@RequestParam String name) {
+        try {
+            List<Member> members = memberService.searchMembersByName(name);
+            return ResponseEntity.ok(members);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
