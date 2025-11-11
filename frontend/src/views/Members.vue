@@ -11,7 +11,12 @@
           <p class="text-muted">Connect with fellow students and chapter members.</p>
         </div>
         <div class="col-md-4 text-end">
-          <button class="btn btn-primary" disabled>
+          <button class="btn btn-outline-secondary me-2" @click="loadData" :disabled="loading" title="Refresh member list">
+            <i class="bi bi-arrow-clockwise me-1"></i>
+            <span v-if="loading">Loading...</span>
+            <span v-else>Refresh</span>
+          </button>
+          <button class="btn btn-primary" @click="openAddMemberModal" :disabled="loading">
             <i class="bi bi-person-plus me-2"></i>
             Add Member
           </button>
@@ -103,9 +108,9 @@
                         </small>
                       </td>
                       <td>
-                        <div v-if="member.chapter">
-                          <div class="fw-bold">{{ member.chapter.name }}</div>
-                          <small class="text-muted">{{ member.chapter.universityName }}</small>
+                        <div v-if="member.chapterName">
+                          <div class="fw-bold">{{ member.chapterName }}</div>
+                          <small class="text-muted">{{ member.universityName }}</small>
                         </div>
                         <span v-else class="text-muted">No Chapter</span>
                       </td>
@@ -179,11 +184,126 @@
         </div>
       </div>
     </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addMemberModalLabel">
+              <i class="bi bi-person-plus me-2"></i>Add New Member
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="addMember">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="firstName" v-model="newMember.firstName" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="lastName" v-model="newMember.lastName" required>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" v-model="newMember.email" required>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" v-model="newMember.username">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="phoneNumber" v-model="newMember.phoneNumber">
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="chapterSelect" class="form-label">Chapter <span class="text-danger">*</span></label>
+                <select class="form-select" id="chapterSelect" v-model="newMember.chapterId" required>
+                  <option value="">Select a chapter</option>
+                  <option v-for="chapter in availableChapters" :key="chapter.id" :value="chapter.id">
+                    {{ chapter.name }} - {{ chapter.universityName }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select class="form-select" id="role" v-model="newMember.role">
+                      <option value="MEMBER">Member</option>
+                      <option value="OFFICER">Officer</option>
+                      <option value="SECRETARY">Secretary</option>
+                      <option value="TREASURER">Treasurer</option>
+                      <option value="VICE_PRESIDENT">Vice President</option>
+                      <option value="PRESIDENT">President</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="major" class="form-label">Major</label>
+                    <input type="text" class="form-control" id="major" v-model="newMember.major">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="graduationYear" class="form-label">Graduation Year</label>
+                    <input type="text" class="form-control" id="graduationYear" v-model="newMember.graduationYear" placeholder="2024">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="password" v-model="newMember.password" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="alert alert-danger" v-if="memberError">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ memberError }}
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" @click="addMember" :disabled="memberLoading">
+              <span v-if="memberLoading">
+                <i class="bi bi-hourglass-split me-2"></i>Adding...
+              </span>
+              <span v-else>
+                <i class="bi bi-person-plus me-2"></i>Add Member
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import api from '@/services/api'
 
 export default {
@@ -195,6 +315,22 @@ export default {
     const searchTerm = ref('')
     const selectedChapter = ref('')
     const selectedRole = ref('')
+    
+    // Member creation state
+    const memberLoading = ref(false)
+    const memberError = ref('')
+    const newMember = ref({
+      firstName: '',
+      lastName: '',
+      email: '',
+      username: '',
+      phoneNumber: '',
+      chapterId: '',
+      role: 'MEMBER',
+      major: '',
+      graduationYear: '',
+      password: ''
+    })
 
     // Load members and chapters from API
     const loadData = async () => {
@@ -238,7 +374,7 @@ export default {
 
       if (selectedChapter.value) {
         filtered = filtered.filter(member => 
-          member.chapter?.id?.toString() === selectedChapter.value
+          member.chapterId?.toString() === selectedChapter.value
         )
       }
 
@@ -260,7 +396,7 @@ export default {
     })
 
     const uniqueChapters = computed(() => {
-      const chapterIds = new Set(members.value.map(member => member.chapter?.id).filter(Boolean))
+      const chapterIds = new Set(members.value.map(member => member.chapterId).filter(Boolean))
       return chapterIds.size
     })
 
@@ -291,8 +427,83 @@ export default {
       return roleClasses[role] || 'badge bg-secondary'
     }
 
+    // Member management functions
+    const openAddMemberModal = () => {
+      // Reset form
+      newMember.value = {
+        firstName: '',
+        lastName: '',
+        email: '',
+        username: '',
+        phoneNumber: '',
+        chapterId: '',
+        role: 'MEMBER',
+        major: '',
+        graduationYear: '',
+        password: ''
+      }
+      memberError.value = ''
+      
+      // Show modal (Bootstrap 5)
+      const modal = new window.bootstrap.Modal(document.getElementById('addMemberModal'))
+      modal.show()
+    }
+
+    const addMember = async () => {
+      if (!newMember.value.firstName || !newMember.value.lastName || !newMember.value.email || 
+          !newMember.value.chapterId || !newMember.value.password) {
+        memberError.value = 'Please fill in all required fields.'
+        return
+      }
+
+      try {
+        memberLoading.value = true
+        memberError.value = ''
+
+        const memberData = {
+          firstName: newMember.value.firstName.trim(),
+          lastName: newMember.value.lastName.trim(),
+          email: newMember.value.email.trim(),
+          username: newMember.value.username?.trim() || null,
+          phoneNumber: newMember.value.phoneNumber?.trim() || null,
+          role: newMember.value.role,
+          major: newMember.value.major?.trim() || null,
+          graduationYear: newMember.value.graduationYear?.trim() || null,
+          password: newMember.value.password,
+          active: true
+        }
+
+        // Add member to specific chapter
+        await api.post(`/api/members/chapter/${newMember.value.chapterId}`, memberData)
+        
+        // Reload members
+        await loadData()
+        
+        // Close modal
+        const modal = window.bootstrap.Modal.getInstance(document.getElementById('addMemberModal'))
+        modal.hide()
+        
+      } catch (err) {
+        console.error('Member creation error:', err)
+        if (err.response?.data?.message) {
+          memberError.value = err.response.data.message
+        } else if (err.response?.status === 400) {
+          memberError.value = 'Invalid member data. Please check your input and try again.'
+        } else {
+          memberError.value = 'Failed to create member. Please try again.'
+        }
+      } finally {
+        memberLoading.value = false
+      }
+    }
+
     // Load data on component mount
     onMounted(() => {
+      loadData()
+    })
+
+    // Refresh data when component is activated (navigated back to)
+    onActivated(() => {
       loadData()
     })
 
@@ -309,7 +520,15 @@ export default {
       officerCount,
       getInitials,
       formatRole,
-      getRoleBadgeClass
+      getRoleBadgeClass,
+      // Member management
+      memberLoading,
+      memberError,
+      newMember,
+      openAddMemberModal,
+      addMember,
+      // Data refresh
+      loadData
     }
   }
 }

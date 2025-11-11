@@ -1,5 +1,6 @@
 package com.turningpoint.chapterorganizer.controller;
 
+import com.turningpoint.chapterorganizer.dto.MemberDTO;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/members")
@@ -29,13 +31,13 @@ public class MemberController {
      * This endpoint is needed for blog functionality
      */
     @GetMapping("/username/{username}")
-    public ResponseEntity<Member> getMemberByUsername(@PathVariable String username) {
+    public ResponseEntity<MemberDTO> getMemberByUsername(@PathVariable String username) {
         try {
             // In our system, username is treated as email
             Optional<Member> member = memberService.getMemberByEmail(username);
             
             if (member.isPresent()) {
-                return ResponseEntity.ok(member.get());
+                return ResponseEntity.ok(convertToDTO(member.get()));
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -48,27 +50,61 @@ public class MemberController {
      * Get all members
      */
     @GetMapping
-    public ResponseEntity<List<Member>> getAllMembers() {
+    public ResponseEntity<List<MemberDTO>> getAllMembers() {
         try {
             // For now, get all members from all chapters
             // In a real system, you might want to filter by user's chapter
             List<Member> members = memberService.getAllMembers();
-            return ResponseEntity.ok(members);
+            
+            // Convert to DTO to avoid circular reference issues
+            List<MemberDTO> memberDTOs = members.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+                
+            return ResponseEntity.ok(memberDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    
+    /**
+     * Helper method to convert Member entity to DTO
+     */
+    private MemberDTO convertToDTO(Member member) {
+        MemberDTO dto = new MemberDTO();
+        dto.setId(member.getId());
+        dto.setFirstName(member.getFirstName());
+        dto.setLastName(member.getLastName());
+        dto.setEmail(member.getEmail());
+        dto.setUsername(member.getUsername());
+        dto.setPhoneNumber(member.getPhoneNumber());
+        dto.setRole(member.getRole());
+        dto.setActive(member.getActive());
+        dto.setMajor(member.getMajor());
+        dto.setGraduationYear(member.getGraduationYear());
+        
+        // Safely extract chapter information
+        if (member.getChapter() != null) {
+            dto.setChapterId(member.getChapter().getId());
+            dto.setChapterName(member.getChapter().getName());
+            dto.setUniversityName(member.getChapter().getUniversityName());
+            dto.setState(member.getChapter().getState());
+            dto.setCity(member.getChapter().getCity());
+        }
+        
+        return dto;
     }
 
     /**
      * Get member by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Member> getMemberById(@PathVariable Long id) {
+    public ResponseEntity<MemberDTO> getMemberById(@PathVariable Long id) {
         try {
             Optional<Member> member = memberService.getMemberById(id);
             
             if (member.isPresent()) {
-                return ResponseEntity.ok(member.get());
+                return ResponseEntity.ok(convertToDTO(member.get()));
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -81,12 +117,12 @@ public class MemberController {
      * Get member by email
      */
     @GetMapping("/email/{email}")
-    public ResponseEntity<Member> getMemberByEmail(@PathVariable String email) {
+    public ResponseEntity<MemberDTO> getMemberByEmail(@PathVariable String email) {
         try {
             Optional<Member> member = memberService.getMemberByEmail(email);
             
             if (member.isPresent()) {
-                return ResponseEntity.ok(member.get());
+                return ResponseEntity.ok(convertToDTO(member.get()));
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -99,10 +135,10 @@ public class MemberController {
      * Create new member
      */
     @PostMapping
-    public ResponseEntity<Member> createMember(@RequestBody Member member) {
+    public ResponseEntity<MemberDTO> createMember(@RequestBody Member member) {
         try {
             Member createdMember = memberService.createMember(member);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdMember);
+            return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(createdMember));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
@@ -114,10 +150,10 @@ public class MemberController {
      * Update member
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member member) {
+    public ResponseEntity<MemberDTO> updateMember(@PathVariable Long id, @RequestBody Member member) {
         try {
             Member updatedMember = memberService.updateMember(id, member);
-            return ResponseEntity.ok(updatedMember);
+            return ResponseEntity.ok(convertToDTO(updatedMember));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
@@ -129,10 +165,12 @@ public class MemberController {
      * Get members by chapter
      */
     @GetMapping("/chapter/{chapterId}")
-    public ResponseEntity<List<Member>> getMembersByChapter(@PathVariable Long chapterId) {
+    public ResponseEntity<List<MemberDTO>> getMembersByChapter(@PathVariable Long chapterId) {
         try {
             List<Member> members = memberService.getMembersByChapter(chapterId);
-            return ResponseEntity.ok(members);
+            return ResponseEntity.ok(members.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -142,10 +180,57 @@ public class MemberController {
      * Search members by name
      */
     @GetMapping("/search")
-    public ResponseEntity<List<Member>> searchMembersByName(@RequestParam String name) {
+    public ResponseEntity<List<MemberDTO>> searchMembersByName(@RequestParam String name) {
         try {
             List<Member> members = memberService.searchMembersByName(name);
-            return ResponseEntity.ok(members);
+            return ResponseEntity.ok(members.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Add member to a specific chapter
+     */
+    @PostMapping("/chapter/{chapterId}")
+    public ResponseEntity<MemberDTO> addMemberToChapter(@PathVariable Long chapterId, @RequestBody Member member) {
+        try {
+            Member createdMember = memberService.addMemberToChapter(chapterId, member);
+            return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(createdMember));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Transfer member to another chapter
+     */
+    @PutMapping("/{id}/transfer/{newChapterId}")
+    public ResponseEntity<MemberDTO> transferMemberToChapter(@PathVariable Long id, @PathVariable Long newChapterId) {
+        try {
+            Member transferredMember = memberService.transferMemberToChapter(id, newChapterId);
+            return ResponseEntity.ok(convertToDTO(transferredMember));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Delete member (hard delete)
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
+        try {
+            memberService.deleteMember(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

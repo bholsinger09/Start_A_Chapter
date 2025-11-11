@@ -1,5 +1,6 @@
 package com.turningpoint.chapterorganizer.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -65,6 +66,7 @@ public class Member {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id", nullable = true)
+    @JsonIgnoreProperties({"members", "events"})
     private Chapter chapter;
 
     @CreationTimestamp
