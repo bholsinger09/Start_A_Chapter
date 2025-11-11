@@ -29,7 +29,7 @@ const routes = [
         path: '/chapters/create',
         name: 'ChapterCreate',
         component: ChapterCreate,
-        meta: { 
+        meta: {
             title: 'Create Chapter',
             requiresAuth: true
         }
