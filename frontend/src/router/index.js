@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 // Lazy load components
 const Dashboard = () => import('../views/Dashboard.vue')
 const Chapters = () => import('../views/Chapters.vue')
+const ChapterCreate = () => import('../views/ChapterCreate.vue')
 const Members = () => import('../views/Members.vue')
 const Events = () => import('../views/Events.vue')
 const Blog = () => import('../views/Blog.vue')
@@ -23,6 +24,15 @@ const routes = [
         name: 'Chapters',
         component: Chapters,
         meta: { title: 'Chapters' }
+    },
+    {
+        path: '/chapters/create',
+        name: 'ChapterCreate',
+        component: ChapterCreate,
+        meta: { 
+            title: 'Create Chapter',
+            requiresAuth: true
+        }
     },
     {
         path: '/members',

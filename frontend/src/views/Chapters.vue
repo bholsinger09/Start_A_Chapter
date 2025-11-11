@@ -11,7 +11,7 @@
           <p class="text-muted">Explore student organizations across universities.</p>
         </div>
         <div class="col-md-4 text-end">
-          <button class="btn btn-primary" disabled>
+          <button class="btn btn-primary" @click="navigateToCreateChapter">
             <i class="bi bi-plus-circle me-2"></i>
             Create Chapter
           </button>
@@ -134,6 +134,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import api from '@/services/api'
 
 export default {
@@ -143,6 +144,7 @@ export default {
     const loading = ref(true)
     const searchTerm = ref('')
     const selectedState = ref('')
+    const router = useRouter()
 
     // Load chapters from API
     const loadChapters = async () => {
@@ -199,6 +201,11 @@ export default {
       }
     }
 
+    // Navigation function
+    const navigateToCreateChapter = () => {
+      router.push('/chapters/create')
+    }
+
     // Load data on component mount
     onMounted(() => {
       loadChapters()
@@ -212,7 +219,8 @@ export default {
       filteredChapters,
       availableStates,
       uniqueUniversities,
-      formatDate
+      formatDate,
+      navigateToCreateChapter
     }
   }
 }

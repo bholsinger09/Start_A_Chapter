@@ -103,6 +103,7 @@
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/InstitutionController.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/repository/ChapterRepository.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/entity/Church.java
+/Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/config/DataPopulation.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/MonitoringLegacyController.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/dto/MemberUpdateRequest.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/entity/OperationalMetric.java
