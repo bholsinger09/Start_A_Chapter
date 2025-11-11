@@ -34,6 +34,10 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Column(nullable = true, unique = true)
+    private String username;
+
     @Size(max = 15, message = "Phone number cannot exceed 15 characters")
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -54,8 +58,13 @@ public class Member {
     @Column(name = "graduation_year")
     private String graduationYear;
 
+    @NotNull(message = "Password is required")
+    @Size(min = 6, max = 255, message = "Password must be between 6 and 255 characters")
+    @Column(nullable = false)
+    private String password;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chapter_id", nullable = false)
+    @JoinColumn(name = "chapter_id", nullable = true)
     private Chapter chapter;
 
     @CreationTimestamp
@@ -110,6 +119,14 @@ public class Member {
         this.email = email;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -148,6 +165,14 @@ public class Member {
 
     public void setGraduationYear(String graduationYear) {
         this.graduationYear = graduationYear;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Chapter getChapter() {

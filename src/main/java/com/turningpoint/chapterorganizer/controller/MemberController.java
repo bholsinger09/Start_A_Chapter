@@ -6,13 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/members")
-@CrossOrigin(origins = "*")
+@CrossOrigin(
+    origins = {"https://startachapter.duckdns.org", "http://startachapter.duckdns.org", "*"}, 
+    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
+    allowedHeaders = "*",
+    allowCredentials = "false"
+)
 public class MemberController {
 
     @Autowired
