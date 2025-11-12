@@ -177,11 +177,13 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Register',
   setup() {
     const router = useRouter()
+    const { setUser } = useAuth()
     
     const form = ref({
       firstName: '',
@@ -272,8 +274,8 @@ export default {
         if (response.data.success) {
           success.value = response.data.message
           
-          // Store user data in localStorage for authentication
-          localStorage.setItem('user', JSON.stringify(response.data.user))
+          // Use auth composable to set user (handles localStorage and reactivity)
+          setUser(response.data.user)
           
           // Redirect to dashboard after successful registration
           setTimeout(() => {

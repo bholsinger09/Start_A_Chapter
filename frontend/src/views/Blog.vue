@@ -98,11 +98,11 @@
                 </p>
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
-                    <button class="btn btn-outline-primary btn-sm me-2" disabled>
+                    <button class="btn btn-outline-primary btn-sm me-2" @click="toggleLikes('post-1')">
                       <i class="bi bi-heart me-1"></i>
                       Like (5)
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm" disabled>
+                    <button class="btn btn-outline-secondary btn-sm" @click="toggleComments('post-1')">
                       <i class="bi bi-chat me-1"></i>
                       Comment (2)
                     </button>
@@ -111,6 +111,44 @@
                     <i class="bi bi-eye me-1"></i>
                     15 views
                   </small>
+                </div>
+                
+                <!-- Comments & Likes Section for Post 1 -->
+                <div v-if="showComments['post-1']" class="border-top mt-3 pt-3">
+                  <h6><i class="bi bi-chat me-2"></i>Comments (2)</h6>
+                  <div class="mb-3">
+                    <div class="d-flex mb-2">
+                      <div class="avatar-circle bg-success me-2">JS</div>
+                      <div>
+                        <strong>John Smith</strong> <small class="text-muted">2h ago</small>
+                        <p class="mb-1">Great post! Looking forward to getting more involved this semester.</p>
+                      </div>
+                    </div>
+                    <div class="d-flex">
+                      <div class="avatar-circle bg-info me-2">SA</div>
+                      <div>
+                        <strong>Sarah Anderson</strong> <small class="text-muted">1h ago</small>
+                        <p class="mb-1">Thanks for sharing! This really motivates me to participate more.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Write a comment..." v-model="newComment['post-1']">
+                    <button class="btn btn-outline-primary" @click="addComment('post-1')">
+                      <i class="bi bi-send"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div v-if="showLikes['post-1']" class="border-top mt-3 pt-3">
+                  <h6><i class="bi bi-heart me-2"></i>Likes (5)</h6>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-primary">John Smith</span>
+                    <span class="badge bg-success">Sarah Anderson</span>
+                    <span class="badge bg-info">Mike Johnson</span>
+                    <span class="badge bg-warning">Lisa Chen</span>
+                    <span class="badge bg-secondary">Alex Wilson</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -128,11 +166,11 @@
                 </p>
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
-                    <button class="btn btn-outline-primary btn-sm me-2" disabled>
+                    <button class="btn btn-outline-primary btn-sm me-2" @click="toggleLikes('post-2')">
                       <i class="bi bi-heart me-1"></i>
                       Like (12)
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm" disabled>
+                    <button class="btn btn-outline-secondary btn-sm" @click="toggleComments('post-2')">
                       <i class="bi bi-chat me-1"></i>
                       Comment (7)
                     </button>
@@ -141,6 +179,86 @@
                     <i class="bi bi-eye me-1"></i>
                     28 views
                   </small>
+                </div>
+                
+                <!-- Comments & Likes Section for Post 2 -->
+                <div v-if="showComments['post-2']" class="border-top mt-3 pt-3">
+                  <h6><i class="bi bi-chat me-2"></i>Comments (7)</h6>
+                  <div class="mb-3">
+                    <div class="d-flex mb-2">
+                      <div class="avatar-circle bg-info me-2">EM</div>
+                      <div>
+                        <strong>Emily Rodriguez</strong> <small class="text-muted">3h ago</small>
+                        <p class="mb-1">This is so inspiring! I just joined last month and already feel so welcomed.</p>
+                      </div>
+                    </div>
+                    <div class="d-flex mb-2">
+                      <div class="avatar-circle bg-warning me-2">MJ</div>
+                      <div>
+                        <strong>Mike Johnson</strong> <small class="text-muted">2h ago</small>
+                        <p class="mb-1">The leadership opportunities have been amazing for my personal growth.</p>
+                      </div>
+                    </div>
+                    <div class="d-flex mb-2">
+                      <div class="avatar-circle bg-success me-2">LC</div>
+                      <div>
+                        <strong>Lisa Chen</strong> <small class="text-muted">1h ago</small>
+                        <p class="mb-1">Great networking events this semester! Looking forward to the next one.</p>
+                      </div>
+                    </div>
+                    <div class="d-flex mb-2">
+                      <div class="avatar-circle bg-secondary me-2">AW</div>
+                      <div>
+                        <strong>Alex Wilson</strong> <small class="text-muted">45min ago</small>
+                        <p class="mb-1">The mentorship program has been incredibly valuable.</p>
+                      </div>
+                    </div>
+                    <div class="d-flex mb-2">
+                      <div class="avatar-circle bg-primary me-2">KT</div>
+                      <div>
+                        <strong>Kevin Thompson</strong> <small class="text-muted">30min ago</small>
+                        <p class="mb-1">Thanks for sharing your experience! Very motivational.</p>
+                      </div>
+                    </div>
+                    <div class="d-flex mb-2">
+                      <div class="avatar-circle bg-danger me-2">SM</div>
+                      <div>
+                        <strong>Sophia Martinez</strong> <small class="text-muted">15min ago</small>
+                        <p class="mb-1">This really captures what it's like to be part of our chapter community.</p>
+                      </div>
+                    </div>
+                    <div class="d-flex">
+                      <div class="avatar-circle bg-info me-2">JD</div>
+                      <div>
+                        <strong>James Davis</strong> <small class="text-muted">10min ago</small>
+                        <p class="mb-1">Looking forward to getting more involved in upcoming events!</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Write a comment..." v-model="newComment['post-2']">
+                    <button class="btn btn-outline-primary" @click="addComment('post-2')">
+                      <i class="bi bi-send"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div v-if="showLikes['post-2']" class="border-top mt-3 pt-3">
+                  <h6><i class="bi bi-heart me-2"></i>Likes (12)</h6>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-primary">Emily Rodriguez</span>
+                    <span class="badge bg-success">Mike Johnson</span>
+                    <span class="badge bg-info">Lisa Chen</span>
+                    <span class="badge bg-warning">Alex Wilson</span>
+                    <span class="badge bg-secondary">Kevin Thompson</span>
+                    <span class="badge bg-danger">Sophia Martinez</span>
+                    <span class="badge bg-primary">James Davis</span>
+                    <span class="badge bg-success">Sarah Anderson</span>
+                    <span class="badge bg-info">John Smith</span>
+                    <span class="badge bg-warning">Maria Garcia</span>
+                    <span class="badge bg-secondary">David Brown</span>
+                    <span class="badge bg-danger">Jessica Lee</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -239,33 +357,65 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Blog',
   setup() {
-    // Check authentication status
-    const isAuthenticated = computed(() => {
-      try {
-        const user = localStorage.getItem('user')
-        return user !== null
-      } catch {
-        return false
-      }
+    const { currentUser, isAuthenticated, initAuth } = useAuth()
+    
+    // Reactive state for comments and likes visibility
+    const showComments = ref({})
+    const showLikes = ref({})
+    const newComment = ref({
+      'post-1': '',
+      'post-2': ''
     })
 
-    const currentUser = computed(() => {
-      try {
-        const user = localStorage.getItem('user')
-        return user ? JSON.parse(user) : null
-      } catch {
-        return null
+    // Toggle functions for comments and likes
+    const toggleComments = (postId) => {
+      showComments.value[postId] = !showComments.value[postId]
+      // Close likes if comments are opened
+      if (showComments.value[postId]) {
+        showLikes.value[postId] = false
       }
+    }
+
+    const toggleLikes = (postId) => {
+      showLikes.value[postId] = !showLikes.value[postId]
+      // Close comments if likes are opened
+      if (showLikes.value[postId]) {
+        showComments.value[postId] = false
+      }
+    }
+
+    const addComment = (postId) => {
+      if (newComment.value[postId] && newComment.value[postId].trim()) {
+        // In a real app, this would make an API call
+        console.log(`Adding comment to ${postId}: ${newComment.value[postId]}`)
+        
+        // Clear the input after adding comment
+        newComment.value[postId] = ''
+        
+        // Show success message (you could add a toast notification here)
+        alert('Comment added successfully!')
+      }
+    }
+
+    onMounted(() => {
+      initAuth()
     })
 
     return {
       isAuthenticated,
-      currentUser
+      currentUser,
+      showComments,
+      showLikes,
+      newComment,
+      toggleComments,
+      toggleLikes,
+      addComment
     }
   }
 }
@@ -295,5 +445,23 @@ export default {
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0;
+}
+
+.avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
 }
 </style>

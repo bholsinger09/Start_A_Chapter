@@ -104,11 +104,13 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Login',
   setup() {
     const router = useRouter()
+    const { setUser } = useAuth()
     
     const form = ref({
       email: '',
@@ -145,15 +147,8 @@ export default {
         if (response.data.success) {
           success.value = response.data.message
           
-          // Store user data in localStorage for authentication
-          localStorage.setItem('user', JSON.stringify(response.data.user))
-          
-          // Trigger storage event to update other components immediately
-          window.dispatchEvent(new StorageEvent('storage', {
-            key: 'user',
-            newValue: JSON.stringify(response.data.user),
-            storageArea: localStorage
-          }))
+          // Use auth composable to set user (handles localStorage and reactivity)
+          setUser(response.data.user)
           
           // Redirect to dashboard after successful login
           setTimeout(() => {

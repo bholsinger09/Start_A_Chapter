@@ -177,19 +177,13 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { onMounted } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Settings',
   setup() {
-    const currentUser = computed(() => {
-      try {
-        const user = localStorage.getItem('user')
-        return user ? JSON.parse(user) : null
-      } catch {
-        return null
-      }
-    })
+    const { currentUser, initAuth } = useAuth()
 
     const formatLoginTime = (timestamp) => {
       if (!timestamp) return 'Unknown'
@@ -199,6 +193,10 @@ export default {
         return 'Invalid date'
       }
     }
+
+    onMounted(() => {
+      initAuth()
+    })
 
     return {
       currentUser,

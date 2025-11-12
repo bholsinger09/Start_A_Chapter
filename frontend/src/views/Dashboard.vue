@@ -150,13 +150,98 @@
           </div>
         </div>
       </div>
+
+      <!-- About Section -->
+      <div class="row mt-5">
+        <div class="col-12">
+          <div class="card border-info">
+            <div class="card-header bg-info text-white">
+              <h5 class="mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                About Campus Chapter Organizer
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <h6 class="text-primary">Purpose & Mission</h6>
+                  <p class="mb-3">
+                    Campus Chapter Organizer is a comprehensive web application designed to help student organizations 
+                    manage their chapter activities, connect members across universities, and facilitate campus engagement. 
+                    This platform enables chapter leaders to organize events, maintain member directories, and foster 
+                    communication within their campus communities.
+                  </p>
+                  
+                  <h6 class="text-primary">Key Features</h6>
+                  <ul class="mb-3">
+                    <li>Chapter management and directory</li>
+                    <li>Member registration and profile management</li>
+                    <li>Event coordination and planning</li>
+                    <li>Cross-university networking</li>
+                    <li>Blog and communication tools</li>
+                  </ul>
+
+                  <div class="alert alert-warning" role="alert">
+                    <h6 class="alert-heading">
+                      <i class="bi bi-exclamation-triangle me-2"></i>
+                      Important Disclaimer
+                    </h6>
+                    <p class="mb-2">
+                      <strong>This application is NOT an official Turning Point USA sponsored platform.</strong> 
+                      This is an independent, freelance-developed application created by Ben Holsinger for educational 
+                      and organizational purposes.
+                    </p>
+                    <p class="mb-0">
+                      For official Turning Point USA information, please visit: 
+                      <a href="https://www.turningpointusa.com" target="_blank" rel="noopener noreferrer" class="alert-link">
+                        www.turningpointusa.com <i class="bi bi-box-arrow-up-right"></i>
+                      </a>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body">
+                      <h6 class="card-title">Development Info</h6>
+                      <p class="card-text small">
+                        <strong>Developer:</strong> Ben Holsinger<br>
+                        <strong>Type:</strong> Independent Freelance Project<br>
+                        <strong>Purpose:</strong> Educational & Organizational Tool<br>
+                        <strong>Status:</strong> Non-Commercial Application
+                      </p>
+                      
+                      <h6 class="card-title mt-3">Legal Disclaimers</h6>
+                      <p class="card-text small text-muted">
+                        • This application is provided "as-is" for educational purposes<br>
+                        • No warranty or guarantee of service availability<br>
+                        • User data is handled according to standard web practices<br>
+                        • Not affiliated with any political organization<br>
+                        • Independent development project
+                      </p>
+
+                      <div class="mt-3">
+                        <a href="https://www.turningpointusa.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                          <i class="bi bi-globe me-1"></i>
+                          Official TPUSA Site
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import api from '@/services/api'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Dashboard',
@@ -170,24 +255,8 @@ export default {
 
     const loading = ref(true)
 
-    // Check authentication status
-    const isAuthenticated = computed(() => {
-      try {
-        const user = localStorage.getItem('user')
-        return user !== null
-      } catch {
-        return false
-      }
-    })
-
-    const currentUser = computed(() => {
-      try {
-        const user = localStorage.getItem('user')
-        return user ? JSON.parse(user) : null
-      } catch {
-        return null
-      }
-    })
+    // Use auth composable for authentication state
+    const { currentUser, isAuthenticated, initAuth } = useAuth()
 
     // Load dashboard statistics
     const loadStats = async () => {
@@ -227,6 +296,7 @@ export default {
     }
 
     onMounted(() => {
+      initAuth()
       loadStats()
     })
 

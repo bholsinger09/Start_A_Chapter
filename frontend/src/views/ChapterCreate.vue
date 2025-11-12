@@ -53,15 +53,21 @@
                   <label for="universityName" class="form-label">
                     University Name <span class="text-danger">*</span>
                   </label>
-                  <input
-                    type="text"
-                    class="form-control"
+                  <select
+                    class="form-select"
                     id="universityName"
                     v-model="form.universityName"
-                    :disabled="isLoading"
-                    placeholder="e.g., University of California, Los Angeles"
+                    :disabled="isLoading || !form.state"
                     required
                   >
+                    <option value="">{{ !form.state ? 'Select a state first' : 'Select a university' }}</option>
+                    <option v-for="university in availableUniversities" :key="university" :value="university">
+                      {{ university }}
+                    </option>
+                  </select>
+                  <small class="form-text text-muted">
+                    {{ !form.state ? 'Please select a state to see available universities' : 'Choose your university from the list' }}
+                  </small>
                 </div>
 
                 <!-- State and City -->
@@ -159,7 +165,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
 
@@ -179,18 +185,32 @@ export default {
     const isLoading = ref(false)
     const error = ref('')
     const success = ref('')
+    const states = ref([])
+    const availableUniversities = ref([])
+    const allUniversities = ref({})
 
-    // US States list
-    const states = ref([
-      'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
-      'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
-      'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
-      'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
-      'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
-      'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
-      'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-      'Wisconsin', 'Wyoming'
-    ])
+    // Fetch states and universities on component mount
+    const fetchUniversityData = async () => {
+      try {
+        const response = await api.get('/api/universities')
+        allUniversities.value = response.data
+        states.value = Object.keys(response.data).sort()
+      } catch (err) {
+        console.error('Failed to fetch university data:', err)
+        error.value = 'Failed to load university data. Please refresh the page.'
+      }
+    }
+
+    // Watch for state changes to update available universities
+    const updateUniversities = () => {
+      if (form.value.state && allUniversities.value[form.value.state]) {
+        availableUniversities.value = allUniversities.value[form.value.state]
+      } else {
+        availableUniversities.value = []
+      }
+      // Clear university selection when state changes
+      form.value.universityName = ''
+    }
 
     const createChapter = async () => {
       if (!form.value.name || !form.value.universityName || !form.value.state || !form.value.city) {
@@ -238,12 +258,19 @@ export default {
       router.push('/chapters')
     }
 
+    // Initialize data on component mount
+    fetchUniversityData()
+
+    // Watch for state changes
+    watch(() => form.value.state, updateUniversities)
+
     return {
       form,
       isLoading,
       error,
       success,
       states,
+      availableUniversities,
       createChapter,
       goBack
     }

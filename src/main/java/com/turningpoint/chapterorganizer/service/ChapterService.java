@@ -47,6 +47,14 @@ public class ChapterService {
     }
 
     /**
+     * Get chapter by ID with members and events (optimized for avoiding N+1 queries)
+     */
+    @Transactional(readOnly = true)
+    public Optional<Chapter> getChapterByIdWithDetails(Long id) {
+        return chapterRepository.findByIdWithMembersAndEvents(id);
+    }
+
+    /**
      * Get chapter by name (case-insensitive)
      */
     @Transactional(readOnly = true)
@@ -68,6 +76,22 @@ public class ChapterService {
     @Transactional(readOnly = true)
     public List<Chapter> getAllActiveChapters() {
         return chapterRepository.findByActiveTrue();
+    }
+
+    /**
+     * Get all active chapters with members (optimized for avoiding N+1 queries)
+     */
+    @Transactional(readOnly = true)
+    public List<Chapter> getAllActiveChaptersWithMembers() {
+        return chapterRepository.findAllActiveChaptersWithMembers();
+    }
+
+    /**
+     * Get all active chapters with events (optimized for avoiding N+1 queries)
+     */
+    @Transactional(readOnly = true)
+    public List<Chapter> getAllActiveChaptersWithEvents() {
+        return chapterRepository.findAllActiveChaptersWithEvents();
     }
 
     /**

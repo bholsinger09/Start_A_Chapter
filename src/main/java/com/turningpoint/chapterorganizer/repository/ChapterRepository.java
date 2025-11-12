@@ -61,4 +61,17 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     // Find chapters with upcoming events
     @Query("SELECT DISTINCT c FROM Chapter c JOIN c.events e WHERE e.eventDateTime > CURRENT_TIMESTAMP AND e.active = true AND c.active = true")
     List<Chapter> findChaptersWithUpcomingEvents();
+
+    // Optimized queries with fetch joins to prevent N+1 queries
+    @Query("SELECT DISTINCT c FROM Chapter c LEFT JOIN FETCH c.members WHERE c.active = true")
+    List<Chapter> findAllActiveChaptersWithMembers();
+
+    @Query("SELECT DISTINCT c FROM Chapter c LEFT JOIN FETCH c.events WHERE c.active = true")
+    List<Chapter> findAllActiveChaptersWithEvents();
+
+    @Query("SELECT DISTINCT c FROM Chapter c LEFT JOIN FETCH c.members LEFT JOIN FETCH c.events WHERE c.id = :id")
+    Optional<Chapter> findByIdWithMembersAndEvents(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT c FROM Chapter c LEFT JOIN FETCH c.members WHERE c.state = :state AND c.active = true")
+    List<Chapter> findActiveChaptersByStateWithMembers(@Param("state") String state);
 }

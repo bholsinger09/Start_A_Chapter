@@ -12,7 +12,14 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "events")
+@Table(name = "events", indexes = {
+    @Index(name = "idx_event_chapter_id", columnList = "chapter_id"),
+    @Index(name = "idx_event_date_time", columnList = "event_date_time"),
+    @Index(name = "idx_event_type", columnList = "type"),
+    @Index(name = "idx_event_active", columnList = "active"),
+    @Index(name = "idx_event_chapter_date", columnList = "chapter_id, event_date_time"),
+    @Index(name = "idx_event_date_active", columnList = "event_date_time, active")
+})
 public class Event {
 
     @Id

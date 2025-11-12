@@ -246,4 +246,39 @@ public class MemberService {
         member.setChapter(newChapter);
         return memberRepository.save(member);
     }
+
+    /**
+     * Add member to a specific chapter
+     */
+    public Member addMemberToChapter(Long chapterId, Member member) {
+        // Check if email already exists
+        if (memberRepository.existsByEmail(member.getEmail())) {
+            throw new IllegalArgumentException("Member with this email already exists");
+        }
+
+        // Get the chapter
+        Chapter chapter = chapterService.getChapterById(chapterId)
+                .orElseThrow(() -> new IllegalArgumentException("Chapter not found with id: " + chapterId));
+
+        // Set chapter and defaults
+        member.setChapter(chapter);
+        if (member.getActive() == null) {
+            member.setActive(true);
+        }
+        if (member.getRole() == null) {
+            member.setRole(MemberRole.MEMBER);
+        }
+
+        return memberRepository.save(member);
+    }
+
+    /**
+     * Delete member (hard delete)
+     */
+    public void deleteMember(Long id) {
+        if (!memberRepository.existsById(id)) {
+            throw new IllegalArgumentException("Member not found with id: " + id);
+        }
+        memberRepository.deleteById(id);
+    }
 }

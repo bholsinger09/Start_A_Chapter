@@ -217,7 +217,7 @@ public class DataPopulation implements CommandLineRunner {
         }
         
         // Add a few more sample members to demonstrate the system
-        if (chapters.size() > 0) {
+        if (!chapters.isEmpty()) {
             // Add Boise State University members (assuming we have chapters)
             Member caseyPeterson = new Member("Casey", "Peterson", "casey.peterson@boisestate.edu", chapters.get(chapters.size() - 1));
             caseyPeterson.setUsername("caseyp");

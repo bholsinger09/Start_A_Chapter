@@ -2,7 +2,6 @@ package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.service.ChapterService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,8 +18,11 @@ import java.util.*;
 )
 public class ChapterController {
 
-    @Autowired
-    private ChapterService chapterService;
+    private final ChapterService chapterService;
+
+    public ChapterController(ChapterService chapterService) {
+        this.chapterService = chapterService;
+    }
 
     @GetMapping("")
     public ResponseEntity<List<Chapter>> getAllChapters() {

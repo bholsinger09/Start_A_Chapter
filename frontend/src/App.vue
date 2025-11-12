@@ -102,48 +102,23 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'App',
   setup() {
-    const currentUser = ref(null)
+    const { currentUser, isAuthenticated, initAuth, logout: authLogout } = useAuth()
 
-    // Check authentication status
-    const isAuthenticated = computed(() => {
-      return currentUser.value !== null
-    })
-
-    // Check auth state on mount
-    const checkAuthState = () => {
-      try {
-        const storedUser = localStorage.getItem('user')
-        if (storedUser) {
-          currentUser.value = JSON.parse(storedUser)
-        }
-      } catch (error) {
-        console.error('Error parsing stored user:', error)
-        localStorage.removeItem('user')
-      }
-    }
-
-    // Logout function
+    // Enhanced logout function with redirect
     const logout = () => {
-      localStorage.removeItem('user')
-      currentUser.value = null
+      authLogout()
       // Redirect to home page
       window.location.href = '/'
     }
 
     onMounted(() => {
-      checkAuthState()
-      
-      // Listen for storage changes (login/logout in other tabs)
-      window.addEventListener('storage', (e) => {
-        if (e.key === 'user') {
-          checkAuthState()
-        }
-      })
+      initAuth()
     })
 
     return {

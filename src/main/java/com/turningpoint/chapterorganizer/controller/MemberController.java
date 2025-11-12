@@ -3,7 +3,7 @@ package com.turningpoint.chapterorganizer.controller;
 import com.turningpoint.chapterorganizer.dto.MemberDTO;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.turningpoint.chapterorganizer.util.ControllerUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +23,11 @@ import java.util.stream.Collectors;
 )
 public class MemberController {
 
-    @Autowired
-    private MemberService memberService;
+    private final MemberService memberService;
+
+    public MemberController(MemberService memberService) {
+        this.memberService = memberService;
+    }
 
     /**
      * Get member by username (treating username as email for compatibility)
@@ -32,18 +35,14 @@ public class MemberController {
      */
     @GetMapping("/username/{username}")
     public ResponseEntity<MemberDTO> getMemberByUsername(@PathVariable String username) {
-        try {
+        return ControllerUtils.executeWithErrorHandling(() -> {
             // In our system, username is treated as email
             Optional<Member> member = memberService.getMemberByEmail(username);
             
-            if (member.isPresent()) {
-                return ResponseEntity.ok(convertToDTO(member.get()));
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            return member.isPresent() 
+                ? ControllerUtils.ok(convertToDTO(member.get()))
+                : ControllerUtils.notFound();
+        });
     }
 
     /**

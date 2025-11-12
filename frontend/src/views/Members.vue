@@ -126,10 +126,18 @@
                       </td>
                       <td>
                         <div class="btn-group btn-group-sm">
-                          <button class="btn btn-outline-primary" disabled>
+                          <button 
+                            class="btn btn-outline-primary" 
+                            @click="viewChapter(member)"
+                            :title="`Search for ${member.chapterName || 'chapter'} information`"
+                          >
                             <i class="bi bi-eye"></i>
                           </button>
-                          <button class="btn btn-outline-secondary" disabled>
+                          <button 
+                            class="btn btn-outline-secondary" 
+                            @click="emailMember(member)"
+                            :title="`Email ${member.firstName} ${member.lastName}`"
+                          >
                             <i class="bi bi-envelope"></i>
                           </button>
                         </div>
@@ -427,6 +435,33 @@ export default {
       return roleClasses[role] || 'badge bg-secondary'
     }
 
+    // Action functions
+    const viewChapter = (member) => {
+      if (member.chapterName && member.universityName) {
+        // Create Google search query for the chapter, university, and Turning Point USA
+        const searchQuery = `"${member.chapterName}" "${member.universityName}" "Turning Point USA chapter"`;
+        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+        
+        // Open in new tab
+        window.open(googleSearchUrl, '_blank');
+      } else {
+        console.warn('Chapter information not available for member:', member);
+      }
+    }
+
+    const emailMember = (member) => {
+      if (member.email) {
+        // Create mailto link with member's email
+        const subject = encodeURIComponent(`Hello ${member.firstName}`);
+        const mailtoUrl = `mailto:${member.email}?subject=${subject}`;
+        
+        // Open default mail client
+        window.location.href = mailtoUrl;
+      } else {
+        console.warn('Email not available for member:', member);
+      }
+    }
+
     // Member management functions
     const openAddMemberModal = () => {
       // Reset form
@@ -521,6 +556,9 @@ export default {
       getInitials,
       formatRole,
       getRoleBadgeClass,
+      // Action functions
+      viewChapter,
+      emailMember,
       // Member management
       memberLoading,
       memberError,

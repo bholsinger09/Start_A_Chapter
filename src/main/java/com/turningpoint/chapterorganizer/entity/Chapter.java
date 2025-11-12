@@ -14,7 +14,13 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "chapters")
+@Table(name = "chapters", indexes = {
+    @Index(name = "idx_chapter_name", columnList = "name"),
+    @Index(name = "idx_chapter_university", columnList = "universityName"),
+    @Index(name = "idx_chapter_state", columnList = "state"),
+    @Index(name = "idx_chapter_active", columnList = "active"),
+    @Index(name = "idx_chapter_state_active", columnList = "state, active")
+})
 public class Chapter {
 
     @Id

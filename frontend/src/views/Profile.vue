@@ -221,29 +221,22 @@
 </template>
 
 <script>
-import { computed, ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'Profile',
   setup() {
     const router = useRouter()
+    const { currentUser, updateUserProfile, initAuth } = useAuth()
     
     const editMode = ref(false)
     const profileLoading = ref(false)
     const profileError = ref('')
     const profileSuccess = ref('')
     const availableChapters = ref([])
-
-    const currentUser = computed(() => {
-      try {
-        const user = localStorage.getItem('user')
-        return user ? JSON.parse(user) : null
-      } catch {
-        return null
-      }
-    })
 
     const profileForm = ref({
       firstName: '',
@@ -344,7 +337,8 @@ export default {
           updatedUser.chapter = null
         }
 
-        localStorage.setItem('user', JSON.stringify(updatedUser))
+        // Use auth composable to update user profile
+        updateUserProfile(updatedUser)
 
         profileSuccess.value = 'Profile updated successfully!'
         editMode.value = false
@@ -378,6 +372,7 @@ export default {
 
     // Initialize on mount
     onMounted(() => {
+      initAuth()
       initializeForm()
       loadChapters()
     })

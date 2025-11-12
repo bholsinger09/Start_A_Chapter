@@ -85,4 +85,17 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // Find the president of a chapter
     @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = 'PRESIDENT' AND m.active = true")
     Optional<Member> findChapterPresident(@Param("chapterId") Long chapterId);
+
+    // Optimized queries with fetch joins to prevent N+1 queries
+    @Query("SELECT DISTINCT m FROM Member m LEFT JOIN FETCH m.chapter WHERE m.active = true")
+    List<Member> findAllActiveMembersWithChapter();
+
+    @Query("SELECT DISTINCT m FROM Member m LEFT JOIN FETCH m.chapter WHERE m.id = :id")
+    Optional<Member> findByIdWithChapter(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT m FROM Member m LEFT JOIN FETCH m.chapter WHERE m.email = :email")
+    Optional<Member> findByEmailWithChapter(@Param("email") String email);
+
+    @Query("SELECT DISTINCT m FROM Member m LEFT JOIN FETCH m.chapter WHERE m.chapter.id = :chapterId AND m.active = true")
+    List<Member> findByChapterIdWithChapter(@Param("chapterId") Long chapterId);
 }
