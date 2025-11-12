@@ -18,15 +18,19 @@ import java.util.Optional;
  * 
  * Before: Single 100+ line register method with multiple responsibilities
  * After: Multiple focused methods, each doing one thing well
+ * 
+ * NOTE: Temporarily disabled to avoid endpoint conflicts with original AuthController
+ * To use this refactored version, comment out the original AuthController and
+ * uncomment the annotations below.
  */
-@RestController
-@RequestMapping("/api/auth")
-@CrossOrigin(
-    origins = {"https://startachapter.duckdns.org", "http://startachapter.duckdns.org", "*"}, 
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-    allowedHeaders = "*",
-    allowCredentials = "false"
-)
+// @RestController
+// @RequestMapping("/api/auth")
+// @CrossOrigin(
+//     origins = {"https://startachapter.duckdns.org", "http://startachapter.duckdns.org", "*"}, 
+//     methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
+//     allowedHeaders = "*",
+//     allowCredentials = "false"
+// )
 public class AuthControllerRefactored {
 
     private final MemberService memberService;

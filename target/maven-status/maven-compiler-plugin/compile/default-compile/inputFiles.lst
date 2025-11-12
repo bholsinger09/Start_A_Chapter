@@ -1,6 +1,7 @@
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/MemberController.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/service/UniversityService.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/CampusChapterOrganizerApplication.java
+/Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/AuthControllerRefactored.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/repository/EventRepository.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/UniversityController.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/dto/MemberDTO.java
@@ -17,5 +18,6 @@
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/entity/Event.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/entity/EventType.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/AuthController.java
+/Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/dto/RegistrationRequest.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/dto/ChapterDto.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/repository/MemberRepository.java
