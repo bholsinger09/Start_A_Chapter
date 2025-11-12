@@ -26,48 +26,76 @@ public class MemberService {
     }
 
     /**
-     * Create a new member
-     * Uses database constraints to prevent race conditions instead of check-then-act pattern
+     * Create a new member - REFACTORED using Successive Refinement
+     * 
+     * BEFORE: 50+ line method with multiple responsibilities
+     * AFTER: Clean orchestrator calling focused helper methods
      */
     public Member createMember(Member member) {
         try {
-            // Validate chapter if provided (chapter is optional)
-            if (member.getChapter() != null && member.getChapter().getId() != null) {
-                Optional<Chapter> chapter = chapterService.getChapterById(member.getChapter().getId());
-                if (chapter.isEmpty()) {
-                    throw new IllegalArgumentException("Chapter not found with id: " + member.getChapter().getId());
-                }
-                member.setChapter(chapter.get());
-            }
-            // Chapter is optional - member can be created without a chapter
-
-            // Set default values
-            if (member.getActive() == null) {
-                member.setActive(true);
-            }
-            if (member.getRole() == null) {
-                member.setRole(MemberRole.MEMBER);
-            }
-
-            // Let the database unique constraint handle duplicates to prevent race conditions
+            // Step 1: Validate and set chapter (extracted method)
+            validateAndSetChapter(member);
+            
+            // Step 2: Set default values (extracted method) 
+            setMemberDefaults(member);
+            
+            // Step 3: Persist member (database handles constraints)
             return memberRepository.save(member);
+            
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            // Handle database constraint violations specifically
-            String message = e.getMessage();
-            if (message != null) {
-                if (message.contains("uk_member_email") || message.contains("email")) {
-                    throw new IllegalArgumentException("Member with this email already exists");
-                } else if (message.contains("uk_member_username") || message.contains("username")) {
-                    throw new IllegalArgumentException("Member with this username already exists");
-                } else if (message.contains("unique constraint") || message.contains("duplicate")) {
-                    throw new IllegalArgumentException("Member with this information already exists");
-                }
-            }
-            throw new IllegalArgumentException("Unable to create member due to data conflict: " + e.getMessage());
+            // Step 4: Handle constraint violations (extracted method)
+            throw handleConstraintViolation(e);
         } catch (Exception e) {
             // Re-throw any other exception
             throw e;
         }
+    }
+    
+    /**
+     * EXTRACTED METHOD 1: Validate and set chapter
+     * Single responsibility: Chapter validation and assignment
+     */
+    private void validateAndSetChapter(Member member) {
+        if (member.getChapter() != null && member.getChapter().getId() != null) {
+            Long chapterId = member.getChapter().getId();
+            Optional<Chapter> chapter = chapterService.getChapterById(chapterId);
+            if (chapter.isEmpty()) {
+                throw new IllegalArgumentException("Chapter not found with id: " + chapterId);
+            }
+            member.setChapter(chapter.get());
+        }
+        // Note: Chapter is optional - member can be created without a chapter
+    }
+    
+    /**
+     * EXTRACTED METHOD 2: Set member defaults
+     * Single responsibility: Ensure proper default values
+     */
+    private void setMemberDefaults(Member member) {
+        if (member.getActive() == null) {
+            member.setActive(true);
+        }
+        if (member.getRole() == null) {
+            member.setRole(MemberRole.MEMBER);
+        }
+    }
+    
+    /**
+     * EXTRACTED METHOD 3: Handle constraint violations 
+     * Single responsibility: Convert database exceptions to meaningful messages
+     */
+    private IllegalArgumentException handleConstraintViolation(org.springframework.dao.DataIntegrityViolationException e) {
+        String message = e.getMessage();
+        if (message != null) {
+            if (message.contains("uk_member_email") || message.contains("email")) {
+                return new IllegalArgumentException("Member with this email already exists");
+            } else if (message.contains("uk_member_username") || message.contains("username")) {
+                return new IllegalArgumentException("Member with this username already exists");
+            } else if (message.contains("unique constraint") || message.contains("duplicate")) {
+                return new IllegalArgumentException("Member with this information already exists");
+            }
+        }
+        return new IllegalArgumentException("Unable to create member due to data conflict: " + e.getMessage());
     }
 
     /**
