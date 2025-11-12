@@ -4,13 +4,14 @@ import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.repository.ChapterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class ChapterService {
 
     private final ChapterRepository chapterRepository;
@@ -22,20 +23,31 @@ public class ChapterService {
 
     /**
      * Create a new chapter
+     * Uses database constraint to prevent race conditions instead of check-then-act pattern
      */
     public Chapter createChapter(Chapter chapter) {
-        // Check if chapter already exists with the same name at the same university
-        if (chapterRepository.existsByNameIgnoreCaseAndUniversityNameIgnoreCase(
-                chapter.getName(), chapter.getUniversityName())) {
-            throw new IllegalArgumentException("Chapter with this name already exists at the university");
-        }
+        try {
+            // Ensure the chapter is active by default
+            if (chapter.getActive() == null) {
+                chapter.setActive(true);
+            }
 
-        // Ensure the chapter is active by default
-        if (chapter.getActive() == null) {
-            chapter.setActive(true);
+            // Let the database unique constraint handle duplicates to prevent race conditions
+            return chapterRepository.save(chapter);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Handle database constraint violations specifically
+            String message = e.getMessage();
+            if (message != null && 
+                (message.contains("uk_chapter_name_university") || 
+                 message.contains("duplicate") ||
+                 message.contains("unique constraint"))) {
+                throw new IllegalArgumentException("Chapter with this name already exists at the university");
+            }
+            throw new IllegalArgumentException("Unable to create chapter due to data conflict: " + e.getMessage());
+        } catch (Exception e) {
+            // Re-throw any other exception
+            throw e;
         }
-
-        return chapterRepository.save(chapter);
     }
 
     /**

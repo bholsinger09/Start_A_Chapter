@@ -6,13 +6,14 @@ import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -26,32 +27,47 @@ public class MemberService {
 
     /**
      * Create a new member
+     * Uses database constraints to prevent race conditions instead of check-then-act pattern
      */
     public Member createMember(Member member) {
-        // Check if email already exists
-        if (memberRepository.existsByEmail(member.getEmail())) {
-            throw new IllegalArgumentException("Member with this email already exists");
-        }
-
-        // Validate chapter if provided (chapter is optional)
-        if (member.getChapter() != null && member.getChapter().getId() != null) {
-            Optional<Chapter> chapter = chapterService.getChapterById(member.getChapter().getId());
-            if (chapter.isEmpty()) {
-                throw new IllegalArgumentException("Chapter not found with id: " + member.getChapter().getId());
+        try {
+            // Validate chapter if provided (chapter is optional)
+            if (member.getChapter() != null && member.getChapter().getId() != null) {
+                Optional<Chapter> chapter = chapterService.getChapterById(member.getChapter().getId());
+                if (chapter.isEmpty()) {
+                    throw new IllegalArgumentException("Chapter not found with id: " + member.getChapter().getId());
+                }
+                member.setChapter(chapter.get());
             }
-            member.setChapter(chapter.get());
-        }
-        // Chapter is optional - member can be created without a chapter
+            // Chapter is optional - member can be created without a chapter
 
-        // Set default values
-        if (member.getActive() == null) {
-            member.setActive(true);
-        }
-        if (member.getRole() == null) {
-            member.setRole(MemberRole.MEMBER);
-        }
+            // Set default values
+            if (member.getActive() == null) {
+                member.setActive(true);
+            }
+            if (member.getRole() == null) {
+                member.setRole(MemberRole.MEMBER);
+            }
 
-        return memberRepository.save(member);
+            // Let the database unique constraint handle duplicates to prevent race conditions
+            return memberRepository.save(member);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Handle database constraint violations specifically
+            String message = e.getMessage();
+            if (message != null) {
+                if (message.contains("uk_member_email") || message.contains("email")) {
+                    throw new IllegalArgumentException("Member with this email already exists");
+                } else if (message.contains("uk_member_username") || message.contains("username")) {
+                    throw new IllegalArgumentException("Member with this username already exists");
+                } else if (message.contains("unique constraint") || message.contains("duplicate")) {
+                    throw new IllegalArgumentException("Member with this information already exists");
+                }
+            }
+            throw new IllegalArgumentException("Unable to create member due to data conflict: " + e.getMessage());
+        } catch (Exception e) {
+            // Re-throw any other exception
+            throw e;
+        }
     }
 
     /**

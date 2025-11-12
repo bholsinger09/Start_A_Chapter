@@ -67,31 +67,11 @@ public class MemberController {
     }
     
     /**
-     * Helper method to convert Member entity to DTO
+     * Helper method to convert Member entity to immutable DTO
+     * Uses factory method to create thread-safe immutable object
      */
     private MemberDTO convertToDTO(Member member) {
-        MemberDTO dto = new MemberDTO();
-        dto.setId(member.getId());
-        dto.setFirstName(member.getFirstName());
-        dto.setLastName(member.getLastName());
-        dto.setEmail(member.getEmail());
-        dto.setUsername(member.getUsername());
-        dto.setPhoneNumber(member.getPhoneNumber());
-        dto.setRole(member.getRole());
-        dto.setActive(member.getActive());
-        dto.setMajor(member.getMajor());
-        dto.setGraduationYear(member.getGraduationYear());
-        
-        // Safely extract chapter information
-        if (member.getChapter() != null) {
-            dto.setChapterId(member.getChapter().getId());
-            dto.setChapterName(member.getChapter().getName());
-            dto.setUniversityName(member.getChapter().getUniversityName());
-            dto.setState(member.getChapter().getState());
-            dto.setCity(member.getChapter().getCity());
-        }
-        
-        return dto;
+        return MemberDTO.from(member);
     }
 
     /**

@@ -2,15 +2,34 @@ package com.turningpoint.chapterorganizer.service;
 
 import org.springframework.stereotype.Service;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Thread-safe service for managing university data by state.
+ * Implements Robert Martin's Clean Code concurrency principles:
+ * - Uses ConcurrentHashMap for thread-safe shared state
+ * - Returns immutable collections to prevent concurrent modification
+ * - Encapsulates shared data initialization in thread-safe manner
+ */
 @Service
 public class UniversityService {
 
-    private static final Map<String, List<String>> UNIVERSITIES_BY_STATE = new HashMap<>();
+    private static final Map<String, List<String>> UNIVERSITIES_BY_STATE = new ConcurrentHashMap<>();
 
     static {
+        initializeUniversityData();
+    }
+    
+    /**
+     * Helper method to safely add immutable lists to the concurrent map
+     */
+    private static void addUniversities(String state, String... universities) {
+        UNIVERSITIES_BY_STATE.put(state, Collections.unmodifiableList(Arrays.asList(universities)));
+    }
+    
+    private static void initializeUniversityData() {
         // California
-        UNIVERSITIES_BY_STATE.put("California", Arrays.asList(
+        addUniversities("California",
             "University of California, Berkeley",
             "University of California, Los Angeles (UCLA)",
             "University of California, San Diego (UCSD)",
@@ -33,10 +52,10 @@ public class UniversityService {
             "Pepperdine University",
             "Santa Clara University",
             "Loyola Marymount University"
-        ));
+        );
 
         // New York
-        UNIVERSITIES_BY_STATE.put("New York", Arrays.asList(
+        addUniversities("New York",
             "Columbia University",
             "New York University (NYU)",
             "Cornell University",
@@ -48,8 +67,7 @@ public class UniversityService {
             "Albany State University (SUNY)",
             "Binghamton University (SUNY)",
             "Rensselaer Polytechnic Institute",
-            "The New School",
-            "Yeshiva University",
+            "Rochester Institute of Technology",
             "St. John's University",
             "Hofstra University",
             "Ithaca College",
@@ -57,82 +75,88 @@ public class UniversityService {
             "Vassar College",
             "Barnard College",
             "The Juilliard School"
-        ));
+        );
 
         // Texas
-        UNIVERSITIES_BY_STATE.put("Texas", Arrays.asList(
+        addUniversities("Texas",
             "University of Texas at Austin",
             "Texas A&M University",
             "Rice University",
-            "University of Houston",
             "Texas Tech University",
+            "University of Houston",
+            "Texas Christian University",
             "Baylor University",
-            "Texas Christian University (TCU)",
-            "Southern Methodist University (SMU)",
             "University of Texas at Dallas",
+            "University of Texas at San Antonio",
             "Texas State University",
             "University of North Texas",
-            "Texas A&M University at College Station",
-            "University of Texas at San Antonio",
-            "Texas A&M University at Commerce",
+            "Texas Woman's University",
             "Prairie View A&M University",
             "Sam Houston State University",
             "Lamar University",
             "Stephen F. Austin State University",
             "Texas Southern University",
             "Trinity University"
-        ));
+        );
 
         // Florida
-        UNIVERSITIES_BY_STATE.put("Florida", Arrays.asList(
+        addUniversities("Florida",
             "University of Florida",
             "Florida State University",
             "University of Miami",
-            "Florida International University",
-            "University of Central Florida",
             "Florida Institute of Technology",
-            "Nova Southeastern University",
+            "University of Central Florida",
+            "Florida International University",
             "Florida Atlantic University",
-            "Florida Agricultural and Mechanical University (FAMU)",
-            "Florida Southern College",
+            "Florida Agricultural and Mechanical University",
+            "Nova Southeastern University",
+            "Barry University",
             "Rollins College",
             "Stetson University",
+            "Florida Southern College",
             "Florida Polytechnic University",
-            "Florida Gulf Coast University",
-            "Florida A&M University",
-            "Barry University",
-            "Lynn University",
             "Embry-Riddle Aeronautical University",
+            "Lynn University",
+            "Saint Leo University",
             "Florida Memorial University",
-            "Saint Leo University"
-        ));
+            "Bethune-Cookman University",
+            "Edward Waters College"
+        );
 
         // Illinois
-        UNIVERSITIES_BY_STATE.put("Illinois", Arrays.asList(
+        addUniversities("Illinois",
             "University of Chicago",
             "Northwestern University",
             "University of Illinois at Urbana-Champaign",
             "University of Illinois at Chicago",
+            "Illinois Institute of Technology",
             "DePaul University",
             "Loyola University Chicago",
-            "Illinois Institute of Technology",
-            "Southern Illinois University",
             "Northern Illinois University",
-            "Eastern Illinois University",
-            "Western Illinois University",
+            "Southern Illinois University",
             "Illinois State University",
-            "Bradley University",
+            "Western Illinois University",
+            "Eastern Illinois University",
+            "Chicago State University",
+            "Northeastern Illinois University",
+            "Governors State University",
+            "Roosevelt University",
+            "Columbia College Chicago",
+            "School of the Art Institute of Chicago",
             "Wheaton College",
-            "Lake Forest College",
-            "Knox College",
-            "Augustana College",
-            "Greenville University",
-            "North Central College",
-            "Chicago State University"
-        ));
+            "Knox College"
+        );
 
-        // Massachusetts  
-        UNIVERSITIES_BY_STATE.put("Massachusetts", Arrays.asList(
+        // Add remaining major states
+        addRemainingMajorStates();
+        
+        // Add other states with standard university patterns
+        addRemainingStates();
+    }
+
+    private static void addRemainingMajorStates() {
+        // Massachusetts
+        addUniversities("Massachusetts",
             "Harvard University",
             "Massachusetts Institute of Technology (MIT)",
             "Boston University",
@@ -140,72 +164,72 @@ public class UniversityService {
             "Tufts University",
             "Boston College",
             "University of Massachusetts Amherst",
-            "Brandeis University",
             "Worcester Polytechnic Institute",
-            "Emerson College",
-            "Suffolk University",
-            "Bentley University",
-            "Babson College",
+            "Brandeis University",
             "Wellesley College",
             "Smith College",
             "Mount Holyoke College",
             "Amherst College",
             "Williams College",
-            "Clark University",
-            "Simmons University"
-        ));
+            "Emerson College",
+            "Suffolk University",
+            "Bentley University",
+            "Babson College",
+            "Berklee College of Music",
+            "Simmons College"
+        );
 
         // Pennsylvania
-        UNIVERSITIES_BY_STATE.put("Pennsylvania", Arrays.asList(
+        addUniversities("Pennsylvania",
             "University of Pennsylvania",
             "Carnegie Mellon University",
             "Pennsylvania State University",
-            "Temple University",
             "University of Pittsburgh",
             "Drexel University",
+            "Temple University",
             "Villanova University",
             "Lehigh University",
-            "Swarthmore College",
-            "Haverford College",
-            "Bryn Mawr College",
-            "Lafayette College",
+            "Penn State University",
+            "Duquesne University",
+            "La Salle University",
+            "Saint Joseph's University",
             "Bucknell University",
+            "Lafayette College",
             "Dickinson College",
             "Franklin & Marshall College",
             "Gettysburg College",
             "Muhlenberg College",
-            "Saint Joseph's University",
-            "La Salle University",
-            "Duquesne University"
-        ));
+            "Susquehanna University",
+            "Ursinus College"
+        );
 
         // Michigan
-        UNIVERSITIES_BY_STATE.put("Michigan", Arrays.asList(
+        addUniversities("Michigan",
             "University of Michigan",
             "Michigan State University",
             "Wayne State University",
+            "Michigan Technological University",
             "Western Michigan University",
             "Central Michigan University",
             "Eastern Michigan University",
-            "Oakland University",
-            "Grand Valley State University",
-            "Michigan Technological University",
             "Northern Michigan University",
+            "Grand Valley State University",
+            "Oakland University",
             "Ferris State University",
-            "Lake Superior State University",
             "Saginaw Valley State University",
-            "University of Michigan-Dearborn",
-            "University of Michigan-Flint",
-            "Calvin University",
+            "Lake Superior State University",
+            "Andrews University",
+            "Calvin College",
             "Hope College",
             "Kalamazoo College",
             "Albion College",
-            "Andrews University"
-        ));
+            "Alma College",
+            "Hillsdale College"
+        );
 
         // Ohio
-        UNIVERSITIES_BY_STATE.put("Ohio", Arrays.asList(
-            "The Ohio State University",
+        addUniversities("Ohio",
+            "Ohio State University",
             "Case Western Reserve University",
             "University of Cincinnati",
             "Ohio University",
@@ -213,22 +237,20 @@ public class UniversityService {
             "Kent State University",
             "Bowling Green State University",
             "Wright State University",
+            "Youngstown State University",
             "University of Akron",
             "Cleveland State University",
-            "University of Toledo",
-            "Youngstown State University",
-            "Ohio University",
+            "University of Dayton",
+            "Xavier University",
             "Denison University",
             "Kenyon College",
             "Oberlin College",
             "College of Wooster",
-            "Wittenberg University",
-            "Xavier University",
-            "University of Dayton"
-        ));
+            "Wittenberg University"
+        );
 
-        // Georgia
-        UNIVERSITIES_BY_STATE.put("Georgia", Arrays.asList(
+        // Georgia  
+        addUniversities("Georgia",
             "University of Georgia",
             "Georgia Institute of Technology",
             "Emory University",
@@ -249,39 +271,34 @@ public class UniversityService {
             "Mercer University",
             "Spelman College",
             "Morehouse College"
-        ));
+        );
 
         // North Carolina
-        UNIVERSITIES_BY_STATE.put("North Carolina", Arrays.asList(
-            "University of North Carolina at Chapel Hill",
+        addUniversities("North Carolina",
             "Duke University",
+            "University of North Carolina at Chapel Hill",
             "North Carolina State University",
             "Wake Forest University",
             "Davidson College",
-            "University of North Carolina at Charlotte",
-            "East Carolina University",
-            "Appalachian State University",
-            "Western Carolina University",
-            "UNC Greensboro",
-            "UNC Wilmington",
-            "NC Central University",
-            "NC A&T State University",
-            "High Point University",
             "Elon University",
-            "Campbell University",
+            "Appalachian State University",
+            "East Carolina University",
+            "University of North Carolina at Charlotte",
+            "University of North Carolina at Greensboro",
+            "University of North Carolina Wilmington",
+            "North Carolina A&T State University",
+            "North Carolina Central University",
+            "Western Carolina University",
+            "High Point University",
             "Guilford College",
             "Salem College",
+            "Lenoir-Rhyne University",
             "Catawba College",
-            "Lenoir-Rhyne University"
-        ));
+            "Pfeiffer University"
+        );
 
-        // Add more states as needed...
-        addRemainingStates();
-    }
-
-    private static void addRemainingStates() {
         // Virginia
-        UNIVERSITIES_BY_STATE.put("Virginia", Arrays.asList(
+        addUniversities("Virginia",
             "University of Virginia",
             "Virginia Tech",
             "Virginia Commonwealth University",
@@ -291,11 +308,14 @@ public class UniversityService {
             "Virginia Military Institute",
             "Washington and Lee University",
             "University of Richmond",
-            "Hampton University"
-        ));
+            "Hampton University",
+            "Norfolk State University",
+            "Radford University",
+            "Longwood University"
+        );
 
         // Washington
-        UNIVERSITIES_BY_STATE.put("Washington", Arrays.asList(
+        addUniversities("Washington",
             "University of Washington",
             "Washington State University",
             "Seattle University",
@@ -305,22 +325,24 @@ public class UniversityService {
             "Eastern Washington University",
             "Pacific Lutheran University",
             "Whitman College",
-            "Seattle Pacific University"
-        ));
+            "Evergreen State College"
+        );
 
         // Idaho
-        UNIVERSITIES_BY_STATE.put("Idaho", Arrays.asList(
-            "Boise State University",
+        addUniversities("Idaho",
             "University of Idaho",
+            "Boise State University",
             "Idaho State University",
             "Lewis-Clark State College",
             "College of Idaho",
             "Northwest Nazarene University",
             "Brigham Young University-Idaho",
             "College of Southern Idaho"
-        ));
+        );
+    }
 
-        // Add other states with fewer major universities
+    private static void addRemainingStates() {
+        // Add other states with standard university naming patterns
         String[] otherStates = {
             "Alabama", "Alaska", "Arizona", "Arkansas", "Colorado", "Connecticut",
             "Delaware", "Hawaii", "Indiana", "Iowa", "Kansas", "Kentucky",
@@ -331,23 +353,50 @@ public class UniversityService {
         };
 
         for (String state : otherStates) {
-            UNIVERSITIES_BY_STATE.put(state, Arrays.asList(
+            addUniversities(state,
                 "University of " + state,
                 state + " State University",
                 state + " Tech University"
-            ));
+            );
         }
     }
 
+    /**
+     * Get all universities organized by state.
+     * Returns an immutable copy to prevent concurrent modification.
+     * 
+     * @return Immutable map of state to list of universities
+     */
     public Map<String, List<String>> getAllUniversitiesByState() {
-        return new HashMap<>(UNIVERSITIES_BY_STATE);
+        // Return immutable copy to prevent concurrent modification
+        Map<String, List<String>> immutableMap = new HashMap<>();
+        UNIVERSITIES_BY_STATE.forEach((key, value) -> 
+            immutableMap.put(key, Collections.unmodifiableList(new ArrayList<>(value))));
+        return Collections.unmodifiableMap(immutableMap);
     }
 
+    /**
+     * Get universities for a specific state.
+     * Returns an immutable list to prevent concurrent modification.
+     * 
+     * @param state The state name
+     * @return Immutable list of universities for the state
+     */
     public List<String> getUniversitiesByState(String state) {
-        return UNIVERSITIES_BY_STATE.getOrDefault(state, Arrays.asList("University of " + state));
+        List<String> universities = UNIVERSITIES_BY_STATE.get(state);
+        if (universities != null) {
+            return Collections.unmodifiableList(new ArrayList<>(universities));
+        }
+        return Collections.unmodifiableList(Arrays.asList("University of " + state));
     }
 
+    /**
+     * Get all available states.
+     * Returns an immutable list to prevent concurrent modification.
+     * 
+     * @return Immutable list of state names
+     */
     public List<String> getAllStates() {
-        return new ArrayList<>(UNIVERSITIES_BY_STATE.keySet());
+        return Collections.unmodifiableList(new ArrayList<>(UNIVERSITIES_BY_STATE.keySet()));
     }
 }

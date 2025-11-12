@@ -13,15 +13,21 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "members", indexes = {
-    @Index(name = "idx_member_email", columnList = "email"),
-    @Index(name = "idx_member_username", columnList = "username"),
-    @Index(name = "idx_member_chapter_id", columnList = "chapter_id"),
-    @Index(name = "idx_member_role", columnList = "role"),
-    @Index(name = "idx_member_active", columnList = "active"),
-    @Index(name = "idx_member_chapter_role", columnList = "chapter_id, role"),
-    @Index(name = "idx_member_chapter_active", columnList = "chapter_id, active")
-})
+@Table(name = "members", 
+    indexes = {
+        @Index(name = "idx_member_email", columnList = "email"),
+        @Index(name = "idx_member_username", columnList = "username"),
+        @Index(name = "idx_member_chapter_id", columnList = "chapter_id"),
+        @Index(name = "idx_member_role", columnList = "role"),
+        @Index(name = "idx_member_active", columnList = "active"),
+        @Index(name = "idx_member_chapter_role", columnList = "chapter_id, role"),
+        @Index(name = "idx_member_chapter_active", columnList = "chapter_id, active")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_member_email", columnNames = {"email"}),
+        @UniqueConstraint(name = "uk_member_username", columnNames = {"username"})
+    }
+)
 public class Member {
 
     @Id

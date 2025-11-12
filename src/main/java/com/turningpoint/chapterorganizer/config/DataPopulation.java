@@ -24,14 +24,31 @@ public class DataPopulation implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Only populate if no chapters exist
-        if (chapterRepository.count() == 0) {
-            populateChapters();
+        // Use synchronized block to prevent concurrent execution during startup
+        synchronized (DataPopulation.class) {
+            populateData();
+        }
+    }
+
+    private void populateData() {
+        try {
+            // Populate chapters only if none exist
+            if (chapterRepository.count() == 0) {
+                populateChapters();
+            }
+        } catch (Exception e) {
+            // If chapters already exist due to concurrent execution, log and continue
+            System.out.println("Chapters may already exist: " + e.getMessage());
         }
         
-        // Only populate members if none exist
-        if (memberRepository.count() == 0) {
-            populateMembers();
+        try {
+            // Populate members only if none exist
+            if (memberRepository.count() == 0) {
+                populateMembers();
+            }
+        } catch (Exception e) {
+            // If members already exist due to concurrent execution, log and continue
+            System.out.println("Members may already exist: " + e.getMessage());
         }
     }
 

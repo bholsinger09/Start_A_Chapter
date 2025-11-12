@@ -14,13 +14,19 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "chapters", indexes = {
-    @Index(name = "idx_chapter_name", columnList = "name"),
-    @Index(name = "idx_chapter_university", columnList = "universityName"),
-    @Index(name = "idx_chapter_state", columnList = "state"),
-    @Index(name = "idx_chapter_active", columnList = "active"),
-    @Index(name = "idx_chapter_state_active", columnList = "state, active")
-})
+@Table(name = "chapters", 
+    indexes = {
+        @Index(name = "idx_chapter_name", columnList = "name"),
+        @Index(name = "idx_chapter_university", columnList = "universityName"),
+        @Index(name = "idx_chapter_state", columnList = "state"),
+        @Index(name = "idx_chapter_active", columnList = "active"),
+        @Index(name = "idx_chapter_state_active", columnList = "state, active")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_chapter_name_university", 
+                         columnNames = {"name", "universityName"})
+    }
+)
 public class Chapter {
 
     @Id
