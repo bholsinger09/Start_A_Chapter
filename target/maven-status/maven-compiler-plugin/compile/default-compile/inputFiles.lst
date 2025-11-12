@@ -32,6 +32,7 @@
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/dto/RegistrationRequestDto.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/dto/SearchResultsDto.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/config/DataInitializer.java
+/Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/UniversityController.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/service/ActivityService.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/AnalyticsController.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/AdminController.java
@@ -50,6 +51,7 @@
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/service/DashboardAnalyticsService.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/config/PasswordConfig.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/dto/RegistrationResponseDto.java
+/Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/dto/MemberDTO.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/exception/GlobalExceptionHandler.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/config/JacksonConfig.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/service/DataInitializationService.java
@@ -82,6 +84,7 @@
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/entity/RSVPStatus.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/repository/MemberRepository.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/entity/ActivityType.java
+/Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/service/UniversityService.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/entity/Permission.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/security/annotation/RequirePolicies.java
 /Users/benh/Documents/StartAChapter/src/main/java/com/turningpoint/chapterorganizer/controller/LoginController.java
