@@ -215,9 +215,93 @@ public class Member {
         this.updatedAt = updatedAt;
     }
 
-    // Helper method for full name
+    // Business behavior methods - transforming anemic model into rich domain object
     public String getFullName() {
         return firstName + " " + lastName;
+    }
+
+    public boolean isLeader() {
+        return role == MemberRole.PRESIDENT || 
+               role == MemberRole.VICE_PRESIDENT || 
+               role == MemberRole.TREASURER || 
+               role == MemberRole.SECRETARY;
+    }
+
+    public boolean isInChapter(Chapter targetChapter) {
+        return this.chapter != null && 
+               Objects.equals(this.chapter.getId(), targetChapter.getId());
+    }
+
+    public boolean canModifyChapter() {
+        return this.active && role == MemberRole.PRESIDENT;
+    }
+
+    public boolean isGraduating(int year) {
+        if (graduationYear == null || graduationYear.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            return Integer.parseInt(graduationYear) == year;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public void promoteToRole(MemberRole newRole) {
+        if (!this.active) {
+            throw new IllegalStateException("Cannot promote inactive member");
+        }
+        if (newRole == null) {
+            throw new IllegalArgumentException("Role cannot be null");
+        }
+        this.role = newRole;
+    }
+
+    public void transferToChapter(Chapter newChapter) {
+        if (newChapter == null) {
+            throw new IllegalArgumentException("Chapter cannot be null");
+        }
+        if (!newChapter.getActive()) {
+            throw new IllegalArgumentException("Cannot transfer to inactive chapter");
+        }
+        this.chapter = newChapter;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public void activate() {
+        this.active = true;
+    }
+
+    // Law of Demeter compliance - delegate to chapter instead of exposing navigation
+    public Long getChapterId() {
+        return chapter != null ? chapter.getId() : null;
+    }
+
+    public String getChapterName() {
+        return chapter != null ? chapter.getName() : null;
+    }
+
+    public String getChapterUniversity() {
+        return chapter != null ? chapter.getUniversityName() : null;
+    }
+
+    public String getChapterState() {
+        return chapter != null ? chapter.getState() : null;
+    }
+
+    public String getChapterCity() {
+        return chapter != null ? chapter.getCity() : null;
+    }
+
+    public String getChapterLocation() {
+        return chapter != null ? chapter.getFullLocation() : null;
+    }
+
+    public boolean hasChapter() {
+        return chapter != null;
     }
 
     // equals and hashCode based on email (business key)

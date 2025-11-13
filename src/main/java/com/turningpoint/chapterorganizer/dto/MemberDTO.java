@@ -68,11 +68,11 @@ public final class MemberDTO {
             member.getActive(),
             member.getMajor(),
             member.getGraduationYear(),
-            member.getChapter() != null ? member.getChapter().getId() : null,
-            member.getChapter() != null ? member.getChapter().getName() : null,
-            member.getChapter() != null ? member.getChapter().getUniversityName() : null,
-            member.getChapter() != null ? member.getChapter().getState() : null,
-            member.getChapter() != null ? member.getChapter().getCity() : null,
+            member.getChapterId(),
+            member.getChapterName(),
+            member.getChapterUniversity(),
+            member.getChapterState(),
+            member.getChapterCity(),
             member.getCreatedAt(),
             member.getUpdatedAt()
         );

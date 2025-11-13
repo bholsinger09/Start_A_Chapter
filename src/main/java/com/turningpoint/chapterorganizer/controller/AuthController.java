@@ -106,9 +106,9 @@ public class AuthController {
             
             if (foundMember.getChapter() != null) {
                 userData.put("chapter", Map.of(
-                    "id", foundMember.getChapter().getId(),
-                    "name", foundMember.getChapter().getName(),
-                    "university", foundMember.getChapter().getUniversityName()
+                    "id", foundMember.getChapterId(),
+                    "name", foundMember.getChapterName(),
+                    "university", foundMember.getChapterUniversity()
                 ));
             } else {
                 userData.put("chapter", null);
@@ -253,7 +253,7 @@ public class AuthController {
         memberData.put("lastName", member.getLastName());
         memberData.put("email", member.getEmail());
         memberData.put("role", member.getRole());
-        memberData.put("chapterId", member.getChapter() != null ? member.getChapter().getId() : null);
+        memberData.put("chapterId", member.getChapterId());
         return memberData;
     }
 

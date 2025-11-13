@@ -56,8 +56,8 @@ public class MemberService {
      * Single responsibility: Chapter validation and assignment
      */
     private void validateAndSetChapter(Member member) {
-        if (member.getChapter() != null && member.getChapter().getId() != null) {
-            Long chapterId = member.getChapter().getId();
+        if (member.hasChapter() && member.getChapterId() != null) {
+            Long chapterId = member.getChapterId();
             Optional<Chapter> chapter = chapterService.getChapterById(chapterId);
             if (chapter.isEmpty()) {
                 throw new IllegalArgumentException("Chapter not found with id: " + chapterId);

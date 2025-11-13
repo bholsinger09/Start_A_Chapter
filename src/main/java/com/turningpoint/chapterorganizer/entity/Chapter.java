@@ -177,25 +177,92 @@ public class Chapter {
         this.updatedAt = updatedAt;
     }
 
-    // Helper methods for managing relationships
+    // Rich domain behavior - transforming anemic model into behavioral object
     public void addMember(Member member) {
+        if (member == null) {
+            throw new IllegalArgumentException("Member cannot be null");
+        }
+        if (!this.active) {
+            throw new IllegalStateException("Cannot add member to inactive chapter");
+        }
         members.add(member);
         member.setChapter(this);
     }
 
     public void removeMember(Member member) {
+        if (member == null) {
+            return; // Idempotent operation
+        }
         members.remove(member);
         member.setChapter(null);
     }
 
     public void addEvent(Event event) {
+        if (event == null) {
+            throw new IllegalArgumentException("Event cannot be null");
+        }
+        if (!this.active) {
+            throw new IllegalStateException("Cannot add event to inactive chapter");
+        }
         events.add(event);
         event.setChapter(this);
     }
 
     public void removeEvent(Event event) {
+        if (event == null) {
+            return; // Idempotent operation
+        }
         events.remove(event);
         event.setChapter(null);
+    }
+
+    // Business behavior methods
+    public int getMemberCount() {
+        return members != null ? members.size() : 0;
+    }
+
+    public int getActiveMemberCount() {
+        if (members == null) return 0;
+        return (int) members.stream()
+                .filter(Member::getActive)
+                .count();
+    }
+
+    public List<Member> getLeadershipMembers() {
+        if (members == null) return new ArrayList<>();
+        return members.stream()
+                .filter(Member::isLeader)
+                .filter(Member::getActive)
+                .toList();
+    }
+
+    public boolean hasPresident() {
+        return members != null && members.stream()
+                .anyMatch(m -> m.getActive() && m.getRole() == MemberRole.PRESIDENT);
+    }
+
+    public Member getPresident() {
+        if (members == null) return null;
+        return members.stream()
+                .filter(m -> m.getActive() && m.getRole() == MemberRole.PRESIDENT)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public boolean canAcceptNewMembers() {
+        return this.active && getMemberCount() < 100; // Business rule: max 100 members
+    }
+
+    public void activate() {
+        this.active = true;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public String getFullLocation() {
+        return city + ", " + state;
     }
 
     // equals and hashCode based on business key (name + universityName)
