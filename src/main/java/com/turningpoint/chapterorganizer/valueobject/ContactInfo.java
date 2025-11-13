@@ -20,16 +20,18 @@ public final class ContactInfo {
         "^[\\d\\s\\-\\(\\)\\+\\.]{10,15}$"
     );
     
-    // Null Object pattern - represents empty/unknown contact info
-    public static final ContactInfo EMPTY = new ContactInfo("", "");
-    
     private final String email;
     private final String phoneNumber;
 
     // Constructor for JPA
     protected ContactInfo() {
-        this.email = null;
-        this.phoneNumber = null;
+        this.email = "";
+        this.phoneNumber = "";
+    }
+    
+    // Null Object pattern - represents empty/unknown contact info
+    public static ContactInfo createEmpty() {
+        return new ContactInfo();
     }
 
     public ContactInfo(String email, String phoneNumber) {
@@ -47,6 +49,11 @@ public final class ContactInfo {
         if (!EMAIL_PATTERN.matcher(email).matches()) {
             throw new IllegalArgumentException("Invalid email format: " + email);
         }
+    }
+    
+    public boolean isEmpty() {
+        return (email == null || email.trim().isEmpty()) && 
+               (phoneNumber == null || phoneNumber.trim().isEmpty());
     }
 
     private void validatePhoneNumber(String phoneNumber) {

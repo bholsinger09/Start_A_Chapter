@@ -20,19 +20,23 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByUsername(String username);
 
     // Find members by chapter ID
-    List<Member> findByChapterId(Long chapterId);
+    @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId")
+    List<Member> findByChapterId(@Param("chapterId") Long chapterId);
 
     // Find active members by chapter ID
-    List<Member> findByChapterIdAndActiveTrue(Long chapterId);
+    @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.active = true")
+    List<Member> findByChapterIdAndActiveTrue(@Param("chapterId") Long chapterId);
 
     // Find members by role
     List<Member> findByRole(MemberRole role);
 
     // Find members by chapter ID and role
-    List<Member> findByChapterIdAndRole(Long chapterId, MemberRole role);
+    @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = :role")
+    List<Member> findByChapterIdAndRole(@Param("chapterId") Long chapterId, @Param("role") MemberRole role);
 
     // Find active members by chapter ID and role
-    List<Member> findByChapterIdAndRoleAndActiveTrue(Long chapterId, MemberRole role);
+    @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = :role AND m.active = true")
+    List<Member> findByChapterIdAndRoleAndActiveTrue(@Param("chapterId") Long chapterId, @Param("role") MemberRole role);
 
     // Find members by first and last name (case-insensitive)
     List<Member> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(

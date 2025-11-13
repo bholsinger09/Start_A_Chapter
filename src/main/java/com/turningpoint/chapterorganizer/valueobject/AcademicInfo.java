@@ -15,9 +15,6 @@ public final class AcademicInfo {
     private static final int MIN_GRADUATION_YEAR = Year.now().getValue();
     private static final int MAX_GRADUATION_YEAR = Year.now().getValue() + 10;
     
-    // Null Object pattern - represents empty/unknown academic info
-    public static final AcademicInfo EMPTY = new AcademicInfo("", "");
-    
     private final String major;
     private final String graduationYear;
 
@@ -25,6 +22,11 @@ public final class AcademicInfo {
     protected AcademicInfo() {
         this.major = null;
         this.graduationYear = null;
+    }
+    
+    // Null Object pattern - represents empty/unknown academic info
+    public static AcademicInfo createEmpty() {
+        return new AcademicInfo();
     }
 
     public AcademicInfo(String major, String graduationYear) {
