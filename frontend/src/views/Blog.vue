@@ -133,7 +133,12 @@
                     </div>
                   </div>
                   <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Write a comment..." v-model="newComment['post-1']">
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="Write a comment..." 
+                      v-model="newComment['post-1']"
+                    >
                     <button class="btn btn-outline-primary" @click="addComment('post-1')">
                       <i class="bi bi-send"></i>
                     </button>
@@ -236,7 +241,12 @@
                     </div>
                   </div>
                   <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Write a comment..." v-model="newComment['post-2']">
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="Write a comment..." 
+                      v-model="newComment['post-2']"
+                    >
                     <button class="btn btn-outline-primary" @click="addComment('post-2')">
                       <i class="bi bi-send"></i>
                     </button>

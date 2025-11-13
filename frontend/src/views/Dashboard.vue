@@ -11,7 +11,8 @@
                 Welcome to Campus Chapter Organizer
               </h2>
               <p class="card-text" v-if="isAuthenticated">
-                Hello {{ currentUser?.firstName || 'User' }}! Manage your campus chapter activities and connect with members.
+                Hello {{ currentUser?.firstName || 'User' }}! 
+                Manage your campus chapter activities and connect with members.
               </p>
               <p class="card-text" v-else>
                 Discover campus chapters, connect with student organizations, and manage your academic community.
@@ -113,7 +114,8 @@
                 Join the Community
               </h4>
               <p class="card-text">
-                Connect with student organizations across universities. Create your profile, join chapters, and engage with the campus community.
+                Connect with student organizations across universities. 
+                Create your profile, join chapters, and engage with the campus community.
               </p>
               <div class="d-flex gap-3 justify-content-center">
                 <router-link to="/register" class="btn btn-primary">
@@ -167,7 +169,8 @@
                   <h6 class="text-primary">Purpose & Mission</h6>
                   <p class="mb-3">
                     Campus Chapter Organizer is a comprehensive web application designed to help student organizations 
-                    manage their chapter activities, connect members across universities, and facilitate campus engagement. 
+                    manage their chapter activities, connect members across universities, 
+                    and facilitate campus engagement. 
                     This platform enables chapter leaders to organize events, maintain member directories, and foster 
                     communication within their campus communities.
                   </p>
@@ -193,7 +196,12 @@
                     </p>
                     <p class="mb-0">
                       For official Turning Point USA information, please visit: 
-                      <a href="https://www.turningpointusa.com" target="_blank" rel="noopener noreferrer" class="alert-link">
+                      <a 
+                        href="https://www.turningpointusa.com" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        class="alert-link"
+                      >
                         www.turningpointusa.com <i class="bi bi-box-arrow-up-right"></i>
                       </a>
                     </p>
@@ -221,7 +229,12 @@
                       </p>
 
                       <div class="mt-3">
-                        <a href="https://www.turningpointusa.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                        <a 
+                          href="https://www.turningpointusa.com" 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          class="btn btn-outline-primary btn-sm"
+                        >
                           <i class="bi bi-globe me-1"></i>
                           Official TPUSA Site
                         </a>

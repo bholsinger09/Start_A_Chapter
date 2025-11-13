@@ -101,7 +101,8 @@ public class ChapterController {
      * Helper method to convert list of chapters to search result format
      * Centralizes chapter data transformation for consistency
      */
-    private List<Map<String, Object>> convertChaptersToSearchResults(List<Chapter> chapters, String extraField, Object extraValue) {
+    private List<Map<String, Object>> convertChaptersToSearchResults(
+            List<Chapter> chapters, String extraField, Object extraValue) {
         List<Map<String, Object>> results = new ArrayList<>();
         for (Chapter chapter : chapters) {
             results.add(convertChapterToSearchResult(chapter, extraField, extraValue));
@@ -142,7 +143,8 @@ public class ChapterController {
                 .toList();
             
             // Convert to simplified format for frontend using helper method
-            List<Map<String, Object>> recommendations = convertChaptersToSearchResults(recommendedChapters, "type", "chapter");
+            List<Map<String, Object>> recommendations = convertChaptersToSearchResults(
+                    recommendedChapters, "type", "chapter");
             
             return ResponseEntity.ok(recommendations);
         } catch (Exception e) {

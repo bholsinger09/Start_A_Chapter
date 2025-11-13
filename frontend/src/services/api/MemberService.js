@@ -262,38 +262,39 @@ export class MemberService extends BaseApiService {
     }
 
     /**
-     * Calculate comprehensive member statistics
+     * Calculate basic member statistics
      */
-    calculateStatistics(members) {
-        const stats = {
+    calculateBasicStats(members) {
+        return {
             totalMembers: members.length,
             activeMembers: members.filter(m => m.isActive).length,
-            leadershipMembers: members.filter(m => m.isLeader).length,
+            leadershipMembers: members.filter(m => m.isLeader).length
+        }
+    }
+
+    /**
+     * Calculate distribution statistics
+     */
+    calculateDistributions(members) {
+        const distributions = {
             roleDistribution: {},
             chapterDistribution: {},
             graduationYearDistribution: {},
-            majorDistribution: {},
-            averageClassSize: 0,
-            recentMembers: [],
-            graduatingMembers: []
+            majorDistribution: {}
         }
 
-        // Role distribution
+        // Role and chapter distributions
         members.forEach(member => {
-            stats.roleDistribution[member.role] = (stats.roleDistribution[member.role] || 0) + 1
-        })
-
-        // Chapter distribution
-        members.forEach(member => {
+            distributions.roleDistribution[member.role] = 
+                (distributions.roleDistribution[member.role] || 0) + 1
+            
             const chapterName = member.chapterName
-            stats.chapterDistribution[chapterName] = (stats.chapterDistribution[chapterName] || 0) + 1
-        })
+            distributions.chapterDistribution[chapterName] = 
+                (distributions.chapterDistribution[chapterName] || 0) + 1
 
-        // Graduation year distribution
-        members.forEach(member => {
             if (member.graduationYear) {
-                stats.graduationYearDistribution[member.graduationYear] =
-                    (stats.graduationYearDistribution[member.graduationYear] || 0) + 1
+                distributions.graduationYearDistribution[member.graduationYear] =
+                    (distributions.graduationYearDistribution[member.graduationYear] || 0) + 1
             }
         })
 
@@ -305,7 +306,7 @@ export class MemberService extends BaseApiService {
             }
         })
 
-        stats.majorDistribution = Object.entries(majorCounts)
+        distributions.majorDistribution = Object.entries(majorCounts)
             .sort(([, a], [, b]) => b - a)
             .slice(0, 10)
             .reduce((obj, [major, count]) => {
@@ -313,19 +314,40 @@ export class MemberService extends BaseApiService {
                 return obj
             }, {})
 
-        // Recent members (last 30 days)
+        return distributions
+    }
+
+    /**
+     * Calculate temporal statistics (recent and graduating members)
+     */
+    calculateTemporalStats(members) {
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-        stats.recentMembers = members
+        const recentMembers = members
             .filter(m => m.createdAt && new Date(m.createdAt) > thirtyDaysAgo)
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
-        // Graduating members (current year)
         const currentYear = new Date().getFullYear()
-        stats.graduatingMembers = members.filter(m => m.isGraduating(currentYear))
+        const graduatingMembers = members.filter(m => m.isGraduating(currentYear))
 
-        return stats
+        return { recentMembers, graduatingMembers }
+    }
+
+    /**
+     * Calculate comprehensive member statistics
+     */
+    calculateStatistics(members) {
+        const basicStats = this.calculateBasicStats(members)
+        const distributions = this.calculateDistributions(members)
+        const temporalStats = this.calculateTemporalStats(members)
+
+        return {
+            ...basicStats,
+            ...distributions,
+            ...temporalStats,
+            averageClassSize: 0
+        }
     }
 
     /**

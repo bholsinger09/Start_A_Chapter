@@ -95,7 +95,11 @@
             <i class="bi bi-search display-1 text-muted mb-3"></i>
             <h4 class="text-muted">No chapters found</h4>
             <p class="text-muted">
-              {{ searchTerm || selectedState ? 'Try adjusting your search criteria.' : 'No chapters available at the moment.' }}
+              {{ 
+                searchTerm || selectedState 
+                  ? 'Try adjusting your search criteria.' 
+                  : 'No chapters available at the moment.' 
+              }}
             </p>
           </div>
         </div>

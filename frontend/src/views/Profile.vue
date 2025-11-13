@@ -353,7 +353,9 @@ export default {
 
     const getChapterDisplayName = () => {
       if (!currentUser.value?.chapter) return 'No Chapter'
-      return `${currentUser.value.chapter.name} - ${currentUser.value.chapter.universityName || currentUser.value.chapter.university}`
+      return `${currentUser.value.chapter.name} - ${
+        currentUser.value.chapter.universityName || currentUser.value.chapter.university
+      }`
     }
 
     const logout = () => {

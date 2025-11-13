@@ -4,10 +4,10 @@ import com.turningpoint.chapterorganizer.dto.MemberDTO;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import com.turningpoint.chapterorganizer.util.ControllerUtils;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 import java.util.Optional;

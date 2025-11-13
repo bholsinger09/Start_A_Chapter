@@ -1,17 +1,18 @@
 package com.turningpoint.chapterorganizer.controller;
 
-import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.Chapter;
-import com.turningpoint.chapterorganizer.service.MemberService;
+import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.service.ChapterService;
+import com.turningpoint.chapterorganizer.service.MemberService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -256,7 +257,8 @@ public class AuthController {
         return memberData;
     }
 
-    private ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(org.springframework.dao.DataIntegrityViolationException e) {
+    private ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(
+            org.springframework.dao.DataIntegrityViolationException e) {
         String message;
         if (e.getMessage().contains("UK_MEMBER_EMAIL")) {
             message = "Email address is already registered";

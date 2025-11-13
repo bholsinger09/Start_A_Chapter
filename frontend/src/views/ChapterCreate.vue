@@ -66,7 +66,11 @@
                     </option>
                   </select>
                   <small class="form-text text-muted">
-                    {{ !form.state ? 'Please select a state to see available universities' : 'Choose your university from the list' }}
+                    {{ 
+                      !form.state 
+                        ? 'Please select a state to see available universities' 
+                        : 'Choose your university from the list' 
+                    }}
                   </small>
                 </div>
 

@@ -11,7 +11,12 @@
           <p class="text-muted">Connect with fellow students and chapter members.</p>
         </div>
         <div class="col-md-4 text-end">
-          <button class="btn btn-outline-secondary me-2" @click="loadData" :disabled="loading" title="Refresh member list">
+          <button 
+            class="btn btn-outline-secondary me-2" 
+            @click="loadData" 
+            :disabled="loading" 
+            title="Refresh member list"
+          >
             <i class="bi bi-arrow-clockwise me-1"></i>
             <span v-if="loading">Loading...</span>
             <span v-else>Refresh</span>
@@ -158,7 +163,11 @@
             <i class="bi bi-people display-1 text-muted mb-3"></i>
             <h4 class="text-muted">No members found</h4>
             <p class="text-muted">
-              {{ searchTerm || selectedChapter || selectedRole ? 'Try adjusting your search criteria.' : 'No members available at the moment.' }}
+              {{ 
+                searchTerm || selectedChapter || selectedRole 
+                  ? 'Try adjusting your search criteria.' 
+                  : 'No members available at the moment.' 
+              }}
             </p>
           </div>
         </div>
@@ -276,7 +285,13 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="graduationYear" class="form-label">Graduation Year</label>
-                    <input type="text" class="form-control" id="graduationYear" v-model="newMember.graduationYear" placeholder="2024">
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      id="graduationYear" 
+                      v-model="newMember.graduationYear" 
+                      placeholder="2024"
+                    >
                   </div>
                 </div>
                 <div class="col-md-6">
