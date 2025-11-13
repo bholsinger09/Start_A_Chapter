@@ -1,7 +1,6 @@
 package com.turningpoint.chapterorganizer.controller;
 
 import com.turningpoint.chapterorganizer.service.UniversityService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +12,11 @@ import java.util.Map;
 @CrossOrigin(origins = {"http://localhost:3000", "https://startachapter.duckdns.org"})
 public class UniversityController {
 
-    @Autowired
-    private UniversityService universityService;
+    private final UniversityService universityService;
+
+    public UniversityController(UniversityService universityService) {
+        this.universityService = universityService;
+    }
 
     @GetMapping
     public ResponseEntity<Map<String, List<String>>> getAllUniversitiesByState() {

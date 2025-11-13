@@ -36,126 +36,23 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, Object> registrationData) {
         try {
-            // Extract registration data
-            String firstName = (String) registrationData.get("firstName");
-            String lastName = (String) registrationData.get("lastName");
-            String email = (String) registrationData.get("email");
-            String phoneNumber = (String) registrationData.get("phoneNumber");
-            String major = (String) registrationData.get("major");
-            String password = (String) registrationData.get("password");
-            
-            // Handle username - generate from email if not provided
-            String username = (String) registrationData.get("username");
-            if (username == null || username.trim().isEmpty()) {
-                // Generate username from email part before @
-                username = email.substring(0, email.indexOf('@'));
-            } else {
-                username = username.trim();
-            }
-            
-            // Handle graduation year (could be String or Integer)
-            String graduationYear = null;
-            Object graduationYearObj = registrationData.get("graduationYear");
-            if (graduationYearObj instanceof String) {
-                graduationYear = (String) graduationYearObj;
-            } else if (graduationYearObj instanceof Integer) {
-                graduationYear = graduationYearObj.toString();
-            } else if (graduationYearObj instanceof Number) {
-                graduationYear = graduationYearObj.toString();
-            }
-            
-            Long chapterId = null;
-            
-            // Handle chapter ID (could be String or Long)
-            Object chapterIdObj = registrationData.get("chapterId");
-            if (chapterIdObj instanceof String) {
-                chapterId = Long.parseLong((String) chapterIdObj);
-            } else if (chapterIdObj instanceof Number) {
-                chapterId = ((Number) chapterIdObj).longValue();
+            RegistrationData data = extractRegistrationData(registrationData);
+            ValidationResult validation = validateRegistrationData(data);
+            if (!validation.isValid()) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", validation.getErrorMessage()));
             }
 
-            // Validate required fields
-            if (firstName == null || firstName.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "First name is required"));
-            }
-            if (lastName == null || lastName.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Last name is required"));
-            }
-            if (email == null || email.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Email is required"));
-            }
-            if (password == null || password.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Password is required"));
-            }
-            if (password.length() < 6) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Password must be at least 6 characters"));
-            }
-            if (username.length() < 3) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Username must be at least 3 characters"));
-            }
-
-            // Get chapter (optional)
-            Optional<Chapter> chapter = Optional.empty();
-            if (chapterId != null) {
-                chapter = chapterService.getChapterById(chapterId);
-                if (chapter.isEmpty()) {
-                    return ResponseEntity.badRequest().body(Map.of("error", "Invalid chapter selected"));
-                }
-            }
-
-            // Create new member
-            Member newMember = new Member();
-            newMember.setFirstName(firstName.trim());
-            newMember.setLastName(lastName.trim());
-            newMember.setEmail(email.trim().toLowerCase());
-            newMember.setUsername(username.trim().toLowerCase());
-            newMember.setPhoneNumber(phoneNumber != null ? phoneNumber.trim() : null);
-            newMember.setMajor(major != null ? major.trim() : null);
-            newMember.setGraduationYear(graduationYear != null ? graduationYear.trim() : null);
-            newMember.setPassword(password.trim()); // Store password (in production, this should be hashed)
+            Member member = createMemberFromData(data);
+            handleChapterAssignment(member, data);
+            Member savedMember = memberService.createMember(member);
             
-            // Set chapter if selected (optional)
-            if (chapter.isPresent()) {
-                newMember.setChapter(chapter.get());
-            }
-
-            // Save member
-            Member createdMember = memberService.createMember(newMember);
-
-            // Return success response with user data (for frontend authentication)
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Registration successful");
+            return buildSuccessResponse(savedMember);
             
-            Map<String, Object> userData = new HashMap<>();
-            userData.put("id", createdMember.getId());
-            userData.put("username", createdMember.getEmail());
-            userData.put("firstName", createdMember.getFirstName());
-            userData.put("lastName", createdMember.getLastName());
-            userData.put("email", createdMember.getEmail());
-            userData.put("action", "register");
-            userData.put("loginTime", System.currentTimeMillis());
-            
-            // Add chapter info if member has a chapter
-            if (createdMember.getChapter() != null) {
-                userData.put("chapter", Map.of(
-                    "id", createdMember.getChapter().getId(),
-                    "name", createdMember.getChapter().getName(),
-                    "university", createdMember.getChapter().getUniversityName()
-                ));
-            } else {
-                userData.put("chapter", null);
-            }
-            
-            response.put("user", userData);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return handleDataIntegrityViolation(e);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Registration failed: " + e.getMessage()));
+            return handleGenericError(e);
         }
     }
 
@@ -165,10 +62,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> loginData) {
         try {
-            // Accept both "email" and "identifier" fields for backward compatibility
             String identifier = loginData.get("email");
             if (identifier == null) {
-                identifier = loginData.get("identifier");
+                identifier = loginData.get("identifier"); // Backward compatibility
             }
             String password = loginData.get("password");
 
@@ -179,10 +75,8 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Password is required"));
             }
 
-            // Find member by email or username
             Optional<Member> member = memberService.getMemberByEmail(identifier.trim().toLowerCase());
             if (member.isEmpty()) {
-                // Try finding by username if email lookup failed
                 member = memberService.getMemberByUsername(identifier.trim().toLowerCase());
             }
             if (member.isEmpty()) {
@@ -191,12 +85,11 @@ public class AuthController {
 
             Member foundMember = member.get();
             
-            // Validate password (in production, this should use password hashing)
+            // TODO: Implement proper password hashing for production
             if (!password.equals(foundMember.getPassword())) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Invalid password"));
             }
 
-            // Return success response with user data
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Login successful");
@@ -210,7 +103,6 @@ public class AuthController {
             userData.put("action", "login");
             userData.put("loginTime", System.currentTimeMillis());
             
-            // Add chapter info if member has a chapter
             if (foundMember.getChapter() != null) {
                 userData.put("chapter", Map.of(
                     "id", foundMember.getChapter().getId(),
@@ -241,6 +133,188 @@ public class AuthController {
             return ResponseEntity.ok(chapters);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Extracts registration data from request map into strongly-typed object.
+     * Centralizes type casting to prevent ClassCastException in business logic.
+     */
+    private RegistrationData extractRegistrationData(Map<String, Object> registrationData) {
+        RegistrationData data = new RegistrationData();
+        data.firstName = (String) registrationData.get("firstName");
+        data.lastName = (String) registrationData.get("lastName");
+        data.email = (String) registrationData.get("email");
+        data.password = (String) registrationData.get("password");
+        data.role = (String) registrationData.get("role");
+        data.chapterName = (String) registrationData.get("chapterName");
+        data.universityName = (String) registrationData.get("universityName");
+        data.state = (String) registrationData.get("state");
+        data.city = (String) registrationData.get("city");
+        data.zipCode = (String) registrationData.get("zipCode");
+        return data;
+    }
+
+    /**
+     * Validates registration data integrity and business rules.
+     * Prevents duplicate email registration and enforces password policy.
+     */
+    private ValidationResult validateRegistrationData(RegistrationData data) {
+        if (data.firstName == null || data.firstName.trim().isEmpty()) {
+            return ValidationResult.invalid("First name is required");
+        }
+        if (data.lastName == null || data.lastName.trim().isEmpty()) {
+            return ValidationResult.invalid("Last name is required");
+        }
+        if (data.email == null || data.email.trim().isEmpty()) {
+            return ValidationResult.invalid("Email is required");
+        }
+        if (data.password == null || data.password.trim().isEmpty()) {
+            return ValidationResult.invalid("Password is required");
+        }
+        if (!isValidEmail(data.email)) {
+            return ValidationResult.invalid("Invalid email format");
+        }
+        if (memberService.getMemberByEmail(data.email).isPresent()) {
+            return ValidationResult.invalid("User with this email already exists");
+        }
+        if (data.password.length() < 6) {
+            return ValidationResult.invalid("Password must be at least 6 characters long");
+        }
+        return ValidationResult.valid();
+    }
+
+    /**
+     * Creates Member entity from validated registration data.
+     * Applies data normalization (trim, lowercase) for consistency.
+     */
+    private Member createMemberFromData(RegistrationData data) {
+        Member member = new Member();
+        member.setFirstName(data.firstName.trim());
+        member.setLastName(data.lastName.trim());
+        member.setEmail(data.email.toLowerCase().trim());
+        member.setPassword(data.password); // MemberService handles encoding
+        member.setActive(true);
+        return member;
+    }
+
+    /**
+     * Handles optional chapter assignment during registration.
+     * Creates new chapters when member registers for non-existing chapter.
+     */
+    private void handleChapterAssignment(Member member, RegistrationData data) {
+        if (shouldAssignToChapter(data)) {
+            Chapter chapter = findOrCreateChapter(data);
+            assignMemberToChapter(member, chapter);
+        }
+    }
+
+    private boolean shouldAssignToChapter(RegistrationData data) {
+        return data.chapterName != null && !data.chapterName.trim().isEmpty() &&
+               data.universityName != null && !data.universityName.trim().isEmpty();
+    }
+
+    private Chapter findOrCreateChapter(RegistrationData data) {
+        List<Chapter> existingChapters = chapterService.searchChaptersByUniversity(data.universityName.trim());
+        if (!existingChapters.isEmpty()) {
+            return existingChapters.get(0);
+        }
+        return createNewChapter(data);
+    }
+
+    private Chapter createNewChapter(RegistrationData data) {
+        Chapter chapter = new Chapter();
+        chapter.setName(data.chapterName.trim());
+        chapter.setUniversityName(data.universityName.trim());
+        chapter.setState(data.state != null ? data.state.trim() : "");
+        chapter.setCity(data.city != null ? data.city.trim() : "");
+        chapter.setActive(true);
+        return chapterService.createChapter(chapter);
+    }
+
+    private void assignMemberToChapter(Member member, Chapter chapter) {
+        member.setChapter(chapter);
+    }
+
+    private ResponseEntity<Map<String, Object>> buildSuccessResponse(Member savedMember) {
+        Map<String, Object> memberData = createMemberDataMap(savedMember);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Registration successful");
+        response.put("member", memberData);
+        return ResponseEntity.ok(response);
+    }
+
+    private Map<String, Object> createMemberDataMap(Member member) {
+        Map<String, Object> memberData = new HashMap<>();
+        memberData.put("id", member.getId());
+        memberData.put("firstName", member.getFirstName());
+        memberData.put("lastName", member.getLastName());
+        memberData.put("email", member.getEmail());
+        memberData.put("role", member.getRole());
+        memberData.put("chapterId", member.getChapter() != null ? member.getChapter().getId() : null);
+        return memberData;
+    }
+
+    private ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(org.springframework.dao.DataIntegrityViolationException e) {
+        String message;
+        if (e.getMessage().contains("UK_MEMBER_EMAIL")) {
+            message = "Email address is already registered";
+        } else if (e.getMessage().contains("UK_CHAPTER_UNIVERSITY")) {
+            message = "Chapter with this university already exists";
+        } else {
+            message = "Registration failed due to data constraint";
+        }
+        return ResponseEntity.badRequest()
+            .body(Map.of("success", false, "message", message));
+    }
+
+    private ResponseEntity<Map<String, Object>> handleGenericError(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("success", false, "message", "Registration failed"));
+    }
+
+    private boolean isValidEmail(String email) {
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$");
+    }
+
+    // Inner classes for Clean Code refactoring
+    private static class RegistrationData {
+        String firstName;
+        String lastName;
+        String email;
+        String password;
+        String role;
+        String chapterName;
+        String universityName;
+        String state;
+        String city;
+        String zipCode;
+    }
+
+    private static class ValidationResult {
+        private final boolean valid;
+        private final String errorMessage;
+
+        private ValidationResult(boolean valid, String errorMessage) {
+            this.valid = valid;
+            this.errorMessage = errorMessage;
+        }
+
+        public static ValidationResult valid() {
+            return new ValidationResult(true, null);
+        }
+
+        public static ValidationResult invalid(String errorMessage) {
+            return new ValidationResult(false, errorMessage);
+        }
+
+        public boolean isValid() {
+            return valid;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
         }
     }
 }

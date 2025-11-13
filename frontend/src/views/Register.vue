@@ -11,7 +11,6 @@
           </div>
           <div class="card-body">
             <form @submit.prevent="handleSubmit">
-              <!-- First Name -->
               <div class="mb-3">
                 <label for="firstName" class="form-label">First Name *</label>
                 <input 
@@ -24,7 +23,6 @@
                 >
               </div>
 
-              <!-- Last Name -->
               <div class="mb-3">
                 <label for="lastName" class="form-label">Last Name *</label>
                 <input 
@@ -37,7 +35,6 @@
                 >
               </div>
 
-              <!-- Email -->
               <div class="mb-3">
                 <label for="email" class="form-label">Email Address *</label>
                 <input 
@@ -50,7 +47,6 @@
                 >
               </div>
 
-              <!-- Password -->
               <div class="mb-3">
                 <label for="password" class="form-label">Password *</label>
                 <input 
@@ -65,7 +61,6 @@
                 >
               </div>
 
-              <!-- Phone Number -->
               <div class="mb-3">
                 <label for="phoneNumber" class="form-label">Phone Number</label>
                 <input 
@@ -77,13 +72,11 @@
                 >
               </div>
 
-              <!-- Academic Information Section -->
               <div class="mb-4">
                 <h6 class="text-primary">
                   <i class="bi bi-mortarboard me-2"></i>Academic Information
                 </h6>
                 
-                <!-- Major / Field of Study -->
                 <div class="mb-3">
                   <label for="major" class="form-label">Major / Field of Study</label>
                   <input 
@@ -96,7 +89,6 @@
                   >
                 </div>
 
-                <!-- Expected Graduation Year -->
                 <div class="mb-3">
                   <label for="graduationYear" class="form-label">Expected Graduation Year</label>
                   <select 
@@ -113,8 +105,7 @@
                 </div>
               </div>
 
-              <!-- Chapter Selection -->
-              <div class="mb-3">
+              <div class="mb-4">
                 <label for="chapterId" class="form-label">Chapter (Optional)</label>
                 <select 
                   class="form-select" 
@@ -132,19 +123,16 @@
                 </small>
               </div>
 
-              <!-- Error Message -->
               <div v-if="error" class="alert alert-danger">
                 <i class="bi bi-exclamation-triangle me-2"></i>
                 {{ error }}
               </div>
 
-              <!-- Success Message -->
               <div v-if="success" class="alert alert-success">
                 <i class="bi bi-check-circle me-2"></i>
                 {{ success }}
               </div>
 
-              <!-- Submit Button -->
               <button 
                 type="submit" 
                 class="btn btn-primary w-100"
@@ -156,7 +144,6 @@
               </button>
             </form>
 
-            <!-- Login Link -->
             <div class="text-center mt-3">
               <p class="mb-0">
                 Already have an account? 
@@ -202,14 +189,12 @@ export default {
     const error = ref('')
     const success = ref('')
 
-    // Generate graduation years (current year + 10 years)
     const currentYear = new Date().getFullYear()
     const graduationYears = ref([])
     for (let year = currentYear; year <= currentYear + 10; year++) {
       graduationYears.value.push(year)
     }
 
-    // Load chapters for selection
     const loadChapters = async () => {
       try {
         loadingChapters.value = true
@@ -223,14 +208,12 @@ export default {
       }
     }
 
-    // Handle form submission
     const handleSubmit = async () => {
       try {
         isLoading.value = true
         error.value = ''
         success.value = ''
 
-        // Validate form
         if (!form.value.firstName.trim()) {
           error.value = 'First name is required'
           return
@@ -252,7 +235,6 @@ export default {
           return
         }
 
-        // Prepare registration data
         const registrationData = {
           firstName: form.value.firstName.trim(),
           lastName: form.value.lastName.trim(),
@@ -268,16 +250,13 @@ export default {
           registrationData.chapterId = form.value.chapterId
         }
 
-        // Submit registration
         const response = await api.post('/api/auth/register', registrationData)
 
         if (response.data.success) {
           success.value = response.data.message
           
-          // Use auth composable to set user (handles localStorage and reactivity)
-          setUser(response.data.user)
+          setUser(response.data.user) // Handles localStorage and reactivity
           
-          // Redirect to dashboard after successful registration
           setTimeout(() => {
             router.push('/')
           }, 2000)

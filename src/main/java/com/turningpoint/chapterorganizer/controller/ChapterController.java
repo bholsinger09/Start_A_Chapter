@@ -79,7 +79,36 @@ public class ChapterController {
         }
     }
 
-    // Search endpoints - temporary solution until SearchController is deployed
+    @GetMapping("/search/trending")
+    /**
+     * Helper method to convert Chapter entity to simplified Map format for frontend
+     * Extracts repetitive data transformation logic following DRY principle
+     */
+    private Map<String, Object> convertChapterToSearchResult(Chapter chapter, String extraField, Object extraValue) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", chapter.getId());
+        result.put("name", chapter.getName());
+        result.put("university", chapter.getUniversityName());
+        result.put("state", chapter.getState());
+        result.put("memberCount", 0);
+        if (extraField != null && extraValue != null) {
+            result.put(extraField, extraValue);
+        }
+        return result;
+    }
+
+    /**
+     * Helper method to convert list of chapters to search result format
+     * Centralizes chapter data transformation for consistency
+     */
+    private List<Map<String, Object>> convertChaptersToSearchResults(List<Chapter> chapters, String extraField, Object extraValue) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        for (Chapter chapter : chapters) {
+            results.add(convertChapterToSearchResult(chapter, extraField, extraValue));
+        }
+        return results;
+    }
+
     @GetMapping("/search/trending")
     public ResponseEntity<List<Map<String, Object>>> getTrendingChapters(
             @RequestParam(defaultValue = "5") int limit) {
@@ -91,18 +120,8 @@ public class ChapterController {
                 .limit(limit)
                 .toList();
             
-            // Convert to simplified format for frontend
-            List<Map<String, Object>> trending = new ArrayList<>();
-            for (Chapter chapter : trendingChapters) {
-                Map<String, Object> trendingItem = new HashMap<>();
-                trendingItem.put("id", chapter.getId());
-                trendingItem.put("name", chapter.getName());
-                trendingItem.put("university", chapter.getUniversityName());
-                trendingItem.put("state", chapter.getState());
-                trendingItem.put("memberCount", 0);
-                trendingItem.put("trend", "up");
-                trending.add(trendingItem);
-            }
+            // Convert to simplified format for frontend using helper method
+            List<Map<String, Object>> trending = convertChaptersToSearchResults(trendingChapters, "trend", "up");
             
             return ResponseEntity.ok(trending);
         } catch (Exception e) {
@@ -122,18 +141,8 @@ public class ChapterController {
                 .limit(limit)
                 .toList();
             
-            // Convert to simplified format for frontend
-            List<Map<String, Object>> recommendations = new ArrayList<>();
-            for (Chapter chapter : recommendedChapters) {
-                Map<String, Object> recommendation = new HashMap<>();
-                recommendation.put("id", chapter.getId());
-                recommendation.put("name", chapter.getName());
-                recommendation.put("university", chapter.getUniversityName());
-                recommendation.put("state", chapter.getState());
-                recommendation.put("memberCount", 0);
-                recommendation.put("type", "chapter");
-                recommendations.add(recommendation);
-            }
+            // Convert to simplified format for frontend using helper method
+            List<Map<String, Object>> recommendations = convertChaptersToSearchResults(recommendedChapters, "type", "chapter");
             
             return ResponseEntity.ok(recommendations);
         } catch (Exception e) {

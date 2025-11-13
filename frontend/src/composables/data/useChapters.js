@@ -11,7 +11,6 @@ import { useError } from './useError.js'
  * Chapters composable state and methods
  */
 export function useChapters() {
-    // Reactive state
     const state = reactive({
         chapters: [],
         currentChapter: null,
@@ -22,10 +21,8 @@ export function useChapters() {
         sortOrder: 'asc'
     })
 
-    // Error handling
     const { error, setError, clearError } = useError()
 
-    // Computed properties
     const filteredChapters = computed(() => {
         let filtered = state.chapters
 
