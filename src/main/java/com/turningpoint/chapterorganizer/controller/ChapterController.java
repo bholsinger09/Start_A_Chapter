@@ -79,7 +79,6 @@ public class ChapterController {
         }
     }
 
-    @GetMapping("/search/trending")
     /**
      * Helper method to convert Chapter entity to simplified Map format for frontend
      * Extracts repetitive data transformation logic following DRY principle
