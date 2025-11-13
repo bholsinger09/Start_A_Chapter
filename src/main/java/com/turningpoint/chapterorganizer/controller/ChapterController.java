@@ -25,10 +25,13 @@ public class ChapterController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Chapter>> getAllChapters() {
+    public ResponseEntity<List<com.turningpoint.chapterorganizer.dto.ChapterDto>> getAllChapters() {
         try {
             List<Chapter> chapters = chapterService.getAllActiveChapters();
-            return ResponseEntity.ok(chapters);
+            List<com.turningpoint.chapterorganizer.dto.ChapterDto> chapterDtos = chapters.stream()
+                .map(com.turningpoint.chapterorganizer.dto.ChapterDto::from)
+                .toList();
+            return ResponseEntity.ok(chapterDtos);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -37,10 +40,10 @@ public class ChapterController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Chapter> getChapterById(@PathVariable Long id) {
+    public ResponseEntity<com.turningpoint.chapterorganizer.dto.ChapterDto> getChapterById(@PathVariable Long id) {
         try {
             Optional<Chapter> chapter = chapterService.getChapterById(id);
-            return chapter.map(ResponseEntity::ok)
+            return chapter.map(c -> ResponseEntity.ok(com.turningpoint.chapterorganizer.dto.ChapterDto.from(c)))
                          .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
