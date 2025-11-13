@@ -15,6 +15,9 @@ public final class AcademicInfo {
     private static final int MIN_GRADUATION_YEAR = Year.now().getValue();
     private static final int MAX_GRADUATION_YEAR = Year.now().getValue() + 10;
     
+    // Null Object pattern - represents empty/unknown academic info
+    public static final AcademicInfo EMPTY = new AcademicInfo("", "");
+    
     private final String major;
     private final String graduationYear;
 
@@ -30,15 +33,18 @@ public final class AcademicInfo {
     }
 
     private String validateMajor(String major) {
-        if (major != null && major.trim().length() > 100) {
+        if (major == null || major.trim().isEmpty()) {
+            return ""; // Return empty string instead of null
+        }
+        if (major.trim().length() > 100) {
             throw new IllegalArgumentException("Major cannot exceed 100 characters");
         }
-        return major != null ? major.trim() : null;
+        return major.trim();
     }
 
     private String validateGraduationYear(String graduationYear) {
         if (graduationYear == null || graduationYear.trim().isEmpty()) {
-            return null;
+            return ""; // Return empty string instead of null
         }
         
         try {
@@ -69,6 +75,11 @@ public final class AcademicInfo {
 
     public boolean hasGraduationYear() {
         return graduationYear != null && !graduationYear.trim().isEmpty();
+    }
+    
+    public boolean isEmpty() {
+        return (major == null || major.trim().isEmpty()) && 
+               (graduationYear == null || graduationYear.trim().isEmpty());
     }
 
     public boolean isGraduating(int targetYear) {

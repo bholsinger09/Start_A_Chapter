@@ -20,6 +20,9 @@ public final class ContactInfo {
         "^[\\d\\s\\-\\(\\)\\+\\.]{10,15}$"
     );
     
+    // Null Object pattern - represents empty/unknown contact info
+    public static final ContactInfo EMPTY = new ContactInfo("", "");
+    
     private final String email;
     private final String phoneNumber;
 

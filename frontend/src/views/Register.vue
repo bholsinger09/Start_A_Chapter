@@ -167,12 +167,18 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
 import { useAuth } from '@/composables/useAuth'
+import { useErrorHandler } from '@/utils/error-handling/ErrorHandler'
+import { 
+  UserRegistrationError, 
+  InputValidationError 
+} from '@/utils/error-handling/ErrorTypes'
 
 export default {
   name: 'Register',
   setup() {
     const router = useRouter()
     const { setUser } = useAuth()
+    const { handleAsyncOperation } = useErrorHandler()
     
     const form = ref({
       firstName: '',
@@ -198,40 +204,58 @@ export default {
     }
 
     const loadChapters = async () => {
-      try {
-        loadingChapters.value = true
-        const response = await api.get('/api/chapters')
-        chapters.value = response.data
-      } catch (err) {
-        console.error('Error loading chapters:', err)
-        error.value = 'Failed to load chapters. Please refresh the page.'
-      } finally {
-        loadingChapters.value = false
-      }
+      await handleAsyncOperation(
+        // Operation: load chapters from API
+        async () => {
+          const response = await api.get('/api/chapters')
+          chapters.value = response.data
+          return response.data
+        },
+        {
+          // Options for error handling
+          loadingRef: loadingChapters,
+          errorRef: error,
+          onSuccess: (data) => {
+            console.log(`Loaded ${data.length} chapters successfully`)
+          },
+          onError: (error) => {
+            // Custom error handling for chapter loading
+            console.error('Chapter loading failed:', error.name, error.message)
+          }
+        }
+      )
     }
 
-    const validateForm = () => {
+    const validateFormOrThrow = () => {
+      // Implement fail-fast validation with specific exceptions
       if (!form.value.firstName.trim()) {
-        error.value = 'First name is required'
-        return false
+        throw UserRegistrationError.missingRequiredField('First name')
       }
       if (!form.value.lastName.trim()) {
-        error.value = 'Last name is required'
-        return false
+        throw UserRegistrationError.missingRequiredField('Last name')  
       }
       if (!form.value.email.trim()) {
-        error.value = 'Email is required'
-        return false
+        throw UserRegistrationError.missingRequiredField('Email')
       }
       if (!form.value.password.trim()) {
-        error.value = 'Password is required'
-        return false
+        throw UserRegistrationError.missingRequiredField('Password')
       }
+      
+      // Validate email format
+      const emailPattern = /^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\.[A-Za-z]{2,})$/
+      if (!emailPattern.test(form.value.email)) {
+        throw UserRegistrationError.invalidEmailFormat(form.value.email)
+      }
+      
+      // Validate password strength
       if (form.value.password.length < 6) {
-        error.value = 'Password must be at least 6 characters'
-        return false
+        throw UserRegistrationError.weakPassword()
       }
-      return true
+      
+      // Validate phone number format if provided
+      if (form.value.phoneNumber.trim() && !/^[\d\s\-\(\)\+\.]{10,15}$/.test(form.value.phoneNumber)) {
+        throw InputValidationError.invalidPhoneFormat(form.value.phoneNumber)
+      }
     }
 
     const buildRegistrationData = () => {
@@ -252,48 +276,61 @@ export default {
       return registrationData
     }
 
-    const handleRegistrationSuccess = (response) => {
-      success.value = response.data.message
-      setUser(response.data.user)
-      
-      setTimeout(() => {
-        router.push('/')
-      }, 2000)
-    }
 
-    const handleRegistrationError = (err) => {
-      console.error('Registration error:', err)
-      if (err.response?.data?.error) {
-        error.value = err.response.data.error
-      } else {
-        error.value = 'Registration failed. Please try again.'
-      }
-    }
 
     const handleSubmit = async () => {
-      try {
-        isLoading.value = true
-        error.value = ''
-        success.value = ''
-
-        if (!validateForm()) {
-          return
+      await handleAsyncOperation(
+        // Operation: register user with validation
+        async () => {
+          // Try-catch-finally first approach: validate then execute
+          
+          // Step 1: Validate form data (fail fast)
+          validateFormOrThrow()
+          
+          // Step 2: Build registration data (happy path)
+          const registrationData = buildRegistrationData()
+          
+          // Step 3: Submit registration
+          const response = await api.post('/api/auth/register', registrationData)
+          
+          // Step 4: Handle successful registration
+          if (response.data.success) {
+            success.value = response.data.message
+            setUser(response.data.user)
+            
+            // Navigate after short delay to show success message
+            setTimeout(() => {
+              router.push('/')
+            }, 2000)
+          } else {
+            // Transform unexpected response format into proper error
+            throw new UserRegistrationError(
+              response.data.error || 'Registration failed',
+              'UNEXPECTED_RESPONSE'
+            )
+          }
+          
+          return response.data
+        },
+        {
+          // Error handling configuration
+          loadingRef: isLoading,
+          errorRef: error,
+          onSuccess: (data) => {
+            console.log('Registration successful for:', data.user?.email)
+          },
+          onError: (error) => {
+            // Clear success message on error
+            success.value = ''
+            console.error('Registration failed:', error.name, error.message)
+          },
+          cleanup: async () => {
+            // Cleanup: always clear sensitive data from memory
+            // (In production, might clear form password field)
+            console.log('Registration operation cleanup completed')
+          }
         }
-
-        const registrationData = buildRegistrationData()
-        const response = await api.post('/api/auth/register', registrationData)
-
-        if (response.data.success) {
-          handleRegistrationSuccess(response)
-        } else {
-          error.value = response.data.error || 'Registration failed'
-        }
-
-      } catch (err) {
-        handleRegistrationError(err)
-      } finally {
-        isLoading.value = false
-      }
+      )
     }
 
     // Load chapters when component mounts

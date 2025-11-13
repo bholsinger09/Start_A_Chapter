@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(name = "chapters", 
@@ -241,12 +242,11 @@ public class Chapter {
                 .anyMatch(m -> m.getActive() && m.getRole() == MemberRole.PRESIDENT);
     }
 
-    public Member getPresident() {
-        if (members == null) return null;
+    public Optional<Member> getPresident() {
+        if (members == null) return Optional.empty();
         return members.stream()
                 .filter(m -> m.getActive() && m.getRole() == MemberRole.PRESIDENT)
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     public boolean canAcceptNewMembers() {
