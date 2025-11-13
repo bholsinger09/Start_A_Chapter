@@ -21,22 +21,22 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // Find members by chapter ID
     @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId")
-    List<Member> findByChapterId(@Param("chapterId") Long chapterId);
+    List<Member> findByChapter_Id(@Param("chapterId") Long chapterId);
 
     // Find active members by chapter ID
     @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.active = true")
-    List<Member> findByChapterIdAndActiveTrue(@Param("chapterId") Long chapterId);
+    List<Member> findByChapter_IdAndActiveTrue(@Param("chapterId") Long chapterId);
 
     // Find members by role
     List<Member> findByRole(MemberRole role);
 
     // Find members by chapter ID and role
     @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = :role")
-    List<Member> findByChapterIdAndRole(@Param("chapterId") Long chapterId, @Param("role") MemberRole role);
+    List<Member> findByChapter_IdAndRole(@Param("chapterId") Long chapterId, @Param("role") MemberRole role);
 
     // Find active members by chapter ID and role
     @Query("SELECT m FROM Member m WHERE m.chapter.id = :chapterId AND m.role = :role AND m.active = true")
-    List<Member> findByChapterIdAndRoleAndActiveTrue(@Param("chapterId") Long chapterId, @Param("role") MemberRole role);
+    List<Member> findByChapter_IdAndRoleAndActiveTrue(@Param("chapterId") Long chapterId, @Param("role") MemberRole role);
 
     // Find members by first and last name (case-insensitive)
     List<Member> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(

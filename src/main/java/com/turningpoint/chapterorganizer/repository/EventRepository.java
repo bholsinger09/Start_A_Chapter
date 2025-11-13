@@ -14,13 +14,13 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Long> {
 
     // Find events by chapter ID
-    List<Event> findByChapterId(Long chapterId);
+    List<Event> findByChapter_Id(Long chapterId);
 
     // Find active events by chapter ID
-    List<Event> findByChapterIdAndActiveTrue(Long chapterId);
+    List<Event> findByChapter_IdAndActiveTrue(Long chapterId);
 
     // Find events by chapter ID ordered by date
-    List<Event> findByChapterIdOrderByEventDateTimeAsc(Long chapterId);
+    List<Event> findByChapter_IdOrderByEventDateTimeAsc(Long chapterId);
 
     // Find upcoming events by chapter ID
     @Query("SELECT e FROM Event e WHERE e.chapter.id = :chapterId AND e.eventDateTime > :now AND e.active = true ORDER BY e.eventDateTime ASC")

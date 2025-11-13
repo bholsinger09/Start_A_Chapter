@@ -127,7 +127,7 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public List<Member> getMembersByChapter(Long chapterId) {
-        return memberRepository.findByChapterIdAndActiveTrue(chapterId);
+        return memberRepository.findByChapter_IdAndActiveTrue(chapterId);
     }
 
     /**
@@ -135,7 +135,7 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public List<Member> getAllMembersByChapter(Long chapterId) {
-        return memberRepository.findByChapterId(chapterId);
+        return memberRepository.findByChapter_Id(chapterId);
     }
 
     /**
@@ -151,7 +151,7 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public List<Member> getMembersByRole(Long chapterId, MemberRole role) {
-        return memberRepository.findByChapterIdAndRoleAndActiveTrue(chapterId, role);
+        return memberRepository.findByChapter_IdAndRoleAndActiveTrue(chapterId, role);
     }
 
     /**
