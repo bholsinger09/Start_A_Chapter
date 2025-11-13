@@ -4,6 +4,7 @@ target/
 *.war
 *.ear
 *.class
+deployment/app.jar
 
 # IDE files
 .idea/
