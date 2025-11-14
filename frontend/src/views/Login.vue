@@ -144,18 +144,18 @@ export default {
           password: form.value.password
         })
 
-        if (response.data.success) {
+        if (response.data.status === 'success') {
           success.value = response.data.message
           
           // Use auth composable to set user (handles localStorage and reactivity)
-          setUser(response.data.user)
+          setUser(response.data.member)
           
           // Redirect to dashboard after successful login
           setTimeout(() => {
             router.push('/')
           }, 1000)
         } else {
-          error.value = response.data.error || 'Login failed'
+          error.value = response.data.message || 'Login failed'
         }
 
       } catch (err) {

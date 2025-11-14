@@ -294,9 +294,9 @@ export default {
           const response = await api.post('/api/auth/register', registrationData)
           
           // Step 4: Handle successful registration
-          if (response.data.success) {
+          if (response.data.status === 'success') {
             success.value = response.data.message
-            setUser(response.data.user)
+            setUser(response.data.member)
             
             // Navigate after short delay to show success message
             setTimeout(() => {
@@ -305,7 +305,7 @@ export default {
           } else {
             // Transform unexpected response format into proper error
             throw new UserRegistrationError(
-              response.data.error || 'Registration failed',
+              response.data.message || 'Registration failed',
               'UNEXPECTED_RESPONSE'
             )
           }
