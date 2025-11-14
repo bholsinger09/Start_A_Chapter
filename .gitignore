@@ -50,6 +50,14 @@ yarn-error.log*
 *.swo
 *~
 
+# Debug and test files
+*debug*.js
+*debug*.html
+*test*.html
+frontend_debug_login.js
+production_success_test.html
+test_login_fix.html
+
 # Backup files
 *.bak
 *.backup
