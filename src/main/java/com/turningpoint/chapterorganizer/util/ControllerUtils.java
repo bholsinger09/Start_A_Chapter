@@ -72,4 +72,13 @@ public final class ControllerUtils {
     public static <T> ResponseEntity<T> badRequest() {
         return ResponseEntity.badRequest().build();
     }
+
+    /**
+     * Create a no content response.
+     * 
+     * @return ResponseEntity with NO_CONTENT status
+     */
+    public static ResponseEntity<Void> noContent() {
+        return ResponseEntity.noContent().build();
+    }
 }
