@@ -4,6 +4,7 @@ import com.turningpoint.chapterorganizer.dto.auth.LoginRequest;
 import com.turningpoint.chapterorganizer.dto.auth.RegistrationRequest;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.exception.DuplicateEmailException;
+import com.turningpoint.chapterorganizer.exception.DuplicateUsernameException;
 import com.turningpoint.chapterorganizer.service.auth.AuthenticationService;
 import com.turningpoint.chapterorganizer.service.auth.RegistrationService;
 
@@ -49,6 +50,8 @@ public class AuthRefactoredController {
             Member member = registrationService.registerUser(request);
             return createSuccessResponse("Registration successful", member);
         } catch (DuplicateEmailException e) {
+            return createErrorResponse(e.getUserFriendlyMessage(), HttpStatus.CONFLICT);
+        } catch (DuplicateUsernameException e) {
             return createErrorResponse(e.getUserFriendlyMessage(), HttpStatus.CONFLICT);
         } catch (IllegalArgumentException e) {
             return createErrorResponse("Registration failed: " + e.getMessage(), HttpStatus.BAD_REQUEST);

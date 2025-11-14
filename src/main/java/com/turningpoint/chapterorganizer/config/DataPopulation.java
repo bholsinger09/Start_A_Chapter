@@ -108,8 +108,8 @@ public class DataPopulation implements CommandLineRunner {
      * Single responsibility: Create the admin user
      */
     private void addAdministratorMember(List<Member> members, Chapter chapter) {
-        Member admin = createMember("Ben", "Holsinger", "bholsinger@hotmail.com", 
-                                   "bholsinger", "2082841929", MemberRole.PRESIDENT, 
+        Member admin = createMember("Admin", "User", "admin@example.com", 
+                                   "admin", "2082841929", MemberRole.PRESIDENT, 
                                    "Computer Science", "2024", "Password123", chapter);
         members.add(admin);
     }

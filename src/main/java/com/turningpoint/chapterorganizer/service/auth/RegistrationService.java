@@ -3,6 +3,7 @@ package com.turningpoint.chapterorganizer.service.auth;
 import com.turningpoint.chapterorganizer.dto.auth.RegistrationRequest;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.exception.DuplicateEmailException;
+import com.turningpoint.chapterorganizer.exception.DuplicateUsernameException;
 import com.turningpoint.chapterorganizer.service.MemberService;
 import com.turningpoint.chapterorganizer.service.validation.ValidationService;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,8 @@ public class RegistrationService {
         checkUserDoesNotExist(request.getEmail());
         
         Member member = createMemberFromRequest(request);
+        checkUsernameDoesNotExist(member.getUsername());
+        
         return memberService.createMember(member);
     }
 
@@ -45,6 +48,12 @@ public class RegistrationService {
     private void checkUserDoesNotExist(String email) {
         if (memberService.findMemberByEmail(email).isPresent()) {
             throw new DuplicateEmailException(email);
+        }
+    }
+
+    private void checkUsernameDoesNotExist(String username) {
+        if (memberService.findMemberByUsername(username).isPresent()) {
+            throw new DuplicateUsernameException(username);
         }
     }
 
