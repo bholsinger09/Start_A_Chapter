@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * Handles all write operations (create, update, delete) with clear responsibilities.
  */
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/api/v2/members")
 @CrossOrigin(
     origins = {"https://startachapter.duckdns.org", "http://startachapter.duckdns.org", "*"}, 
     methods = {RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},

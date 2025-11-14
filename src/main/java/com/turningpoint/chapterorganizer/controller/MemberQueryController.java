@@ -17,7 +17,7 @@ import java.util.Optional;
  * Handles all read-only member endpoints with clear, single responsibilities.
  */
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/api/v2/members")
 @CrossOrigin(
     origins = {"https://startachapter.duckdns.org", "http://startachapter.duckdns.org", "*"}, 
     methods = {RequestMethod.GET, RequestMethod.OPTIONS},
