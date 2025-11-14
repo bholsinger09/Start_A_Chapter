@@ -4,6 +4,7 @@ import com.turningpoint.chapterorganizer.entity.Chapter;
 import com.turningpoint.chapterorganizer.entity.Member;
 import com.turningpoint.chapterorganizer.entity.MemberRole;
 import com.turningpoint.chapterorganizer.repository.MemberRepository;
+import com.turningpoint.chapterorganizer.service.constants.MemberServiceConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -60,7 +61,8 @@ public class MemberService {
             Long chapterId = member.getChapterId();
             Optional<Chapter> chapter = chapterService.getChapterById(chapterId);
             if (chapter.isEmpty()) {
-                throw new IllegalArgumentException("Chapter not found with id: " + chapterId);
+                throw new IllegalArgumentException(MemberServiceConstants.formatErrorMessage(
+                    MemberServiceConstants.CHAPTER_NOT_FOUND_ERROR, chapterId));
             }
             member.setChapter(chapter.get());
         }
@@ -68,15 +70,15 @@ public class MemberService {
     }
     
     /**
-     * EXTRACTED METHOD 2: Set member defaults
+     * EXTRACTED METHOD 2: Set member defaults - Boy Scout Rule: Use constants for defaults
      * Single responsibility: Ensure proper default values
      */
     private void setMemberDefaults(Member member) {
         if (member.getActive() == null) {
-            member.setActive(true);
+            member.setActive(MemberServiceConstants.DEFAULT_MEMBER_ACTIVE_STATUS);
         }
         if (member.getRole() == null) {
-            member.setRole(MemberRole.MEMBER);
+            member.setRole(MemberServiceConstants.DEFAULT_MEMBER_ROLE);
         }
     }
     
@@ -84,18 +86,26 @@ public class MemberService {
      * EXTRACTED METHOD 3: Handle constraint violations 
      * Single responsibility: Convert database exceptions to meaningful messages
      */
+    /**
+     * EXTRACTED METHOD 3: Handle constraint violations - Boy Scout Rule: Use constants for error messages
+     * Single responsibility: Convert database exceptions to meaningful messages
+     */
     private IllegalArgumentException handleConstraintViolation(org.springframework.dao.DataIntegrityViolationException e) {
         String message = e.getMessage();
         if (message != null) {
-            if (message.contains("uk_member_email") || message.contains("email")) {
-                return new IllegalArgumentException("Member with this email already exists");
-            } else if (message.contains("uk_member_username") || message.contains("username")) {
-                return new IllegalArgumentException("Member with this username already exists");
-            } else if (message.contains("unique constraint") || message.contains("duplicate")) {
-                return new IllegalArgumentException("Member with this information already exists");
+            if (message.contains(MemberServiceConstants.EMAIL_CONSTRAINT_KEY) || 
+                message.contains(MemberServiceConstants.EMAIL_CONSTRAINT_KEYWORD)) {
+                return new IllegalArgumentException(MemberServiceConstants.EMAIL_ALREADY_EXISTS_ERROR);
+            } else if (message.contains(MemberServiceConstants.USERNAME_CONSTRAINT_KEY) || 
+                      message.contains(MemberServiceConstants.USERNAME_CONSTRAINT_KEYWORD)) {
+                return new IllegalArgumentException(MemberServiceConstants.USERNAME_ALREADY_EXISTS_ERROR);
+            } else if (message.contains(MemberServiceConstants.UNIQUE_CONSTRAINT_KEYWORD) || 
+                      message.contains(MemberServiceConstants.DUPLICATE_CONSTRAINT_KEYWORD)) {
+                return new IllegalArgumentException(MemberServiceConstants.MEMBER_ALREADY_EXISTS_ERROR);
             }
         }
-        return new IllegalArgumentException("Unable to create member due to data conflict: " + e.getMessage());
+        return new IllegalArgumentException(MemberServiceConstants.formatErrorMessage(
+            MemberServiceConstants.DATA_CONFLICT_ERROR, e.getMessage()));
     }
 
     /**
@@ -107,35 +117,35 @@ public class MemberService {
     }
 
     /**
-     * Get member by email
+     * Get member by email - Boy Scout Rule: Clear method naming
      */
     @Transactional(readOnly = true)
-    public Optional<Member> getMemberByEmail(String email) {
-        return memberRepository.findByEmail(email);
+    public Optional<Member> findMemberByEmail(String email) {
+        return memberRepository.findMemberByEmail(email);
     }
 
     /**
-     * Get member by username
+     * Get member by username - Boy Scout Rule: Consistent naming pattern
      */
     @Transactional(readOnly = true)
-    public Optional<Member> getMemberByUsername(String username) {
-        return memberRepository.findByUsername(username);
+    public Optional<Member> findMemberByUsername(String username) {
+        return memberRepository.findMemberByUsername(username);
     }
 
     /**
-     * Get all active members by chapter
+     * Get all active members by chapter - Boy Scout Rule: Descriptive method name
      */
     @Transactional(readOnly = true)
-    public List<Member> getMembersByChapter(Long chapterId) {
-        return memberRepository.findByChapter_IdAndActiveTrue(chapterId);
+    public List<Member> findActiveMembersByChapter(Long chapterId) {
+        return memberRepository.findActiveMembersByChapterId(chapterId);
     }
 
     /**
-     * Get all members by chapter (including inactive)
+     * Get all members by chapter (including inactive) - Boy Scout Rule: Clear intent
      */
     @Transactional(readOnly = true)
-    public List<Member> getAllMembersByChapter(Long chapterId) {
-        return memberRepository.findByChapter_Id(chapterId);
+    public List<Member> findAllMembersByChapter(Long chapterId) {
+        return memberRepository.findAllMembersByChapterId(chapterId);
     }
 
     /**
@@ -145,29 +155,59 @@ public class MemberService {
     public List<Member> getAllMembers() {
         return memberRepository.findAll();
     }
-
+    
+    // ============= BACKWARD COMPATIBILITY METHODS - Boy Scout Rule: Maintain existing API =============
+    // These methods maintain backward compatibility while we gradually migrate to better names
+    
     /**
-     * Get members by role in a chapter
+     * @deprecated Use findMemberByEmail(String email) instead
      */
+    @Deprecated(since = "1.0.0")
     @Transactional(readOnly = true)
-    public List<Member> getMembersByRole(Long chapterId, MemberRole role) {
-        return memberRepository.findByChapter_IdAndRoleAndActiveTrue(chapterId, role);
+    public Optional<Member> getMemberByEmail(String email) {
+        return findMemberByEmail(email);
+    }
+    
+    /**
+     * @deprecated Use findMemberByUsername(String username) instead
+     */
+    @Deprecated(since = "1.0.0") 
+    @Transactional(readOnly = true)
+    public Optional<Member> getMemberByUsername(String username) {
+        return findMemberByUsername(username);
+    }
+    
+    /**
+     * @deprecated Use findActiveMembersByChapter(Long chapterId) instead
+     */
+    @Deprecated(since = "1.0.0")
+    @Transactional(readOnly = true)
+    public List<Member> getMembersByChapter(Long chapterId) {
+        return findActiveMembersByChapter(chapterId);
     }
 
     /**
-     * Get chapter officers (President, VP, Secretary, Treasurer, Officer)
+     * Get active members by role in a chapter - Boy Scout Rule: Clear business intent
      */
     @Transactional(readOnly = true)
-    public List<Member> getChapterOfficers(Long chapterId) {
-        return memberRepository.findChapterOfficers(chapterId);
+    public List<Member> findActiveMembersByChapterAndRole(Long chapterId, MemberRole role) {
+        return memberRepository.findActiveMembersByChapterIdAndRole(chapterId, role);
     }
 
     /**
-     * Get the chapter president
+     * Get active chapter officers - Boy Scout Rule: Clear active status 
      */
     @Transactional(readOnly = true)
-    public Optional<Member> getChapterPresident(Long chapterId) {
-        return memberRepository.findChapterPresident(chapterId);
+    public List<Member> findActiveChapterOfficers(Long chapterId) {
+        return memberRepository.findActiveChapterOfficers(chapterId);
+    }
+
+    /**
+     * Get active chapter president - Boy Scout Rule: Clear active status
+     */
+    @Transactional(readOnly = true)
+    public Optional<Member> findActiveChapterPresident(Long chapterId) {
+        return memberRepository.findActiveChapterPresident(chapterId);
     }
 
     /**
@@ -175,12 +215,13 @@ public class MemberService {
      */
     public Member updateMember(Long id, Member updatedMember) {
         Member existingMember = memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException(MemberServiceConstants.formatErrorMessage(
+                    MemberServiceConstants.MEMBER_NOT_FOUND_ERROR, id)));
 
-        // Check if email is changing and if new email already exists
+        // Check if email is changing and if new email already exists - Boy Scout Rule: Use constants
         if (!existingMember.getEmail().equals(updatedMember.getEmail())) {
-            if (memberRepository.existsByEmailAndIdNot(updatedMember.getEmail(), id)) {
-                throw new IllegalArgumentException("Member with this email already exists");
+            if (memberRepository.existsMemberByEmailAndIdNot(updatedMember.getEmail(), id)) {
+                throw new IllegalArgumentException(MemberServiceConstants.EMAIL_ALREADY_EXISTS_ERROR);
             }
         }
 
@@ -249,7 +290,7 @@ public class MemberService {
     public List<Member> searchMembers(Long chapterId, String firstName, String lastName,
             String email, MemberRole role, String major,
             String graduationYear, Boolean active) {
-        return memberRepository.findMembersByCriteria(chapterId, firstName, lastName, email,
+        return memberRepository.searchMembersByMultipleCriteria(chapterId, firstName, lastName, email,
                 role, major, graduationYear, active);
     }
 
@@ -258,7 +299,7 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public List<Member> searchMembersByName(String name) {
-        return memberRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name);
+        return memberRepository.findMembersByPartialNameMatch(name, name);
     }
 
     /**
@@ -266,7 +307,7 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public Long countActiveMembersByChapter(Long chapterId) {
-        return memberRepository.countActiveMembersByChapter(chapterId);
+        return memberRepository.countActiveMembersByChapterId(chapterId);
     }
 
     /**
@@ -274,7 +315,7 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public Long countMembersByRoleInChapter(Long chapterId, MemberRole role) {
-        return memberRepository.countMembersByRoleInChapter(chapterId, role);
+        return memberRepository.countActiveMembersByChapterIdAndRole(chapterId, role);
     }
 
     /**
@@ -296,7 +337,7 @@ public class MemberService {
      */
     public Member addMemberToChapter(Long chapterId, Member member) {
         // Check if email already exists
-        if (memberRepository.existsByEmail(member.getEmail())) {
+        if (memberRepository.existsMemberByEmail(member.getEmail())) {
             throw new IllegalArgumentException("Member with this email already exists");
         }
 
