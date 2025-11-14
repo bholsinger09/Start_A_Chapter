@@ -151,13 +151,13 @@ class MemberServiceTest {
     }
 
     @Test
-    void getMembersByRole_ShouldReturnMembersWithSpecificRole() {
+    void findActiveMembersByChapterAndRole_ShouldReturnMembersWithSpecificRole() {
         // Given
         List<Member> presidents = Arrays.asList(testMember);
-        when(memberRepository.findByChapter_IdAndRoleAndActiveTrue(1L, MemberRole.PRESIDENT)).thenReturn(presidents);
+        when(memberRepository.findActiveMembersByChapterIdAndRole(1L, MemberRole.PRESIDENT)).thenReturn(presidents);
 
         // When
-        List<Member> result = memberService.getMembersByRole(1L, MemberRole.PRESIDENT);
+        List<Member> result = memberService.findActiveMembersByChapterAndRole(1L, MemberRole.PRESIDENT);
 
         // Then
         assertThat(result).hasSize(1);
@@ -165,13 +165,13 @@ class MemberServiceTest {
     }
 
     @Test
-    void getChapterPresident_ShouldReturnPresident_WhenExists() {
+    void findActiveChapterPresident_ShouldReturnPresident_WhenExists() {
         // Given
         testMember.setRole(MemberRole.PRESIDENT);
-        when(memberRepository.findChapterPresident(1L)).thenReturn(Optional.of(testMember));
+        when(memberRepository.findActiveChapterPresident(1L)).thenReturn(Optional.of(testMember));
 
         // When
-        Optional<Member> result = memberService.getChapterPresident(1L);
+        Optional<Member> result = memberService.findActiveChapterPresident(1L);
 
         // Then
         assertThat(result).isPresent();
@@ -195,7 +195,7 @@ class MemberServiceTest {
     @Test
     void countActiveMembers_ShouldReturnCount() {
         // Given
-        when(memberRepository.countActiveMembersByChapter(1L)).thenReturn(5L);
+        when(memberRepository.countActiveMembersByChapterId(1L)).thenReturn(5L);
 
         // When
         Long result = memberService.countActiveMembersByChapter(1L);

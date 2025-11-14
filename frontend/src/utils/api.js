@@ -37,7 +37,19 @@ async function makeRequest(url, options = {}) {
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
+      let errorData;
+      const contentType = response.headers.get('content-type');
+      
+      try {
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await response.json();
+        } else {
+          errorData = await response.text();
+        }
+      } catch (parseError) {
+        errorData = `HTTP ${response.status}: ${response.statusText}`;
+      }
+      
       throw new ApiError(
         `Request failed: ${response.status} ${response.statusText}`,
         response.status,
@@ -166,6 +178,7 @@ export function handleApiError(error, defaultMessage = 'An error occurred') {
   console.error('API Error:', error);
   
   if (error instanceof ApiError) {
+    // Handle specific HTTP status codes
     if (error.status === 401) {
       return 'Authentication required. Please login.';
     }
@@ -175,9 +188,22 @@ export function handleApiError(error, defaultMessage = 'An error occurred') {
     if (error.status === 404) {
       return 'Resource not found.';
     }
+    if (error.status === 409) {
+      // Conflict - typically duplicate resource
+      if (typeof error.data === 'object' && error.data.message) {
+        return error.data.message;
+      }
+      return 'A conflict occurred. Resource already exists.';
+    }
     if (error.status >= 500) {
       return 'Server error. Please try again later.';
     }
+    
+    // Try to extract message from JSON response
+    if (typeof error.data === 'object' && error.data.message) {
+      return error.data.message;
+    }
+    
     return error.data || error.message || defaultMessage;
   }
   

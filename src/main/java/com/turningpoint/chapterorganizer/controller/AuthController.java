@@ -9,6 +9,7 @@ import com.turningpoint.chapterorganizer.exception.MemberAuthenticationException
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Profile("disabled")  // Disabled in favor of AuthRefactoredController
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(

@@ -31,7 +31,34 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
-    console.error('API Error:', error.response?.status, error.response?.data || error.message)
+    const status = error.response?.status
+    const data = error.response?.data
+    
+    console.error('API Error:', status, data || error.message)
+    
+    // Enhance error with user-friendly messages
+    if (status === 409 || status === 400) {
+      // Handle registration conflicts and validation errors
+      if (data && typeof data === 'object' && data.message) {
+        error.userMessage = data.message
+        error.message = data.message // Override axios message
+        error.userFriendly = true
+      } else if (data && typeof data === 'string') {
+        try {
+          const parsedData = JSON.parse(data)
+          if (parsedData.message) {
+            error.userMessage = parsedData.message
+            error.message = parsedData.message
+            error.userFriendly = true
+          }
+        } catch (parseError) {
+          error.userMessage = data
+          error.message = data
+          error.userFriendly = true
+        }
+      }
+    }
+    
     return Promise.reject(error)
   }
 )
