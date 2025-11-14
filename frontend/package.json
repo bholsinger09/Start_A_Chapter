@@ -15,6 +15,7 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
+    "axios": "^1.6.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "vue": "^3.5.24",

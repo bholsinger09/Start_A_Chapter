@@ -28,7 +28,7 @@ export class UserRegistrationError extends Error {
   static invalidEmailFormat(email) {
     return new UserRegistrationError(
       `Email address '${email}' is not in a valid format`,
-      'INVALID_EMAIL_FORMAT', 
+      'INVALID_EMAIL_FORMAT',
       'email'
     );
   }
@@ -76,7 +76,7 @@ export class UserAuthenticationError extends Error {
   static missingCredentials() {
     return new UserAuthenticationError(
       'Email and password are required',
-      'MISSING_CREDENTIALS'  
+      'MISSING_CREDENTIALS'
     );
   }
 
@@ -149,7 +149,7 @@ export class InputValidationError extends Error {
   static invalidPhoneFormat(phone) {
     return new InputValidationError(
       'Please enter a valid phone number',
-      'phoneNumber', 
+      'phoneNumber',
       phone
     );
   }

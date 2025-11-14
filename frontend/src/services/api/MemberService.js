@@ -285,11 +285,11 @@ export class MemberService extends BaseApiService {
 
         // Role and chapter distributions
         members.forEach(member => {
-            distributions.roleDistribution[member.role] = 
+            distributions.roleDistribution[member.role] =
                 (distributions.roleDistribution[member.role] || 0) + 1
-            
+
             const chapterName = member.chapterName
-            distributions.chapterDistribution[chapterName] = 
+            distributions.chapterDistribution[chapterName] =
                 (distributions.chapterDistribution[chapterName] || 0) + 1
 
             if (member.graduationYear) {

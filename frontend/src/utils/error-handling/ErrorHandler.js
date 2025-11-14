@@ -15,22 +15,22 @@ import {
  * Implements error boundaries and consistent error processing
  */
 export class ErrorHandler {
-  
+
   /**
    * Handles API errors by transforming them into domain-specific exceptions
    * Implements try-catch-finally first approach with proper cleanup
    */
   static async handleApiOperation(operation, cleanup = null) {
     let operationStarted = false;
-    
+
     try {
       // Write try-catch-finally first, then implement operation
       operationStarted = true;
-      
+
       // Execute the actual operation
       const result = await operation();
       return result;
-      
+
     } catch (error) {
       // Transform API errors into domain exceptions
       throw ErrorHandler.transformApiError(error);
@@ -65,16 +65,16 @@ export class ErrorHandler {
     switch (errorType) {
       case 'REGISTRATION_FAILED':
         return ErrorHandler.transformRegistrationError(errorCode, data);
-      
+
       case 'AUTHENTICATION_FAILED':
         return ErrorHandler.transformAuthenticationError(errorCode, data);
-      
+
       case 'VALIDATION_FAILED':
         return ErrorHandler.transformValidationError(data);
-      
+
       case 'CHAPTER_OPERATION_FAILED':
         return ErrorHandler.transformChapterError(errorCode, data);
-      
+
       default:
         return ErrorHandler.transformGenericError(status, data);
     }
@@ -90,23 +90,23 @@ export class ErrorHandler {
         const emailMatch = data.message?.match(/email '([^']+)'/);
         const email = emailMatch ? emailMatch[1] : 'this email';
         return UserRegistrationError.duplicateEmail(email);
-      
+
       case 'INVALID_EMAIL_FORMAT':
         const invalidEmailMatch = data.message?.match(/Email address '([^']+)'/);
         const invalidEmail = invalidEmailMatch ? invalidEmailMatch[1] : 'invalid email';
         return UserRegistrationError.invalidEmailFormat(invalidEmail);
-      
+
       case 'WEAK_PASSWORD':
         return UserRegistrationError.weakPassword();
-      
+
       case 'MISSING_REQUIRED_FIELD':
         const fieldMatch = data.message?.match(/^(.+) is required/);
         const fieldName = fieldMatch ? fieldMatch[1] : 'Required field';
         return UserRegistrationError.missingRequiredField(fieldName);
-      
+
       case 'CHAPTER_NOT_FOUND':
         return UserRegistrationError.chapterNotFound('selected chapter');
-      
+
       default:
         return new UserRegistrationError(
           data.message || 'Registration failed',
@@ -122,16 +122,16 @@ export class ErrorHandler {
     switch (errorCode) {
       case 'AUTH_FAILED':
         return UserAuthenticationError.invalidCredentials();
-      
+
       case 'MISSING_CREDENTIALS':
         return UserAuthenticationError.missingCredentials();
-      
+
       case 'ACCOUNT_DISABLED':
         return UserAuthenticationError.accountDisabled();
-      
+
       case 'TOO_MANY_ATTEMPTS':
         return UserAuthenticationError.tooManyAttempts();
-      
+
       default:
         return UserAuthenticationError.invalidCredentials(); // Security: don't expose specific reasons
     }
@@ -144,7 +144,7 @@ export class ErrorHandler {
     const fieldName = data.field || 'unknown field';
     const invalidValue = data.invalidValue;
     const message = data.message || 'Validation failed';
-    
+
     return new InputValidationError(message, fieldName, invalidValue);
   }
 
@@ -161,7 +161,7 @@ export class ErrorHandler {
    */
   static transformGenericError(status, data) {
     const message = data?.message || 'An unexpected error occurred';
-    
+
     switch (status) {
       case 400:
         return new InputValidationError(message, 'unknown', null);
@@ -197,7 +197,7 @@ export class ErrorHandler {
       userAgent: navigator.userAgent,
       url: window.location.href
     };
-    
+
     // In production, send to monitoring service
     console.error('Error logged:', logEntry);
   }
@@ -223,20 +223,20 @@ export class ErrorHandler {
       'DataFetchError',
       'NetworkError'
     ];
-    
+
     const nonRetryableReasons = [
       'DUPLICATE_EMAIL',
-      'INVALID_EMAIL_FORMAT', 
+      'INVALID_EMAIL_FORMAT',
       'WEAK_PASSWORD',
       'MISSING_REQUIRED_FIELD'
     ];
-    
+
     if (nonRetryableReasons.includes(error.reason)) {
       return false;
     }
-    
-    return retryableErrors.includes(error.name) || 
-           error.name === 'Error'; // Generic system errors are retryable
+
+    return retryableErrors.includes(error.name) ||
+      error.name === 'Error'; // Generic system errors are retryable
   }
 }
 
@@ -246,45 +246,45 @@ export class ErrorHandler {
  */
 export function useErrorHandler() {
   const handleAsyncOperation = async (operation, options = {}) => {
-    const { 
-      loadingRef = null, 
-      errorRef = null, 
+    const {
+      loadingRef = null,
+      errorRef = null,
       onSuccess = null,
       onError = null,
       cleanup = null
     } = options;
-    
+
     // Set loading state
     if (loadingRef) {
       loadingRef.value = true;
     }
-    
+
     try {
       // Clear previous errors
       if (errorRef) {
         errorRef.value = '';
       }
-      
+
       // Execute operation with error handling
       const result = await ErrorHandler.handleApiOperation(operation, cleanup);
-      
+
       // Handle success
       if (onSuccess) {
         onSuccess(result);
       }
-      
+
       return result;
-      
+
     } catch (error) {
       // Log error for monitoring
       ErrorHandler.logError(error, 'Vue Component Operation');
-      
+
       // Update error display
       if (errorRef) {
         const errorDisplay = ErrorHandler.createErrorDisplay(error);
         errorRef.value = errorDisplay.message;
       }
-      
+
       // Custom error handling
       if (onError) {
         onError(error);
@@ -292,7 +292,7 @@ export function useErrorHandler() {
         // Re-throw if no custom handler
         throw error;
       }
-      
+
     } finally {
       // Always clear loading state
       if (loadingRef) {

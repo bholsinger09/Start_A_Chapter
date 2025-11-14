@@ -77,7 +77,7 @@ export const MemberUtils = {
 
         const term = searchTerm.toLowerCase()
         const fullName = this.getFullName(memberData).toLowerCase()
-        
+
         return fullName.includes(term) ||
             memberData.email?.toLowerCase().includes(term) ||
             memberData.username?.toLowerCase().includes(term) ||
@@ -89,7 +89,7 @@ export const MemberUtils = {
      */
     generateAvatarColor(memberData) {
         if (!memberData) return '#007bff'
-        
+
         const colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1']
         const fullName = this.getFullName(memberData)
         const hash = fullName.split('').reduce((a, b) => {
@@ -133,7 +133,7 @@ export const ChapterUtils = {
      */
     getLeadershipCount(chapterData) {
         if (!chapterData?.members) return 0
-        return chapterData.members.filter(m => 
+        return chapterData.members.filter(m =>
             MemberUtils.isActive(m) && MemberUtils.isLeader(m)
         ).length
     },
@@ -142,7 +142,7 @@ export const ChapterUtils = {
      * Check if chapter has president
      */
     hasPresident(chapterData) {
-        return chapterData?.members?.some(m => 
+        return chapterData?.members?.some(m =>
             MemberUtils.isActive(m) && MemberUtils.hasRole(m, USER_ROLES.PRESIDENT)
         ) || false
     },
@@ -176,7 +176,7 @@ export const ChapterUtils = {
         if (!chapterData) return false
         if (!searchTerm && !stateFilter) return true
 
-        const matchesText = !searchTerm || 
+        const matchesText = !searchTerm ||
             chapterData.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             chapterData.universityName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             chapterData.city?.toLowerCase().includes(searchTerm.toLowerCase())

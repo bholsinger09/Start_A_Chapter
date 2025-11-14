@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { 
-  API_CONFIG, 
-  USER_ROLES, 
+import {
+  API_CONFIG,
+  USER_ROLES,
   ROLE_LABELS,
   API_ENDPOINTS,
   UI_CONSTANTS,
@@ -83,7 +83,7 @@ describe('Application Constants', () => {
       Object.values(ROLE_LABELS).forEach(label => {
         // Should start with capital letter
         expect(label[0]).toBe(label[0].toUpperCase())
-        
+
         // Should not be all caps
         expect(label).not.toBe(label.toUpperCase())
       })
@@ -138,7 +138,7 @@ describe('Application Constants', () => {
     it('should have error messages defined', () => {
       if (ERROR_MESSAGES) {
         expect(typeof ERROR_MESSAGES).toBe('object')
-        
+
         // Should have network error message
         if (ERROR_MESSAGES.NETWORK_ERROR) {
           expect(typeof ERROR_MESSAGES.NETWORK_ERROR).toBe('string')
@@ -153,7 +153,7 @@ describe('Application Constants', () => {
           if (typeof message === 'string') {
             // Should not contain technical jargon
             expect(message).not.toMatch(/undefined|null|NaN/i)
-            
+
             // Should be properly capitalized
             expect(message[0]).toBe(message[0].toUpperCase())
           }
@@ -206,7 +206,7 @@ describe('Application Constants', () => {
     it('should maintain consistency between roles and labels', () => {
       const roleCount = Object.keys(USER_ROLES).length
       const labelCount = Object.keys(ROLE_LABELS).length
-      
+
       // Should have equal number of roles and labels
       expect(labelCount).toBeGreaterThanOrEqual(roleCount)
     })
@@ -220,11 +220,11 @@ describe('Application Constants', () => {
   describe('Constant Integrity', () => {
     it('should maintain consistent role values', () => {
       const originalRole = USER_ROLES.PRESIDENT
-      
+
       // Test that we can detect if constants change
       expect(originalRole).toBe('PRESIDENT')
       expect(USER_ROLES.PRESIDENT).toBe('PRESIDENT')
-      
+
       // If constants were modified, this would fail
       expect(USER_ROLES.PRESIDENT).toBe(originalRole)
     })
@@ -233,7 +233,7 @@ describe('Application Constants', () => {
       expect(Object.keys(USER_ROLES)).toContain('PRESIDENT')
       expect(Object.keys(USER_ROLES)).toContain('MEMBER')
       expect(Object.keys(USER_ROLES)).toContain('ADMIN')
-      
+
       // Should have all expected roles
       const expectedRoles = ['PRESIDENT', 'VICE_PRESIDENT', 'TREASURER', 'SECRETARY', 'MEMBER', 'ADMIN']
       expectedRoles.forEach(role => {

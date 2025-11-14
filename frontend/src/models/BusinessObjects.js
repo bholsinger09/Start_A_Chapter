@@ -138,13 +138,13 @@ export class ChapterObject {
 
     getLeadershipCount() {
         if (!this.#data.members) return 0
-        return this.#data.members.filter(m => 
+        return this.#data.members.filter(m =>
             m.active && LEADERSHIP_ROLES.includes(m.role)
         ).length
     }
 
     hasPresident() {
-        return this.#data.members?.some(m => 
+        return this.#data.members?.some(m =>
             m.active && m.role === USER_ROLES.PRESIDENT
         ) || false
     }
@@ -165,7 +165,7 @@ export class ChapterObject {
     matchesSearch(searchTerm, stateFilter = null) {
         if (!searchTerm && !stateFilter) return true
 
-        const matchesText = !searchTerm || 
+        const matchesText = !searchTerm ||
             this.#data.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             this.#data.universityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             this.#data.city.toLowerCase().includes(searchTerm.toLowerCase())

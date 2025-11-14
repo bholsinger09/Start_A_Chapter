@@ -33,9 +33,9 @@ api.interceptors.response.use(
   (error) => {
     const status = error.response?.status
     const data = error.response?.data
-    
+
     console.error('API Error:', status, data || error.message)
-    
+
     // Enhance error with user-friendly messages
     if (status === 409 || status === 400) {
       // Handle registration conflicts and validation errors
@@ -58,7 +58,7 @@ api.interceptors.response.use(
         }
       }
     }
-    
+
     return Promise.reject(error)
   }
 )
